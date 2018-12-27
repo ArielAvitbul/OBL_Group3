@@ -70,8 +70,16 @@ public class ClientConsole extends Application implements CommonIF
   {
 	  if (message instanceof Student)
 		  student=(Student) message;
-	  else if (message instanceof String)
-		  newAlert(AlertType.INFORMATION,null,null,(String)message);
+	/*  else if (message instanceof MyData) {
+		  MyData data = (MyData)message;
+		  switch (data.getAction()) {
+		  case "student_id_not_found":
+			  try {
+			  newAlert(AlertType.ERROR, null, "Student ID not found", (String)data.getData("message"));
+			  } catch (Exception e) {e.printStackTrace();}
+			  break;
+		  }
+	  }*/
   }
 
   
@@ -113,5 +121,11 @@ public class ClientConsole extends Application implements CommonIF
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	@Override
+		public void stop() throws Exception {
+			super.stop();
+			client.closeConnection();
+		}
 }
 //End of ConsoleChat class

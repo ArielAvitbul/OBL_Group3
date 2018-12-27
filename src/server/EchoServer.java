@@ -76,9 +76,9 @@ public class EchoServer extends AbstractServer
 	  					}
 	  				}
 	  				if (!rs.isClosed()) {
-	  					MyData errorData = new MyData("student_id_not_found");
-	  					errorData.add("message", "ID was not found in our database.");
-	  				client.sendToClient(errorData);
+	  		//			MyData errorData = new MyData("student_id_not_found");
+	  		//			errorData.add("message", "ID was not found in our database.");
+	  		//		client.sendToClient(errorData);
 	  				rs.close();
 	  					}
 	  				break;
@@ -138,7 +138,7 @@ public class EchoServer extends AbstractServer
 		System.out.println("SQL Succesfully connected.");
       sv.listen(); //Start listening for connections
     } 
-    catch (SQLException e) {}
+    catch (SQLException e) {e.printStackTrace();}
     catch (IOException e) 
     {
       System.out.println("ERROR - Could not listen for clients!");
