@@ -84,7 +84,7 @@ public class ClientConsole extends Application implements CommonIF
 	public void start(Stage primaryStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("PrototypeGUI.fxml"));
-		      client= new ChatClient(IP = getParameters().getRaw().get(0), port, this);
+		      client= new ChatClient(IP = getParameters().getRaw().get(0), port = Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new MainController(this));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
@@ -98,7 +98,7 @@ public class ClientConsole extends Application implements CommonIF
 	                + " Terminating client.");
 	      System.exit(1);
 	    } catch (IndexOutOfBoundsException e) {
-			newAlert(AlertType.ERROR, null, "No IP", "Please specify IP in first argument");
+			newAlert(AlertType.ERROR, null, "No IP", "Please specify IP & Port in this order");
 			System.exit(1);
 		}
 		

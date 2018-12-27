@@ -12,16 +12,14 @@ public class MyDB {
 	private static String port = "3306";
 	private static String username = "root";
 	private static String password = "arielsql";
-	 public static Connection getConnection() throws Exception{
-	  try {
+	 public static Connection getConnection(String user, String pw) throws SQLException{
+		 username = user;
+		 password = pw;
+		 try {
 	   Class.forName("com.mysql.jdbc.Driver");
+		 } catch (ClassNotFoundException e) {e.printStackTrace();}
 	   Connection conn = DriverManager.getConnection("jdbc:mysql://"+IP+":"+port+"/"+schema,username,password);
 	   System.out.println("Connected");
 	   return conn;
-	  } catch(SQLException e) {e.printStackTrace();
-	  }
-	  
-	  
-	  return null;
 	 }
 }

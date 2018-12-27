@@ -1,16 +1,17 @@
 package server;
-
 // This file contains material supporting section 3.7 of the textbook:
 // "Object Oriented Software Engineering" and is issued under the open-source
 // license found at www.lloseng.com 
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 
+import application.MyData;
+import client.Student;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
@@ -58,51 +59,47 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object o, ConnectionToClient client)
   {
-	    try {
-			handleObjects(o);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+	  try 
+		{
+	  if (o instanceof MyData) { // verify the object was an 
+	  		MyData data = (MyData) o;
+	  		    switch (data.getAction()) {
+	  		    case "view_student_name":
+	  		    	Statement stmt = conn.createStatement();
+	  				ResultSet rs = stmt.executeQuery("SELECT * FROM Student");
+	  				while (!rs.isClosed() && rs.next()) {
+	  					if (rs.getString("StudentID").equals(data.getData("student_id"))) {
+	  						Student st = new Student(rs.getString("StudentID"),rs.getString("StudentName"),rs.getString("StatusMembership"),
+	  								rs.getString("Operation"),rs.getBoolean("Freeze"));
+	  						client.sendToClient(st);
+	  						rs.close();
+	  					}
+	  				}
+	  				if (!rs.isClosed()) {
+	  					MyData errorData = new MyData("student_id_not_found");
+	  					errorData.add("message", "ID was not found in our database.");
+	  				client.sendToClient(errorData);
+	  				rs.close();
+	  					}
+	  				break;
+	  		    case "update_statusmembership":
+	  		    	Student st = (Student)data.getData("student");
+	  		    	PreparedStatement que = conn.prepareStatement("update Student set StatusMembership=? WHERE StudentID=?");
+					que.setString(1, (String)data.getData("selected_status")); // statusmembership input from box 
+					que.setString(2,st.getId()); // studentid
+					que.executeUpdate();
+					st.setStatusMembership((String)data.getData("selected_status"));
+					client.sendToClient(st);
+	  				que.close();
+	  		    }
+	  		    }
+		} catch (SQLException e) {e.printStackTrace();}
+		catch (IOException e) {
+			System.out.println("Failed to send to client...");
 			e.printStackTrace();
-		}
-	   // this.sendToAllClients(o);
+			}
 	  }
 
-    /**
-     * meh
-     */
-  private void handleObjects(Object o) throws Exception {
-  	if (o instanceof ArrayList) { // verify the object was an ArrayList
-  		System.out.println(o);
-  		if (((ArrayList<String>) o).get(0).equals("view_student_name")) {
-  			try 
-  			{
-  				Statement stmt = conn.createStatement();
-  				ResultSet rs = stmt.executeQuery("SELECT StudentName,StudentID FROM Student");
-  				while (!rs.isClosed() && rs.next()) {
-  					if (rs.getString("StudentID").equals(((ArrayList<String>) o).get(1))) {
-  						sendToAllClients(rs.getString("StudentName"));
-  						rs.close();
-  					}
-  				}
-  				if (!rs.isClosed()) {
-  				sendToAllClients("No result.");
-  				rs.close();
-  				}
-  				//stmt.executeUpdate("UPDATE course SET semestr=\"W08\" WHERE num=61309");
-  			} catch (SQLException e) {e.printStackTrace();}
-  		} else if (((ArrayList<String>) o).get(0).equals("update_statusmembership")) {
-  			try 
-  			{
-  				PreparedStatement que = conn.prepareStatement("update Student set StatusMembership=? WHERE StudentID=?");
-				que.setString(1, ((ArrayList<String>) o).get(2)); // statusmembership input from box 
-				que.setString(2,((ArrayList<String>) o).get(1)); // studentid found by view
-				que.executeUpdate();
-  				que.close();
-  				//stmt.executeUpdate("UPDATE course SET semestr=\"W08\" WHERE num=61309");
-  			} catch (SQLException e) {e.printStackTrace();}
-  		}
-  	}
-  }
   /**
    * This method overrides the one in the superclass.  Called
    * when the server starts listening for connections.
@@ -134,19 +131,21 @@ public class EchoServer extends AbstractServer
    */
   public static void main(String[] args) 
   {
-    EchoServer sv = new EchoServer(PORT);
+    
     try {
-		conn = MyDB.getConnection();
+    	EchoServer sv = new EchoServer(Integer.parseInt(args[0]));
+		conn = MyDB.getConnection(args[1],args[2]);
 		System.out.println("SQL Succesfully connected.");
-	} catch (Exception e) {e.printStackTrace();}
-    try 
-    {
       sv.listen(); //Start listening for connections
     } 
-    catch (Exception ex) 
+    catch (SQLException e) {}
+    catch (IOException e) 
     {
       System.out.println("ERROR - Could not listen for clients!");
-    }
+    } catch (IndexOutOfBoundsException e) {
+		System.out.println("Enter: port, username (sql), password (sql) in such order.");
+		System.exit(1);
+	}
   }
 }
 //End of EchoServer class
