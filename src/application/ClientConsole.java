@@ -3,9 +3,9 @@ package application;
 import java.io.IOException;
 import java.util.Optional;
 
-import client.ChatClient;
-import client.Student;
+import common.ChatClient;
 import common.CommonIF;
+import common.Student;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -98,7 +98,7 @@ public class ClientConsole extends Application implements CommonIF
 	                + " Terminating client.");
 	      System.exit(1);
 	    } catch (IndexOutOfBoundsException e) {
-			newAlert(AlertType.ERROR, null, "No IP", "Please specify IP & Port in this order");
+			newAlert(AlertType.ERROR, null, "No IP/Port", "Please specify IP & Port in this order");
 			System.exit(1);
 		}
 		

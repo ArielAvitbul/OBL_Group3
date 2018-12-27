@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import application.MyData;
-import client.Student;
+import common.Student;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 

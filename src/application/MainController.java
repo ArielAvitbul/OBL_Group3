@@ -3,7 +3,7 @@ package application;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import client.Student;
+import common.Student;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +23,7 @@ public class MainController {
     @FXML
     void update(ActionEvent event) throws Exception {
     	if (cc.getStudent()==null) {
-    		cc.newAlert(AlertType.ERROR, null, "No student to update", "Please view a student first");
+    		ClientConsole.newAlert(AlertType.ERROR, null, "No student to update", "Please view a student first");
     	}
     	data = new MyData("update_statusmembership");
     	data.add("student", cc.getStudent());
