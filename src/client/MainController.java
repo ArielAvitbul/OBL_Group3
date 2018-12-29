@@ -1,8 +1,10 @@
-package application;
+package client;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import application.ClientConsole;
+import application.MyData;
 import common.Student;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;

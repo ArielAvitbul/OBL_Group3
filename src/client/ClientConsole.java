@@ -1,8 +1,9 @@
-package application;
+package client;
 
 import java.io.IOException;
 import java.util.Optional;
 
+import application.MainController;
 import common.ChatClient;
 import common.CommonIF;
 import common.Student;
@@ -27,11 +28,6 @@ import javafx.stage.Stage;
  */
 public class ClientConsole extends Application implements CommonIF 
 {
-  //Class variables *************************************************
-  
-	private static String IP = "localhost";
-	private static int port = 4407;
-	
   
   //Instance variables **********************************************
   
@@ -92,7 +88,7 @@ public class ClientConsole extends Application implements CommonIF
 	public void start(Stage primaryStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("PrototypeGUI.fxml"));
-		      client= new ChatClient(IP = getParameters().getRaw().get(0), port = Integer.parseInt(getParameters().getRaw().get(1)), this);
+		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new MainController(this));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
