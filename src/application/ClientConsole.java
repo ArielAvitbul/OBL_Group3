@@ -8,11 +8,12 @@ import common.CommonIF;
 import common.Student;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -28,12 +29,6 @@ import javafx.stage.Stage;
 public class ClientConsole extends Application implements CommonIF 
 {
   //Class variables *************************************************
-  
-	private static String IP = "localhost";
-	private static int port = 4407;
-	
-  
-  //Instance variables **********************************************
   
   /**
    * The instance of the client that created this ConsoleChat.
@@ -89,12 +84,12 @@ public class ClientConsole extends Application implements CommonIF
    * This method is responsible for the creation of the Client GUI.
    */
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) {// bottom size 900 460
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("PrototypeGUI.fxml"));
-		      client= new ChatClient(IP = getParameters().getRaw().get(0), port = Integer.parseInt(getParameters().getRaw().get(1)), this);
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
+		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new MainController(this));
-			Parent root = loader.load();
+			BorderPane root = loader.load();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -102,14 +97,20 @@ public class ClientConsole extends Application implements CommonIF
 		}
 		catch(IOException exception) 
 	    {
-	      System.out.println("Error: Can't setup connection!"
-	                + " Terminating client.");
+	      System.out.println("Error: Can't setup connection! Terminating client.");
+	      exception.printStackTrace();
 	      System.exit(1);
 	    } catch (IndexOutOfBoundsException e) {
 			newAlert(AlertType.ERROR, null, "No IP/Port", "Please specify IP & Port in this order");
 			System.exit(1);
 		}
 		
+	}
+	public void addBottom(BorderPane bp, String fxml, Object controller) throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml+".fxml"));
+		loader.setController(controller);
+		AnchorPane root = loader.load();
+		bp.setCenter(root);
 	}
 	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);

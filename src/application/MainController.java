@@ -1,17 +1,12 @@
 package application;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.io.IOException;
 
-import common.Student;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 
 public class MainController {
 	private ClientConsole cc;
@@ -19,7 +14,7 @@ public class MainController {
 	public MainController(ClientConsole cc) {
 		this.cc = cc;
 	}
-
+/*
     @FXML
     void update(ActionEvent event) throws Exception {
     	if (cc.getStudent()!=null) {
@@ -44,24 +39,21 @@ public class MainController {
     	 else
     		 namedisplay.setText("No result");
     	 namedisplay.setVisible(true);
-    }
-    @FXML
-    private TextField studentid;
-    @FXML
-    private Button view;
-    
-    @FXML
-    private ResourceBundle resources;
-    @FXML
-    private Label namedisplay;
-    @FXML
-    private URL location;
-    @FXML
-    private ComboBox<String> box;
-    @FXML
-    void initialize() {
-    	box.setItems(FXCollections.observableArrayList("Locked" ,"Frozen" ,"Active" ,"NotRegistered"));
-    	box.getSelectionModel().selectFirst();
-    }
+    }*/
+	 @FXML
+	    private Button search_book_button;
+
+	    @FXML
+	    void menu_search(ActionEvent event) {
+	    	SearchController controller = new SearchController();
+	    	BorderPane bp = (BorderPane) ((Node)event.getSource()).getScene().getRoot();
+	    	try {
+				cc.addBottom(bp, "search", controller);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	
+
 }
 
