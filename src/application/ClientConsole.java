@@ -1,5 +1,6 @@
 package application;
 
+
 import java.io.IOException;
 import java.util.Optional;
 
@@ -120,6 +121,7 @@ public class ClientConsole extends Application implements CommonIF
 			return alert.showAndWait();
 	}
 	public static void main(String[] args) {
+		
 		launch(args);
 	}
 	

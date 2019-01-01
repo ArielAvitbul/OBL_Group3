@@ -65,6 +65,7 @@ public class EchoServer extends AbstractServer
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
 	  		    case "view_student_name":
+	  		    	MyDB.insertToDB("student" );
 	  		    	Statement stmt = conn.createStatement();
 	  				ResultSet rs = stmt.executeQuery("SELECT * FROM Student");
 	  				while (!rs.isClosed() && rs.next()) {
