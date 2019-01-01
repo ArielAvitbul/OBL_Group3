@@ -4,11 +4,9 @@ package server;
 // license found at www.lloseng.com 
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import application.MyData;
 import common.Student;
@@ -32,8 +30,7 @@ public class EchoServer extends AbstractServer
   /**
    * The default port to listen on.
    */
-	final public static int PORT = 4407;
-	private static Connection conn;
+	private MyDB db;
   
   //Constructors ****************************************************
   
@@ -45,6 +42,7 @@ public class EchoServer extends AbstractServer
   public EchoServer(int port) 
   {
     super(port);
+	db = new MyDB();
   }
 
   
@@ -54,6 +52,7 @@ public class EchoServer extends AbstractServer
    * This method handles any messages received from the client.
    *
    * @param msg The message received from the client.
+   * 
    * @param client The connection from which the message originated.
    */
   public void handleMessageFromClient
@@ -65,9 +64,7 @@ public class EchoServer extends AbstractServer
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
 	  		    case "view_student_name":
-	  		    	MyDB.insertToDB("student" );
-	  		    	Statement stmt = conn.createStatement();
-	  				ResultSet rs = stmt.executeQuery("SELECT * FROM Student");
+	  				ResultSet rs = db.select("SELECT * FROM Student");
 	  				while (!rs.isClosed() && rs.next()) {
 	  					if (rs.getString("StudentID").equals(data.getData("student_id"))) {
 	  						Student st = new Student(rs.getString("StudentID"),rs.getString("StudentName"),rs.getString("StatusMembership"),
@@ -85,13 +82,15 @@ public class EchoServer extends AbstractServer
 	  				break;
 	  		    case "update_statusmembership":
 	  		    	Student st = (Student)data.getData("student");
-	  		    	PreparedStatement que = conn.prepareStatement("update Student set StatusMembership=? WHERE StudentID=?");
+	  		    	PreparedStatement que = db.update("update Student set StatusMembership=? WHERE StudentID=?");
 					que.setString(1, (String)data.getData("selected_status")); // statusmembership input from box 
 					que.setString(2,st.getId()); // studentid
 					que.executeUpdate();
 					st.setStatusMembership((String)data.getData("selected_status"));
 					client.sendToClient(st);
 	  				que.close();
+	  				default:
+	  					client.sendToClient(o);
 	  		    }
 	  		    }
 		} catch (SQLException e) {e.printStackTrace();}
@@ -135,16 +134,13 @@ public class EchoServer extends AbstractServer
     
     try {
     	EchoServer sv = new EchoServer(Integer.parseInt(args[0]));
-		conn = MyDB.getConnection(args[1],args[2]);
-		System.out.println("SQL Succesfully connected.");
       sv.listen(); //Start listening for connections
     } 
-    catch (SQLException e) {e.printStackTrace();}
     catch (IOException e) 
     {
       System.out.println("ERROR - Could not listen for clients!");
     } catch (IndexOutOfBoundsException e) {
-		System.out.println("Enter: port, username (sql), password (sql) in such order.");
+		System.out.println("Enter port.");
 		System.exit(1);
 	}
   }

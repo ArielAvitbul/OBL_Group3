@@ -9,7 +9,7 @@ public class MyData implements Serializable{
 	public MyData(String datatype) {
 		this.action=datatype;
 	}
-	private HashMap<String,Object> getData() {
+	public HashMap<String,Object> getData() {
 		if (this.data==null)
 			this.data=new HashMap<>();
 		return data;

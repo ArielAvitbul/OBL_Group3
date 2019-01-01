@@ -63,18 +63,9 @@ public class ClientConsole extends Application implements CommonIF
   @Override
   public void handle(Object message)
   {
-	  if (message instanceof Student)
-		  student=(Student) message;
-	/*  else if (message instanceof MyData) {
-		  MyData data = (MyData)message;
-		  switch (data.getAction()) {
-		  case "student_id_not_found":
-			  try {
-			  newAlert(AlertType.ERROR, null, "Student ID not found", (String)data.getData("message"));
-			  } catch (Exception e) {e.printStackTrace();}
-			  break;
-		  }
-	  }*/
+	  MyData data = (MyData) message;
+		  System.out.println("Client received: "+ data.getAction() +": "+ data.getData());
+		  // TODO: work on client's response to server messages.
   }
 
   
@@ -88,7 +79,7 @@ public class ClientConsole extends Application implements CommonIF
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
 		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
-			loader.setController(new MainController(this));
+			loader.setController(new ReaderController(this));
 			BorderPane root = loader.load();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());

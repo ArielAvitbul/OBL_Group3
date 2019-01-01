@@ -1,13 +1,15 @@
 package application;
 
-import java.sql.SQLException;
+import java.io.IOException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 
 public class ReaderController {
 	private ClientConsole cc;
@@ -15,15 +17,29 @@ public class ReaderController {
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
-	
+    @FXML
+    private TextField loginPassField;
+
     @FXML
     private Button btnLogin;
+
+    @FXML
+    private Button search_book_button;
+
     @FXML
     private TextField loginIdField;
     @FXML
-    private TextField loginPassField;
-    
-    private void submitLogin (ActionEvent event) throws SQLException
+    void menu_search(ActionEvent event) {
+    	SearchController controller = new SearchController();
+    	BorderPane bp = (BorderPane) ((Node)event.getSource()).getScene().getRoot();
+    	try {
+			cc.addBottom(bp, "search", controller);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    @FXML
+    private void submitLogin (ActionEvent event)
     {
     	if(isValidLoginFields())
     	{
