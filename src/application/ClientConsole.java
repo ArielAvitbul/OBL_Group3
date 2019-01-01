@@ -3,9 +3,9 @@ package application;
 import java.io.IOException;
 import java.util.Optional;
 
-import client.ChatClient;
-import client.Student;
+import common.ChatClient;
 import common.CommonIF;
+import common.Student;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -70,8 +70,16 @@ public class ClientConsole extends Application implements CommonIF
   {
 	  if (message instanceof Student)
 		  student=(Student) message;
-	  else if (message instanceof String)
-		  newAlert(AlertType.INFORMATION,null,null,(String)message);
+	/*  else if (message instanceof MyData) {
+		  MyData data = (MyData)message;
+		  switch (data.getAction()) {
+		  case "student_id_not_found":
+			  try {
+			  newAlert(AlertType.ERROR, null, "Student ID not found", (String)data.getData("message"));
+			  } catch (Exception e) {e.printStackTrace();}
+			  break;
+		  }
+	  }*/
   }
 
   
@@ -84,7 +92,7 @@ public class ClientConsole extends Application implements CommonIF
 	public void start(Stage primaryStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("PrototypeGUI.fxml"));
-		      client= new ChatClient(IP = getParameters().getRaw().get(0), port, this);
+		      client= new ChatClient(IP = getParameters().getRaw().get(0), port = Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new MainController(this));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
@@ -98,7 +106,7 @@ public class ClientConsole extends Application implements CommonIF
 	                + " Terminating client.");
 	      System.exit(1);
 	    } catch (IndexOutOfBoundsException e) {
-			newAlert(AlertType.ERROR, null, "No IP", "Please specify IP in first argument");
+			newAlert(AlertType.ERROR, null, "No IP/Port", "Please specify IP & Port in this order");
 			System.exit(1);
 		}
 		
@@ -113,5 +121,11 @@ public class ClientConsole extends Application implements CommonIF
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
+	@Override
+		public void stop() throws Exception {
+			super.stop();
+			client.closeConnection();
+		}
 }
 //End of ConsoleChat class
