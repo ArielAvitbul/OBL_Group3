@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <AnchorPane prefHeight="240.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/top.jpg" />
+               </image>
+            </ImageView>
+            <Button fx:id="search_book_button" layoutX="402.0" layoutY="192.0" mnemonicParsing="false" onAction="#menu_search" opacity="0.0" prefHeight="47.0" prefWidth="135.0" text="SEARCH BOOK" />
+         </children>
+      </AnchorPane>
+   </top>
+</BorderPane>

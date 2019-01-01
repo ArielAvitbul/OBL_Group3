@@ -2,11 +2,10 @@
 // "Object Oriented Software Engineering" and is issued under the open-source
 // license found at www.lloseng.com 
 
-package client;
+package common;
 
 import java.io.IOException;
 
-import common.CommonIF;
 import ocsf.client.AbstractClient;
 
 /**
@@ -20,6 +19,7 @@ import ocsf.client.AbstractClient;
  */
 public class ChatClient extends AbstractClient
 {
+	final private int delay=3;
   //Instance variables **********************************************
   
   /**
@@ -71,7 +71,7 @@ public class ChatClient extends AbstractClient
     try
     {
     	sendToServer(o);
-    	wait(5000); // if 5 seconds passed and wasn't awakened : nothing came back from the server
+    	wait(delay*1000); // if 5 seconds passed and wasn't awakened : nothing came back from the server
     }
     catch(Exception e)
     {
