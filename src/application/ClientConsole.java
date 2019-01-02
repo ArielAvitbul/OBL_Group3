@@ -80,7 +80,7 @@ public class ClientConsole extends Application implements CommonIF
 	public void start(Stage primaryStage) {// bottom size 900 460
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
-		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
+		    client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new ReaderController(this));
 			BorderPane root = loader.load();
 			Scene scene = new Scene(root);

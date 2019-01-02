@@ -20,6 +20,9 @@ public class MyData implements Serializable{
 	public Object getData(String datatype) {
 		return getData().get(datatype);
 	}
+	public void setAction(String action) {
+		this.action = action;
+	}
 	public String getAction() {
 		return action;
 	}
