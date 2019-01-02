@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.util.Optional;
 
+import application.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
 import common.Student;
@@ -51,6 +52,7 @@ public class ClientConsole extends Application implements CommonIF
   }
   public void send(Object o) throws InterruptedException 
   {
+	  
         client.handleMessageFromClientUI(o);
   }
 
@@ -97,7 +99,7 @@ public class ClientConsole extends Application implements CommonIF
 		}
 		
 	}
-	public void addBottom(BorderPane bp, String fxml, Object controller) throws IOException {
+	public void showBottom(BorderPane bp, String fxml, Object controller) throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml+".fxml"));
 		loader.setController(controller);
 		AnchorPane root = loader.load();

@@ -22,25 +22,12 @@ public class MyDB {
 	catch (SQLException e) {e.printStackTrace();System.exit(1);}
 	}
 	
-	public ResultSet select(String query) {
-		try {
-		Statement stmt = conn.createStatement();
-			return stmt.executeQuery(query);
-		} catch (SQLException e) {
-			System.out.println("Failed to SELECT from Database");
-			e.printStackTrace();
-		}
-		return null;
+	public ResultSet select(String query) throws SQLException {
+		return conn.createStatement().executeQuery(query);
 	}
 	
-	public PreparedStatement update(String query) {
-		 try {
+	public PreparedStatement update(String query) throws SQLException {
 			return conn.prepareStatement(query);
-		} catch (SQLException e) {
-			System.out.println("Failed to UPDATE Database");
-			e.printStackTrace();
-		}
-		 return null;
 	}
 	 
 }

@@ -31,6 +31,7 @@ public class EchoServer extends AbstractServer
    * The default port to listen on.
    */
 	private MyDB db;
+	private ReaderServerController readerCont;
   
   //Constructors ****************************************************
   
@@ -43,6 +44,7 @@ public class EchoServer extends AbstractServer
   {
     super(port);
 	db = new MyDB();
+	readerCont = new ReaderServerController();
   }
 
   
@@ -60,25 +62,10 @@ public class EchoServer extends AbstractServer
   {
 	  try 
 		{
-	  if (o instanceof MyData) { // verify the object was an 
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
-	  		    case "view_student_name":
-	  				ResultSet rs = db.select("SELECT * FROM Student");
-	  				while (!rs.isClosed() && rs.next()) {
-	  					if (rs.getString("StudentID").equals(data.getData("student_id"))) {
-	  						Student st = new Student(rs.getString("StudentID"),rs.getString("StudentName"),rs.getString("StatusMembership"),
-	  								rs.getString("Operation"),rs.getBoolean("Freeze"));
-	  						client.sendToClient(st);
-	  						rs.close();
-	  					}
-	  				}
-	  				if (!rs.isClosed()) {
-	  		//			MyData errorData = new MyData("student_id_not_found");
-	  		//			errorData.add("message", "ID was not found in our database.");
-	  		//		client.sendToClient(errorData);
-	  				rs.close();
-	  					}
+	  		    case "search_book":
+	  				client.sendToClient(readerCont.search(db,data));
 	  				break;
 	  		    case "update_statusmembership":
 	  		    	Student st = (Student)data.getData("student");
@@ -89,16 +76,15 @@ public class EchoServer extends AbstractServer
 					st.setStatusMembership((String)data.getData("selected_status"));
 					client.sendToClient(st);
 	  				que.close();
-	  				default:
+	  			default:
 	  					client.sendToClient(o);
-	  		    }
 	  		    }
 		} catch (SQLException e) {e.printStackTrace();}
 		catch (IOException e) {
 			System.out.println("Failed to send to client...");
 			e.printStackTrace();
 			}
-	  }
+  }
 
   /**
    * This method overrides the one in the superclass.  Called

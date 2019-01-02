@@ -6,6 +6,7 @@ package common;
 
 import java.io.IOException;
 
+import application.MyData;
 import ocsf.client.AbstractClient;
 
 /**
@@ -75,8 +76,9 @@ public class ChatClient extends AbstractClient
     }
     catch(Exception e)
     {
-      clientUI.handle
-        ("Could not send message to server.  Terminating client.");
+    	MyData error = new MyData("error");
+    	error.add("msg", "Could not send message to server.  Terminating client.");
+      clientUI.handle(error);
       e.printStackTrace();
       quit();
     }

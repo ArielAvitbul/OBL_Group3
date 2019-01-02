@@ -1,7 +1,9 @@
-package application;
+package application.controllers;
 
 import java.io.IOException;
 
+import application.ClientConsole;
+import application.MyData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -13,10 +15,14 @@ import javafx.scene.layout.BorderPane;
 
 public class ReaderController {
 	private ClientConsole cc;
-	 
+	private SearchController searchController;
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
+	@FXML
+    void initialize() {
+		searchController = new SearchController(cc);
+    }
     @FXML
     private TextField loginPassField;
 
@@ -30,10 +36,9 @@ public class ReaderController {
     private TextField loginIdField;
     @FXML
     void menu_search(ActionEvent event) {
-    	SearchController controller = new SearchController();
     	BorderPane bp = (BorderPane) ((Node)event.getSource()).getScene().getRoot();
     	try {
-			cc.addBottom(bp, "search", controller);
+			cc.showBottom(bp, "search", searchController);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,10 +75,4 @@ public class ReaderController {
 	private boolean isValidLoginFields() {
 		return !(loginIdField.getText().isEmpty() && loginPassField.getText().isEmpty());
 	}
-    
-    
-    
-    
-    
-    
-   }
+}
