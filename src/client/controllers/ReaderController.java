@@ -56,19 +56,11 @@ public class ReaderController {
     			}
     		catch (InterruptedException e)
     			{
-        			Alert alert = new Alert(AlertType.ERROR);
-        			alert.setTitle("OBL System Error");
-        			alert.setHeaderText("Login denied!");
-        			alert.setContentText("One or more of your fields were empty!");
-        			alert.showAndWait();
+    				ClientConsole.newAlert(AlertType.ERROR, null,"OBL System Error","Login denied!");
     			}
     	}
     	else {
-    		Alert alert = new Alert(AlertType.INFORMATION);
-    		alert.setTitle("OBL System Information");
-    		alert.setHeaderText("Login denied!");
-    		alert.setContentText("One or more of your fields were empty!");
-    		alert.showAndWait();
+    		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
     	}
     }
 
