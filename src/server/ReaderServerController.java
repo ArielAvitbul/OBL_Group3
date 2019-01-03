@@ -2,7 +2,8 @@ package server;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import common.Member;
 import client.MyData;
 
 public class ReaderServerController {
@@ -28,6 +29,7 @@ public class ReaderServerController {
 		if(!db.hasResults(memberMatch))
 			return new MyData("No such member");
 		data.getData().clear();
+		ArrayList<String> memberParametars = new ArrayList<String>();
 		for(int i = 0; i<memberMatch.getMetaData().getColumnCount();i++) {
 			
 		}
@@ -35,4 +37,5 @@ public class ReaderServerController {
 		data.setAction("login approved");
 		return data;
 	}
+//	public Member create
 }
