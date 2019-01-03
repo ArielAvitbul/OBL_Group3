@@ -10,7 +10,7 @@
    <children>
       <ImageView pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/search.jpeg" />
+            <Image url="@../images/search.jpeg" />
          </image>
       </ImageView>
       <VBox layoutX="158.0" layoutY="136.0" prefHeight="190.0" prefWidth="132.0" spacing="20.0">

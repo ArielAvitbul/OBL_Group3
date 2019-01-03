@@ -11,7 +11,7 @@ public class MyDB {
 	private final String port="3306";
 	private final String schema="oblg3";
 	private final String user="root";
-	private final String pass="arielsql";
+	private final String pass="123321";
 	private Connection conn;
 	public MyDB() {
 		try {
@@ -28,6 +28,9 @@ public class MyDB {
 	
 	public PreparedStatement update(String query) throws SQLException {
 			return conn.prepareStatement(query);
+	}
+	public boolean hasResults(ResultSet rs) throws SQLException {
+		return rs.first();
 	}
 	 
 }

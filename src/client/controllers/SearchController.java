@@ -1,7 +1,7 @@
-package application.controllers;
+package client.controllers;
 
-import application.ClientConsole;
-import application.MyData;
+import client.ClientConsole;
+import client.MyData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
