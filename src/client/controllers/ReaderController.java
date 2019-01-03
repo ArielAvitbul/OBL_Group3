@@ -3,17 +3,18 @@ package client.controllers;
 import java.io.IOException;
 
 import client.ClientConsole;
+import client.MyButton;
 import client.MyData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
 public class ReaderController {
+	private MyButton searchButton;
 	private ClientConsole cc;
 	private SearchController searchController;
 	public ReaderController(ClientConsole cc) {
@@ -22,7 +23,12 @@ public class ReaderController {
 	@FXML
     void initialize() {
 		searchController = new SearchController(cc);
+		searchButton = new MyButton("images/buttons/searchBook.jpg", 402, 192, e->menu_search());
+		topPane.getChildren().add(searchButton.getImage());
+		topPane.getChildren().add(searchButton);
     }
+	@FXML
+    private AnchorPane topPane;
     @FXML
     private TextField loginPassField;
 
@@ -30,15 +36,11 @@ public class ReaderController {
     private Button btnLogin;
 
     @FXML
-    private Button search_book_button;
-
-    @FXML
     private TextField loginIdField;
-    @FXML
-    void menu_search(ActionEvent event) {
-    	BorderPane bp = (BorderPane) ((Node)event.getSource()).getScene().getRoot();
+
+    void menu_search() {
     	try {
-			cc.showBottom(bp, "search", searchController);
+			cc.setBottom((BorderPane)topPane.getScene().getRoot(), "search", searchController);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
