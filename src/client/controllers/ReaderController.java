@@ -45,9 +45,14 @@ public class ReaderController {
     	if (!controllers.containsKey(fxml)) {
     		switch (fxml) {
     		case "search":
-    			loader.setController(new SearchController());
+    			controllers.put(fxml, new SearchController());
+    			break;
+    			default: // unrecognized fxml
+    				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
+    				System.exit(1);
     		}
     	}
+    	loader.setController(controllers.get(fxml));
 		try {
 			((BorderPane)topPane.getScene().getRoot()).setCenter(loader.load());
 		} catch (IOException e) {
