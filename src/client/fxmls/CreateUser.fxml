@@ -11,7 +11,7 @@
    <children>
       <ImageView pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/createuser.jpg" />
+            <Image url="@../images/createuser.jpg" />
          </image>
       </ImageView>
       <TextField fx:id="emailField" layoutX="134.0" layoutY="118.0" />
