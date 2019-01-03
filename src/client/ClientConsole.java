@@ -91,12 +91,6 @@ public class ClientConsole extends Application implements CommonIF
 			System.exit(1);
 		}
 	}
-	public void setBottom(BorderPane bp, String fxml, Object controller) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/"+fxml+".fxml"));
-		loader.setController(controller);
-		AnchorPane root = loader.load();
-		bp.setCenter(root);
-	}
 	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
 		alert.setTitle(title == null ? "OBL - Group 3" : title);
