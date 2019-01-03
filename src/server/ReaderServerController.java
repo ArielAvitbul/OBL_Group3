@@ -22,6 +22,7 @@ public class ReaderServerController {
 	/*method for confirming login request from client
 	 * input: MyDB instance and MyData instance
 	 * output: MyData (Member instance) that has been logged in or empty MyData
+	 * Guy Wrote This
 	 */
 	public MyData login (MyDB db , MyData data) throws SQLException{
 		String MyQuery = "SELECT * FROM Members WHERE userName="+data.getData("id")+"AND password="+data.getData("password");
