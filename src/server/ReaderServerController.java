@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 
 import application.MyData;
+import common.Member;
 
 public class ReaderServerController {
 	public MyData search(MyDB db, MyData data) throws SQLException {
@@ -18,16 +19,21 @@ public class ReaderServerController {
 			}
 			return null;
 	}
+	/*method for confirming login request from client
+	 * input: MyDB instance and MyData instance
+	 * output: MyData (Member instance) that has been logged in or empty MyData
+	 */
 	public MyData login (MyDB db , MyData data) throws SQLException{
-		String MyQuery = "SELECT userName,password FROM Members WHERE userName="+data.getData("id")+"AND password="+data.getData("password");
+		String MyQuery = "SELECT * FROM Members WHERE userName="+data.getData("id")+"AND password="+data.getData("password");
 		ResultSet memberMatch = db.select(MyQuery);
-		if(isReultSetEmpty(memberMatch))
+		if(!db.hasResults(memberMatch))
 			return new MyData("No such member");
+		data.getData().clear();
+		for(int i = 0; i<memberMatch.getMetaData().getColumnCount();i++) {
+			
+		}
+		data.add("MemberLoggedIn",null);
 		data.setAction("login approved");
 		return data;
 	}
-	private boolean isReultSetEmpty(ResultSet memberMatch) throws SQLException {
-		return !memberMatch.first();
-	}
-
 }

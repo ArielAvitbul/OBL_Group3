@@ -66,6 +66,11 @@ public class ClientConsole extends Application implements CommonIF
   public void handle(Object message)
   {
 	  MyData data = (MyData) message;
+	  switch (data.getAction()) {
+	  case "login approved":
+		  ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Good job", "login approved");
+	  }
+	  		
 		  System.out.println("Client received: "+ data.getAction() +": "+ data.getData());
 		  // TODO: work on client's response to server messages.
   }
