@@ -34,7 +34,6 @@ public class ClientConsole extends Application implements CommonIF
   /**
    * The instance of the client that created this ConsoleChat.
    */
-	private Student student;
   ChatClient client;
   
   //Instance methods ************************************************
@@ -44,12 +43,6 @@ public class ClientConsole extends Application implements CommonIF
    * received, it sends it to the client's message handler.
  * @throws InterruptedException 
    */
-  public synchronized Student getStudent() throws Exception{
-	  return student;
-  }
-  public void forgetStudent() {
-	  this.student = null;
-  }
   public void send(Object o) throws InterruptedException 
   {
 	  
@@ -98,7 +91,7 @@ public class ClientConsole extends Application implements CommonIF
 			System.exit(1);
 		}
 	}
-	public void showBottom(BorderPane bp, String fxml, Object controller) throws IOException {
+	public void setBottom(BorderPane bp, String fxml, Object controller) throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/"+fxml+".fxml"));
 		loader.setController(controller);
 		AnchorPane root = loader.load();
