@@ -37,5 +37,21 @@ public class ReaderServerController {
 		data.setAction("login approved");
 		return data;
 	}
-//	public Member create
+	public Member createMember(ResultSet rs) throws SQLException {
+		ArrayList<String> theMember = new ArrayList<String>();
+			theMember.add(Integer.toString(rs.getInt(1))); // memberNumber
+			theMember.add(rs.getString(2));
+			theMember.add(rs.getString(3));
+			theMember.add(rs.getString(4));
+			theMember.add(rs.getString(5));
+			theMember.add(rs.getString(6));
+			theMember.add(rs.getString(7));
+			theMember.add(rs.getString(8));
+			theMember.add(Integer.toString(rs.getInt(11))); // lateReturnes
+			
+		
+		
+		return null;
+		
+	}
 }
