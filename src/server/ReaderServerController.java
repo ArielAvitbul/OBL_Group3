@@ -3,7 +3,7 @@ package server;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import application.MyData;
+import client.MyData;
 
 public class ReaderServerController {
 	public MyData search(MyDB db, MyData data) throws SQLException {

@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import application.MyData;
+import client.MyData;
 import common.Student;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;

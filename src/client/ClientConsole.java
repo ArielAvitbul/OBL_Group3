@@ -1,9 +1,9 @@
-package application;
+package client;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import application.controllers.ReaderController;
+import client.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
 import common.Student;
@@ -77,9 +77,9 @@ public class ClientConsole extends Application implements CommonIF
    * This method is responsible for the creation of the Client GUI.
    */
 	@Override
-	public void start(Stage primaryStage) {// bottom size 900 460
+	public void start(Stage primaryStage) {
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/gui.fxml"));
 		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new ReaderController(this));
 			BorderPane root = loader.load();
@@ -97,10 +97,9 @@ public class ClientConsole extends Application implements CommonIF
 			newAlert(AlertType.ERROR, null, "No IP/Port", "Please specify IP & Port in this order");
 			System.exit(1);
 		}
-		
 	}
 	public void showBottom(BorderPane bp, String fxml, Object controller) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml+".fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/"+fxml+".fxml"));
 		loader.setController(controller);
 		AnchorPane root = loader.load();
 		bp.setCenter(root);
