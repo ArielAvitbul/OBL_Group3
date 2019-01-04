@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -28,11 +29,12 @@ public class ReaderController {
 		buttons = new HashMap<>();
 		controllers = new HashMap<>();
 		buttons.put("search", new MyButton(topPane,"images/buttons/searchBook.jpg", 402, 192, e->setBottom("search")));
+		buttons.put("login",new MyButton(topPane,"images/buttons/searchBook.jpg", 700, 144, e->submitLogin(new ActionEvent())));
     }
 	@FXML
     private AnchorPane topPane;
     @FXML
-    private TextField loginPassField;
+    private PasswordField passField;
 
     @FXML
     private Button btnLogin;
@@ -67,7 +69,7 @@ public class ReaderController {
     	{
     		MyData login = new MyData ("login");
     		login.add("id", loginIdField.getText());
-    		login.add("password", loginPassField.getText());
+    		login.add("password", passField.getText());
     		try {
     				cc.send(login);
     			}
@@ -82,7 +84,7 @@ public class ReaderController {
     }
 
 	private boolean isValidLoginFields() {
-		return !(loginIdField.getText().isEmpty() && loginPassField.getText().isEmpty());
+		return !(loginIdField.getText().isEmpty() && passField.getText().isEmpty());
 	}
 	private class SearchController {
 
