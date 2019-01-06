@@ -77,9 +77,8 @@ public class ReaderController {
     				ClientConsole.newAlert(AlertType.ERROR, null,"OBL System Error","Login denied!");
     			}
     	}
-    	else {
+    	else
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
-    	}
     }
 
 	private boolean isValidLoginFields() {
