@@ -25,9 +25,10 @@ public class ReaderController {
 	}
 	@FXML
     void initialize() {
-		buttons = new HashMap<>();
-		controllers = new HashMap<>();
-		buttons.put("search", new MyButton(topPane,"images/buttons/searchBook.jpg", 402, 192, e->setBottom("search")));
+		buttons = new HashMap<>(); // holds all the dynamic buttons
+		controllers = new HashMap<>(); // holds all the dynamic controllers
+		buttons.put("search", new MyButton("client/images/buttons/searchBook.jpg", 402, 192, e->setBottom("search")));
+		topPane.getChildren().add(buttons.get("search"));
     }
 	@FXML
     private AnchorPane topPane;
