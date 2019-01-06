@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.AccessibleRole;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -24,6 +25,7 @@ public class ReaderController {
 	private ClientConsole cc;
 	private HashMap<String,MyButton> buttons;
 	private HashMap<String,Object> controllers;
+	public Label welcomeMsg;
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
@@ -64,7 +66,11 @@ public class ReaderController {
 			e.printStackTrace();
 		}
     }
-
+    
+    /*This function handles a Reader login request and sends it to server if its valid
+     * input:none
+     * output: successful or unsuccessful login reaction 
+     */
     @FXML
     private void submitLogin (ActionEvent event)
     {
@@ -89,26 +95,62 @@ public class ReaderController {
     	}
     	else {
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
-    	}
+    		}
     }
-
+    
+    
+    /* This function checks if login fields are empty after clicking the login button
+     * input: none
+     * output: T/F
+     */
 	private boolean isValidLoginFields() {
 		return !(loginIdField.getText().isEmpty() && passField.getText().isEmpty());
 	}
+	
+	
+	/* This method handles pane changing to a logged in member view
+	 * input: none
+	 * output: none
+	 */
 	private void setTopPaneAfterLogin() {
 		MyButton toRemove = buttons.get("login");
-		topPane.getChildren().remove(toRemove);
 		ImageView imgToRemove = toRemove.getImage();
+		topPane.getChildren().remove(toRemove);
 		topPane.getChildren().remove(imgToRemove);
-		topPane.getChildren().remove(passField);
-		topPane.getChildren().remove(loginIdField);
+		passField.setVisible(false);
+		btnLogin.setVisible(false);
+		buttons.remove("login");
+		loginIdField.setVisible(false);
 		String newImageURL = "client/images/afterLogin.jpeg";
 		topImage.setImage(new Image(newImageURL));
-		buttons.put("logout",new MyButton(topPane, null, 700, 144, e->submitLogout(new ActionEvent())));
+		buttons.put("logout",new MyButton(topPane, null, 704,105, e->submitLogout(new ActionEvent())));
+		buttons.get("logout").setPrefSize(106, 32);
+		welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn"));
+		topPane.getChildren().add(welcomeMsg);
+		welcomeMsg.setPrefSize(102, 32);
+		welcomeMsg.setLayoutX(705);
+		welcomeMsg.setLayoutY(61);
+		welcomeMsg.setVisible(true);
 	}
-	private void submitLogout(ActionEvent actionEvent) {
-		ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Logout reached", "logout button added");
-	}
+	
+	
+	/* This method handles a user logout
+	 * input: none
+	 * output: none
+	 */
+		private void submitLogout(ActionEvent actionEvent) {
+			cc.getFromServer().getData().remove("MemberLoggedIn");
+			String newImageURL = "client/images/beforeLogin.jpeg";
+			topImage.setImage(new Image(newImageURL));
+			topPane.getChildren().remove(welcomeMsg);
+			buttons.get("logout").setVisible(false);
+			passField.setVisible(true);
+			passField.clear();
+			loginIdField.setVisible(true);
+			loginIdField.clear();
+			btnLogin.setVisible(true);	
+			buttons.put("login",new MyButton(topPane,"images/buttons/login.jpg", 700, 144, e->submitLogin(new ActionEvent())));
+   }
 	private class SearchController {
 
 		@FXML

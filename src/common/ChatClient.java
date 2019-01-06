@@ -80,7 +80,6 @@ public class ChatClient extends AbstractClient
     	error.add("msg", "Could not send message to server.  Terminating client.");
       clientUI.handle(error);
       e.printStackTrace();
-      quit();
     }
   }
   

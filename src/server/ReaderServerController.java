@@ -35,7 +35,7 @@ public class ReaderServerController {
 		data.getData().clear();
 		if(!db.hasResults(memberMatch)) {
 			data.setAction("login_failed");
-			data.add("reason", "no such user");
+			data.add("reason", "User name or password incorrect");
 		} else {
 			data.setAction("login_approved");
 			data.add("MemberLoggedIn",createMember(memberMatch, db));
