@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import client.ClientConsole;
-import client.MyButton;
+import client.MyImage;
 import client.MyData;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,7 +18,7 @@ import javafx.scene.layout.BorderPane;
 
 public class ReaderController {
 	private ClientConsole cc;
-	private HashMap<String,MyButton> buttons;
+	private HashMap<String,MyImage> buttons;
 	private HashMap<String,Object> controllers;
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
@@ -27,7 +27,7 @@ public class ReaderController {
     void initialize() {
 		buttons = new HashMap<>(); // holds all the dynamic buttons
 		controllers = new HashMap<>(); // holds all the dynamic controllers
-		buttons.put("search", new MyButton("client/images/buttons/searchBook.jpg", 402, 192, e->setBottom("search")));
+		buttons.put("search", new MyImage("client/images/buttons/searchBook.jpg", 402, 192, e->setBottom("search")));
 		topPane.getChildren().add(buttons.get("search"));
     }
 	@FXML
