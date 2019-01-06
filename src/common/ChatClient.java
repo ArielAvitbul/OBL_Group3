@@ -72,7 +72,7 @@ public class ChatClient extends AbstractClient
     try
     {
     	sendToServer(o);
-    	wait(delay*1000); // if 5 seconds passed and wasn't awakened : nothing came back from the server
+    	wait(delay*1000); // if 3 seconds passed and wasn't awakened : nothing came back from the server
     }
     catch(Exception e)
     {
@@ -80,7 +80,6 @@ public class ChatClient extends AbstractClient
     	error.add("msg", "Could not send message to server.  Terminating client.");
       clientUI.handle(error);
       e.printStackTrace();
-      quit();
     }
   }
   

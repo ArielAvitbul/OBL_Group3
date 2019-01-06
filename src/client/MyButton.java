@@ -10,17 +10,19 @@ import javafx.scene.layout.Pane;
 public class MyButton extends Button {
 	private ImageView image;
 	public MyButton(Pane pane,String imageURL, double layoutX, double layoutY, EventHandler<MouseEvent> mouseRelease) {
-		image = new ImageView(new Image(getClass().getResource(imageURL).toExternalForm()));
-		image.setLayoutX(layoutX);
-		image.setLayoutY(layoutY);
+		if(imageURL!=null) {
+			image = new ImageView(new Image(getClass().getResource(imageURL).toExternalForm()));
+			image.setLayoutX(layoutX);
+			image.setLayoutY(layoutY);		
+			setPrefHeight(image.getImage().getHeight());
+			setPrefWidth(image.getImage().getWidth());
+			pane.getChildren().add(image);
+		}
 		setLayoutX(layoutX);
 		setLayoutY(layoutY);
 		setOpacity(0.0);
-		setPrefHeight(image.getImage().getHeight());
-		setPrefWidth(image.getImage().getWidth());
 		if (mouseRelease!=null)
-		setOnMouseReleased(mouseRelease);
-		pane.getChildren().add(image);
+			setOnMouseReleased(mouseRelease);
 		pane.getChildren().add(this);
 	}
 	
