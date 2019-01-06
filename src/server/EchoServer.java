@@ -68,15 +68,12 @@ public class EchoServer extends AbstractServer
 	  				break;
 	  		    case "login":
 	  		    	client.sendToClient(readerCont.login(db, data));
-	  		    case "update_statusmembership":
-	  		    	Student st = (Student)data.getData("student");
-	  		    	PreparedStatement que = db.update("update Student set StatusMembership=? WHERE StudentID=?");
-					que.setString(1, (String)data.getData("selected_status")); // statusmembership input from box 
-					que.setString(2,st.getId()); // studentid
-					que.executeUpdate();
-					st.setStatusMembership((String)data.getData("selected_status"));
-					client.sendToClient(st);
-	  				que.close();
+	  		    	break;
+	  		    case "client_stopped":
+	  		    case "logout":
+	  		    	readerCont.setLoggedIn(db, false, (String)data.getData("name"));
+	  		    	client.sendToClient(new MyData("logged out!"));
+	  		    	break;
 	  			default:
 	  					client.sendToClient(o);
 	  		    }

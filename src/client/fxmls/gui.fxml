@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -8,18 +12,32 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <AnchorPane fx:id="topPane" prefHeight="240.0" prefWidth="900.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fx:id="topImage" pickOnBounds="true" preserveRatio="true">
+            <ImageView layoutX="42.0" layoutY="55.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../images/beforeLogin.jpeg" />
+                  <Image url="@../images/logo.png" />
                </image>
             </ImageView>
-            <TextField fx:id="loginIdField" layoutX="682.0" layoutY="66.0" promptText="User Name" />
-            <Button fx:id="btnLogin" layoutX="700.0" layoutY="144.0" mnemonicParsing="false" onAction="#submitLogin" opacity="0.0" prefHeight="32.0" prefWidth="106.0" text="ENTER" />
-            <PasswordField fx:id="passField" layoutX="682.0" layoutY="108.0" promptText="Password" />
+            <ImageView fx:id="loginPicture" layoutX="726.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/login.png" />
+               </image>
+            </ImageView>
+            <TextField fx:id="loginIdField" layoutX="683.0" layoutY="80.0" promptText="User Name" />
+            <PasswordField fx:id="passField" layoutX="683.0" layoutY="114.0" promptText="Password" />
+            <ImageView fx:id="loginButton" layoutX="705.0" layoutY="148.0" onMouseReleased="#submitLogin">
+               <image>
+                  <Image url="@../images/buttons/login.jpg" />
+               </image>
+            </ImageView>
+            <ImageView layoutX="695.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/person.png" />
+               </image>
+            </ImageView>
          </children>
       </AnchorPane>
    </top>

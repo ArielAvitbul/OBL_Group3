@@ -1,5 +1,6 @@
 package server;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,19 +29,30 @@ public class ReaderServerController {
 	 */
 	public MyData login (MyDB db , MyData data) throws SQLException{
 		String MyQuery = "SELECT *"
-							+ "FROM Member "
-							+ "WHERE username = '"+ data.getData("id")+"' "
+							+ "FROM users "
+							+ "WHERE name = '"+ data.getData("name")+"' "
 							+ "AND password = '"+data.getData("password")+"';";
 		ResultSet memberMatch = db.select(MyQuery);
 		data.getData().clear();
 		if(!db.hasResults(memberMatch)) {
 			data.setAction("login_failed");
 			data.add("reason", "User name or password incorrect");
+		} else if (memberMatch.getBoolean("loggedin")) {
+			data.setAction("login_failed");
+			data.add("reason", "Already logged in!");
 		} else {
 			data.setAction("login_approved");
+			setLoggedIn(db,true,memberMatch.getString("name"));
 			data.add("MemberLoggedIn",createMember(memberMatch, db));
-		}
+			}
 		return data;
+	}
+	
+	public void setLoggedIn(MyDB db, boolean value, String name) throws SQLException { // TODO change name to id...
+		PreparedStatement ps = db.update("UPDATE users SET loggedin =? WHERE name =?");
+		ps.setBoolean(1, value);
+		ps.setString(2, name);
+		ps.executeUpdate();
 	}
 	
 	/*this method creates Member instance for the member that has logged in
@@ -52,7 +64,7 @@ public class ReaderServerController {
 		/*	toReturn = new Member(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getString(5),rs.getString(6),
 					rs.getString(7),rs.getString(8),getMemberBorrows(rs.getInt(1),db),getMemberViolations(rs.getInt(1), db),
 					rs.getInt(11));*/
-			toReturn = new Member(rs.getString("username"),rs.getString("password"));
+			toReturn = new Member(rs.getString("name"),rs.getString("password"));
 			return toReturn;
 	}
 		/* function to get all of the specified member borrows
