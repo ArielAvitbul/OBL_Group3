@@ -27,13 +27,19 @@ public class ReaderServerController {
 	 * Guy Wrote This
 	 */
 	public MyData login (MyDB db , MyData data) throws SQLException{
-		String MyQuery = "SELECT * FROM Member WHERE userName="+data.getData("id")+"AND password="+data.getData("password");
+		String MyQuery = "SELECT *"
+							+ "FROM Member "
+							+ "WHERE username = '"+ data.getData("id")+"' "
+							+ "AND password = '"+data.getData("password")+"';";
 		ResultSet memberMatch = db.select(MyQuery);
-		if(!db.hasResults(memberMatch))
-			return new MyData("No such member");
 		data.getData().clear();
-		data.add("MemberLoggedIn",createMember(memberMatch, db));
-		data.setAction("login approved");
+		if(!db.hasResults(memberMatch)) {
+			data.setAction("login_failed");
+			data.add("reason", "no such user");
+		} else {
+			data.setAction("login_approved");
+			data.add("MemberLoggedIn",createMember(memberMatch, db));
+		}
 		return data;
 	}
 	
@@ -43,9 +49,10 @@ public class ReaderServerController {
 	 */
 	public Member createMember(ResultSet rs, MyDB db) throws SQLException {
 			Member toReturn;
-			toReturn = new Member(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getString(5),rs.getString(6),
+		/*	toReturn = new Member(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getString(5),rs.getString(6),
 					rs.getString(7),rs.getString(8),getMemberBorrows(rs.getInt(1),db),getMemberViolations(rs.getInt(1), db),
-					rs.getInt(11));
+					rs.getInt(11));*/
+			toReturn = new Member(rs.getString("username"),rs.getString("password"));
 			return toReturn;
 	}
 		/* function to get all of the specified member borrows

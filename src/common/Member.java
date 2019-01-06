@@ -1,6 +1,8 @@
 package common;
 
-public class Member extends Reader
+import java.io.Serializable;
+
+public class Member extends Reader implements Serializable
 {
 	
 	private enum Status
@@ -29,9 +31,12 @@ public class Member extends Reader
 				borrowHistory, violationHostory, lateReturns);
 		// TODO Auto-generated constructor stub
 	}
-
 	public Member() {
-		// TODO Auto-generated constructor stub
+		
+	}
+	public Member(String username, String password) {
+		this.userName=username;
+		this.password=password;
 	}
 
 	public int getMemberNumber() 
@@ -74,5 +79,9 @@ public class Member extends Reader
 				break;
 				
 		}
+	}
+	@Override
+	public String toString() { // for testing
+		return userName;
 	}
 }

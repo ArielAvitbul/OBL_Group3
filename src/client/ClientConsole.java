@@ -1,19 +1,19 @@
 package client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 import client.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
-import common.Student;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -35,6 +35,7 @@ public class ClientConsole extends Application implements CommonIF
    * The instance of the client that created this ConsoleChat.
    */
   ChatClient client;
+  MyData fromServer;
   
   //Instance methods ************************************************
   
@@ -58,11 +59,13 @@ public class ClientConsole extends Application implements CommonIF
   @Override
   public void handle(Object message)
   {
-	  MyData data = (MyData) message;
-		  System.out.println("Client received: "+ data.getAction() +": "+ data.getData());
+	  fromServer = (MyData) message;
+		  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
 		  // TODO: work on client's response to server messages.
   }
-
+  public MyData getFromServer() {
+	  return fromServer;
+  }
   
   //Class methods ***************************************************
   
