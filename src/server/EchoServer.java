@@ -66,6 +66,8 @@ public class EchoServer extends AbstractServer
 	  		    case "search_book":
 	  				client.sendToClient(readerCont.search(db,data));
 	  				break;
+	  		    case "login":
+	  		    	client.sendToClient(readerCont.login(db, data));
 	  		    case "update_statusmembership":
 	  		    	Student st = (Student)data.getData("student");
 	  		    	PreparedStatement que = db.update("update Student set StatusMembership=? WHERE StudentID=?");
