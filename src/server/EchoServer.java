@@ -71,7 +71,7 @@ public class EchoServer extends AbstractServer
 	  		    	break;
 	  		    case "client_stopped":
 	  		    case "logout":
-	  		    	readerCont.setLoggedIn(db, false, (String)data.getData("name"));
+	  		    	readerCont.setLoggedIn(db, false, (Integer)data.getData("id"));
 	  		    	client.sendToClient(new MyData("logged out!"));
 	  		    	break;
 	  			default:

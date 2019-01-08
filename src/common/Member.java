@@ -34,7 +34,8 @@ public class Member extends Reader implements Serializable
 	public Member() {
 		
 	}
-	public Member(String username, String password) {
+	public Member(int id, String username, String password) {
+		this.id=id;
 		this.userName=username;
 		this.password=password;
 	}

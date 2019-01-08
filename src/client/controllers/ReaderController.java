@@ -9,7 +9,6 @@ import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
 import common.Member;
-import common.MemberCard;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +20,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -67,6 +67,9 @@ public class ReaderController {
 	private boolean removeFrom(Pane pane, String name) {
 		for (Node n : pane.getChildren()) {
 			if (name.equals(n.getId())) {
+				if (pane.equals(MenuBox)) {
+					MenuBox.getChildren().remove(MenuBox.getChildren().indexOf(n)+1); // delete his separator
+				}
 				pane.getChildren().remove(n);
 				return true;
 			}
@@ -75,6 +78,8 @@ public class ReaderController {
 	}
     void addTo(Pane pane, Node button, boolean enteredexit) {
     	pane.getChildren().add(button);
+    	if (pane.equals(MenuBox))
+    		pane.getChildren().add(new ImageView(new Image("client/images/buttons/separator.png")));
     	if (enteredexit) {
     	button.setOnMouseEntered(e-> mouseEntered(e));
     	button.setOnMouseExited(e->mouseExited(e));
@@ -84,9 +89,13 @@ public class ReaderController {
     protected void mouseEntered(MouseEvent ev) {
     	//ImageView button = ((ImageView)ev.getSource());
     	//	button.setImage(new Image("client/images/buttons/"+button.getId()+"Pressed.jpg"));
+    	ImageView image = ((ImageView)ev.getSource());
     	ColorAdjust effect = new ColorAdjust();
-    	effect.setBrightness(-0.1);
-     ((ImageView)ev.getSource()).setEffect(effect);
+    	double num = 0.1;
+    	if (image.getParent().equals(MenuBox))
+    		num=0.5;
+    	effect.setBrightness(-num);
+     image.setEffect(effect);
     }
     @FXML
     protected void mouseExited(MouseEvent ev) {
@@ -137,7 +146,7 @@ public class ReaderController {
     	if(isValidLoginFields())
     	{
     		MyData login = new MyData ("login");
-    		login.add("name", loginIdField.getText());
+    		login.add("id", loginIdField.getText());
     		login.add("password", passField.getText());
     		try {
     				cc.send(login);
@@ -149,12 +158,12 @@ public class ReaderController {
     		String result = cc.getFromServer().getAction();
     		if (result.equals("login_approved")) {
     			addTo(topPane,new MyImage("logout","client/images/buttons/logout.png", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
-    			addTo(topPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),true);
+    			addTo(topPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),false);
     			welcomeMsg.setId("welcomeMsg");
     			welcomeMsg.setLayoutX(loginPicture.getLayoutX());
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
     			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
-    			addTo(MenuBox, new MyImage("viewProfile","client/images/buttons/viewProfile.jpg",e1->setBottom(e1)),true);
+    			addTo(MenuBox, new MyImage("viewProfile","client/images/buttons/viewProfile.png",e1->setBottom(e1)),true);
     		} else if (result.equals("login_failed"))
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
     	}
@@ -174,7 +183,7 @@ public class ReaderController {
 			try {
 				MyData data = new MyData("logout");
 				Member member = (Member) cc.getReader();
-				data.add("name", member.getUserName());
+				data.add("id", member.getId());
 				cc.send(data);
 				
 			} catch (InterruptedException e) {e.printStackTrace();}
