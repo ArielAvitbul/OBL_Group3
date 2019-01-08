@@ -111,10 +111,10 @@ public class ClientConsole extends Application implements CommonIF
 		alert.setContentText(content);
 			return alert.showAndWait();
 	}
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		launch(args);
 	}
-	
 	@Override
 		public void stop() throws Exception {
 			super.stop();

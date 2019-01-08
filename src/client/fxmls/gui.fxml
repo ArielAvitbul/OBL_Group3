@@ -28,7 +28,7 @@
             </ImageView>
             <TextField fx:id="loginIdField" layoutX="683.0" layoutY="80.0" promptText="User Name" />
             <PasswordField fx:id="passField" layoutX="683.0" layoutY="114.0" promptText="Password" />
-            <ImageView fx:id="loginButton" layoutX="705.0" layoutY="148.0" onMouseReleased="#submitLogin">
+            <ImageView fx:id="loginButton" layoutX="705.0" layoutY="148.0" onMouseEntered="#mouseEntered" onMouseExited="#mouseExited" onMouseReleased="#submitLogin">
                <image>
                   <Image url="@../images/buttons/login.jpg" />
                </image>
@@ -38,6 +38,15 @@
                   <Image url="@../images/buttons/person.png" />
                </image>
             </ImageView>
+            <HBox fx:id="MenuBox" alignment="TOP_CENTER" layoutY="193.0" prefHeight="47.0" prefWidth="900.0">
+               <children>
+                  <ImageView fx:id="searchBook" onMouseEntered="#mouseEntered" onMouseExited="#mouseExited" onMouseReleased="#setBottom" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/buttons/searchBook.jpg" />
+                     </image>
+                  </ImageView>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
    </top>

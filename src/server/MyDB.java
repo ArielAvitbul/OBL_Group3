@@ -32,5 +32,4 @@ public class MyDB {
 	public boolean hasResults(ResultSet rs) throws SQLException {
 		return rs.first();
 	}
-	 
 }
