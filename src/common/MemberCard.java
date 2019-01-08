@@ -6,9 +6,9 @@ public class MemberCard {
 	private String lastName="";
 	private String phoneNumber="";
 	private String emailAddress="";
-	private Borrow[] borrowHistory;
-	private Violation[] violationHostory;
-	private int lateReturns;
+	private Borrow[] borrowHistory=null;
+	private Violation[] violationHostory=null;
+	private int lateReturns=0;
 
 	public MemberCard(String firstName, String lastName, String phoneNumber, String emailAddress,
 			Borrow[] borrowHistory, Violation[] violationHostory, int lateReturns) 
@@ -20,6 +20,10 @@ public class MemberCard {
 		this.borrowHistory = borrowHistory;
 		this.violationHostory = violationHostory;
 		this.lateReturns = lateReturns;
+	}
+	
+	public MemberCard() {
+		
 	}
 	
 	public String getFirstName() 

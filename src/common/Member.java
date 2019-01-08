@@ -17,20 +17,7 @@ public class Member extends Reader implements Serializable
 	private String password;
 	private Status status=Status.ACTIVE;
 	private MemberCard myMemberCard;
-	
-	public Member(int id, String newUserName, String newPassword, int newUserStatus,
-			String firstName, String lastName, String phoneNumber, String emailAddress,
-			Borrow[] borrowHistory, Violation[] violationHostory, int lateReturns) 
-	{
-		super();
-		this.id=id;
-		this.userName=newUserName;
-		this.password=newPassword;
-		setUserStatus(newUserStatus);
-		this.myMemberCard=new MemberCard(firstName, lastName, phoneNumber, emailAddress, 
-				borrowHistory, violationHostory, lateReturns);
-		// TODO Auto-generated constructor stub
-	}
+
 	public Member() {
 		
 	}
@@ -39,6 +26,11 @@ public class Member extends Reader implements Serializable
 		this.userName=username;
 		this.password=password;
 	}
+	
+	private void setMemberCard(MemberCard card) {
+		this.myMemberCard=card;
+	}
+	
 	public MemberCard getMemberCard() {
 		return myMemberCard;
 	}

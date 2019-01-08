@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+
 import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
@@ -22,6 +23,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -130,7 +133,13 @@ public class ReaderController {
 	private boolean isValidLoginFields() {
 		return !(loginIdField.getText().isEmpty() && passField.getText().isEmpty());
 	}
-	
+	/* Handles login button's ENTER KEY PRESS*/
+	@FXML
+    void keyBoard(KeyEvent event) {
+		if (!passField.getText().isEmpty() && !passField.getText().isEmpty() && event.getCode().equals(KeyCode.ENTER) && cc.getReader()==null) {
+			submitLogin(null);
+		}
+    }
 	/* This method handles a user logout
 	 * input: none
 	 * output: none
@@ -164,8 +173,11 @@ public class ReaderController {
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
     			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
     			addTo(MenuBox, new MyImage("viewProfile","client/images/buttons/viewProfile.png",e1->setBottom(e1)),true);
-    		} else if (result.equals("login_failed"))
+    		} else if (result.equals("login_failed")) {
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
+    			passField.clear();
+    			loginIdField.clear();
+    		}
     	}
     	else
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
@@ -232,7 +244,7 @@ public class ReaderController {
 		void initialize() {
 			Member member = ((Member) cc.getReader());
 			idField.setText(String.valueOf(member.getId()));
-	//		nameField.setText(member.getMemberCard().getFirstName());
+			nameField.setText(member.getMemberCard().getFirstName());
 		}
 		@FXML
 	    private TextField idField;
