@@ -10,7 +10,7 @@
 
 <AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="saveInfo" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/viewProfile.jpg" />
          </image>
@@ -22,7 +22,7 @@
             <TextField fx:id="statusField" editable="false" />
             <TextField fx:id="nameField" />
             <TextField fx:id="idField" editable="false" />
-            <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#save" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#setBottom" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/save.jpg" />
                </image>
@@ -31,7 +31,7 @@
       </VBox>
       <HBox layoutX="40.0" layoutY="113.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
          <children>
-            <ImageView onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#history" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="history" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#setBottom" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/history.jpg" />
                </image>

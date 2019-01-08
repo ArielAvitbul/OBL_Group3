@@ -36,7 +36,6 @@ public class ClientConsole extends Application implements CommonIF
    */
   ChatClient client;
   MyData fromServer;
-  Reader reader;
   
   //Instance methods ************************************************
   
@@ -50,14 +49,6 @@ public class ClientConsole extends Application implements CommonIF
 	  
         client.handleMessageFromClientUI(o);
   }
-  
-  public Reader getReader() {
-	  return reader;
-  }
-
-  public void forgetReader() {
-	  this.reader = null;
-  }
   /**
    * This method overrides the method in the CommonIF interface.  It
    * displays a message onto the screen.
@@ -68,8 +59,6 @@ public class ClientConsole extends Application implements CommonIF
   public void handle(Object message)
   {
 	  fromServer = (MyData) message;
-	  if (fromServer.getAction().equals("login_approved"))
-		  reader = (Member) fromServer.getData("MemberLoggedIn");
 		  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
 		  // TODO: work on client's response to server messages.
   }
@@ -117,13 +106,11 @@ public class ClientConsole extends Application implements CommonIF
 	}
 	@Override
 		public void stop() throws Exception {
-			super.stop();
-			if (reader !=null) {
 			MyData data = new MyData("client_stopped");
-			data.add("name", ((Member)reader).getUserName());
+			data.add("ip", client.getInetAddress().toString());
 			send(data);
-			}
 			client.closeConnection();
+			super.stop();
 		}
 }
 //End of ConsoleChat class

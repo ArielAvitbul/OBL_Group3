@@ -43,6 +43,12 @@ public class EchoServer extends AbstractServer
   {
     super(port);
 	db = new MyDB();
+	try {
+		db.update("UPDATE users set loggedin=0").executeUpdate();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 	readerCont = new ReaderServerController();
   }
 
@@ -67,12 +73,17 @@ public class EchoServer extends AbstractServer
 	  				client.sendToClient(readerCont.search(db,data));
 	  				break;
 	  		    case "login":
+	  		    	System.out.println((Integer)data.getData("id")+" had logged in (IP:"+ client.getInetAddress().toString()+")");
+	  		    	readerCont.updateIP(db, client.getInetAddress().toString(), (Integer)data.getData("id"));
 	  		    	client.sendToClient(readerCont.login(db, data));
 	  		    	break;
 	  		    case "client_stopped":
+	  		    	readerCont.setLoggedIn(db, false, (String)data.getData("ip"));
+	  		    	break;
 	  		    case "logout":
 	  		    	readerCont.setLoggedIn(db, false, (Integer)data.getData("id"));
-	  		    	client.sendToClient(new MyData("logged out!"));
+	  		    	System.out.println(data.getData("id") +" has logged out");
+	  		    	client.sendToClient(new MyData("successful_logout"));
 	  		    	break;
 	  			default:
 	  					client.sendToClient(o);

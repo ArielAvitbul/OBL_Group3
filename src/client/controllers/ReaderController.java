@@ -38,10 +38,14 @@ public class ReaderController {
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
+	
+	protected ClientConsole getCC() {
+		return cc;
+	}
 	@FXML
-    void initialize() {
+	void initialize() {
 		controllers = new HashMap<>();
-    }
+	}
 	@FXML
     private ImageView searchBook;
 	@FXML
@@ -105,7 +109,7 @@ public class ReaderController {
     	((ImageView)ev.getSource()).setEffect(null);
     }
     @FXML
-    void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
+    protected void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
     	String fxml = ((ImageView)ev.getSource()).getId();
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     	if (!controllers.containsKey(fxml)) {
@@ -114,7 +118,10 @@ public class ReaderController {
     			controllers.put(fxml, new SearchController());
     			break;
     		case "viewProfile":
-    			controllers.put(fxml, new ViewProfileController());
+    			controllers.put("viewProfile", ((MemberController)controllers.get("member")).new ViewProfileController());
+    			break;
+    		case "history":
+    			controllers.put("history",((MemberController.ViewProfileController)controllers.get("viewProfile")).new HistoryController());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
@@ -124,7 +131,7 @@ public class ReaderController {
     	loader.setController(controllers.get(fxml));
 		try {
 			((BorderPane)topPane.getScene().getRoot()).setCenter(loader.load());
-		} catch (IOException e) {e.printStackTrace();}
+		} catch (IOException e) {}
     }     
     /* This function checks if login fields are empty after clicking the login button
      * input: none
@@ -136,9 +143,8 @@ public class ReaderController {
 	/* Handles login button's ENTER KEY PRESS*/
 	@FXML
     void keyBoard(KeyEvent event) {
-		if (!passField.getText().isEmpty() && !passField.getText().isEmpty() && event.getCode().equals(KeyCode.ENTER) && cc.getReader()==null) {
+		if (!passField.getText().isEmpty() && !passField.getText().isEmpty() && event.getCode().equals(KeyCode.ENTER) && !controllers.containsKey("member"))
 			submitLogin(null);
-		}
     }
 	/* This method handles a user logout
 	 * input: none
@@ -155,7 +161,7 @@ public class ReaderController {
     	if(isValidLoginFields())
     	{
     		MyData login = new MyData ("login");
-    		login.add("id", loginIdField.getText());
+    		login.add("id", Integer.valueOf(loginIdField.getText()));
     		login.add("password", passField.getText());
     		try {
     				cc.send(login);
@@ -173,6 +179,7 @@ public class ReaderController {
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
     			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
     			addTo(MenuBox, new MyImage("viewProfile","client/images/buttons/viewProfile.png",e1->setBottom(e1)),true);
+    			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
     		} else if (result.equals("login_failed")) {
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
     			passField.clear();
@@ -194,12 +201,11 @@ public class ReaderController {
 			removeFrom(MenuBox,"viewProfile");
 			try {
 				MyData data = new MyData("logout");
-				Member member = (Member) cc.getReader();
+				Member member = ((MemberController)controllers.get("member")).getMember();
 				data.add("id", member.getId());
 				cc.send(data);
 				
 			} catch (InterruptedException e) {e.printStackTrace();}
-			cc.forgetReader();
    }
 	private class SearchController {
 
@@ -237,53 +243,5 @@ public class ReaderController {
 				ClientConsole.newAlert(AlertType.ERROR, null, "Search failure", "Something went wrong..");
 			}
 	}
-	}
-	
-	private class ViewProfileController {
-		@FXML
-		void initialize() {
-			Member member = ((Member) cc.getReader());
-			idField.setText(String.valueOf(member.getId()));
-			nameField.setText(member.getMemberCard().getFirstName());
-		}
-		@FXML
-	    private TextField idField;
-
-	    @FXML
-	    private TextField statusField;
-
-	    @FXML
-	    private TextField nameField;
-
-	    @FXML
-	    private TextField emailField;
-
-	    @FXML
-	    private ImageView saveButton;
-
-	    @FXML
-	    private TextField phoneField;
-	    @FXML
-	    private AnchorPane pane;
-	    @FXML
-	    void entered(MouseEvent e) {
-	    	mouseEntered(e);
-	    }
-
-	    @FXML
-	    void exited(MouseEvent e) {
-	    	mouseExited(e);
-	    }
-
-	    @FXML
-	    void save(MouseEvent event) {
-
-	    }
-
-	    @FXML
-	    void history(MouseEvent event) {
-
-	    }
-
 	}
 }

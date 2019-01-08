@@ -17,17 +17,14 @@ public class Member extends Reader implements Serializable
 	private String password;
 	private Status status=Status.ACTIVE;
 	private MemberCard myMemberCard;
-
-	public Member() {
-		
-	}
+	
 	public Member(int id, String username, String password) {
 		this.id=id;
 		this.userName=username;
 		this.password=password;
 	}
 	
-	private void setMemberCard(MemberCard card) {
+	public void setMemberCard(MemberCard card) {
 		this.myMemberCard=card;
 	}
 	

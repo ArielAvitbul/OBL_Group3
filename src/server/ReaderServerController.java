@@ -5,10 +5,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import common.Borrow;
-import common.Member;
-import common.Violation;
 import client.MyData;
+import common.Borrow;
+import common.Librarian;
+import common.Member;
+import common.MemberCard;
+import common.Violation;
 
 public class ReaderServerController {
 	public MyData search(MyDB db, MyData data) throws SQLException {
@@ -48,24 +50,47 @@ public class ReaderServerController {
 		return data;
 	}
 	
+	public void setLoggedIn(MyDB db, boolean value, String ip) throws SQLException { // TODO change name to id...
+		PreparedStatement ps = db.update("UPDATE users SET loggedin =? WHERE ip =?");
+		ps.setBoolean(1, value);
+		ps.setString(2, ip);
+		ps.executeUpdate();
+	}
+	
 	public void setLoggedIn(MyDB db, boolean value, int id) throws SQLException { // TODO change name to id...
 		PreparedStatement ps = db.update("UPDATE users SET loggedin =? WHERE id =?");
 		ps.setBoolean(1, value);
 		ps.setInt(2, id);
 		ps.executeUpdate();
 	}
-	
+	public void updateIP(MyDB db, String ip,int id) throws SQLException {
+		PreparedStatement ps = db.update("UPDATE users SET ip=? WHERE id =?");
+		ps.setString(1, ip);
+		ps.setInt(2, id);
+		ps.executeUpdate();
+	}
 	/*this method creates Member instance for the member that has logged in
 	 * input: ResultSet (member details) and MyDB instance
 	 * output: Member instance
 	 */
 	public Member createMember(ResultSet rs, MyDB db) throws SQLException {
-			Member toReturn;
-		/*	toReturn = new Member(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getString(5),rs.getString(6),
-					rs.getString(7),rs.getString(8),getMemberBorrows(rs.getInt(1),db),getMemberViolations(rs.getInt(1), db),
-					rs.getInt(11));*/
-			toReturn = new Member(rs.getInt("id"),rs.getString("name"),rs.getString("password")); // TODO: fix this
+			Member toReturn=null;
+			if (rs.getInt("rank")==1) {
+				ResultSet libRS = db.select("SELECT * FROM Librarian where id = "+ rs.getInt("id"));
+				if (db.hasResults(libRS))
+				toReturn = new Librarian(rs.getInt("id"), rs.getString("username"), rs.getString("password"), libRS.getInt("workerNum"),libRS.getInt("permissionLevel"));
+			} else if (rs.getInt("rank")==0) {
+			toReturn = new Member(rs.getInt("id"),rs.getString("name"),rs.getString("password"));
+			}
+			toReturn.setMemberCard(fetchMemberCard(rs.getInt("id"),db));
 			return toReturn;
+	}
+	/* fetch membercard*/
+	private MemberCard fetchMemberCard(int id, MyDB db) throws SQLException {
+		ResultSet rs = db.select("SELECT * from member_card WHERE userID = "+ id);
+		if (db.hasResults(rs))
+		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), null, null, rs.getInt("lateReturns"));
+		return null;
 	}
 		/* function to get all of the specified member borrows
 		 * input: memberID (unique) , MyDB instance.

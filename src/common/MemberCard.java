@@ -1,6 +1,8 @@
 package common;
 
-public class MemberCard {
+import java.io.Serializable;
+
+public class MemberCard implements Serializable{
 	
 	private String firstName="";
 	private String lastName="";

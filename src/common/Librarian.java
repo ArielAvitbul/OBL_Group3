@@ -7,21 +7,16 @@ public class Librarian extends Member{
 		REGULAR,
 		SPECIAL
 	}
-	private final int librarianNumber;
+	private final int workerNum;
 	private final int employeeID;
 	private levels permissionLevel;
 	
-	public Librarian(int newLibrarianNumber, int newEmployeeID, levels newPermissionLevel)
+	public Librarian(int userID,String username,String password, int workerNum, int permissionLevel)
 	{
-		super();
-		this.librarianNumber=newLibrarianNumber;
-		this.employeeID=newEmployeeID;
-		this.permissionLevel=newPermissionLevel;
-	}
-	
-	public int getLibrarianNumber() 
-	{
-		return librarianNumber;
+		super(userID,username,password);
+		this.workerNum=workerNum;
+		this.employeeID=userID;
+		this.permissionLevel=(permissionLevel==0 ? levels.REGULAR : levels.SPECIAL);
 	}
 	
 	public int getEmployeeID() 
@@ -37,6 +32,10 @@ public class Librarian extends Member{
 	public void setPermissionLevel(levels permissionLevel) 
 	{
 		this.permissionLevel = permissionLevel;
+	}
+
+	public int getWorkerNum() {
+		return workerNum;
 	}
 	
 }
