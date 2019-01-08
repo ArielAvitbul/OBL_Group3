@@ -64,7 +64,7 @@ public class ReaderServerController {
 		/*	toReturn = new Member(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getString(5),rs.getString(6),
 					rs.getString(7),rs.getString(8),getMemberBorrows(rs.getInt(1),db),getMemberViolations(rs.getInt(1), db),
 					rs.getInt(11));*/
-			toReturn = new Member(rs.getInt("id"),rs.getString("name"),rs.getString("password"));
+			toReturn = new Member(rs.getInt("id"),rs.getString("name"),rs.getString("password")); // TODO: fix this
 			return toReturn;
 	}
 		/* function to get all of the specified member borrows
