@@ -19,9 +19,9 @@
          <children>
             <TextField fx:id="emailField" />
             <TextField fx:id="phoneField" />
-            <TextField fx:id="statusField" />
+            <TextField fx:id="statusField" editable="false" />
             <TextField fx:id="nameField" />
-            <TextField fx:id="idField" />
+            <TextField fx:id="idField" editable="false" />
             <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#save" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/save.jpg" />

@@ -2,10 +2,10 @@ package common;
 
 public class MemberCard {
 	
-	private final String firstName;
-	private final String lastName;
-	private String phoneNumber;
-	private String emailAddress;
+	private String firstName="";
+	private String lastName="";
+	private String phoneNumber="";
+	private String emailAddress="";
 	private Borrow[] borrowHistory;
 	private Violation[] violationHostory;
 	private int lateReturns;

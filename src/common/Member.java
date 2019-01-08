@@ -12,18 +12,18 @@ public class Member extends Reader implements Serializable
 		ACTIVE
 	}
 	
-	private int memberNumber;
-	private String userName;
+	private int id;
+	private String userName="";
 	private String password;
-	private Status userStatus;
+	private Status status=Status.ACTIVE;
 	private MemberCard myMemberCard;
 	
-	public Member(int newMemberNumber, String newUserName, String newPassword, int newUserStatus,
+	public Member(int id, String newUserName, String newPassword, int newUserStatus,
 			String firstName, String lastName, String phoneNumber, String emailAddress,
 			Borrow[] borrowHistory, Violation[] violationHostory, int lateReturns) 
 	{
 		super();
-		this.memberNumber=newMemberNumber;
+		this.id=id;
 		this.userName=newUserName;
 		this.password=newPassword;
 		setUserStatus(newUserStatus);
@@ -38,10 +38,12 @@ public class Member extends Reader implements Serializable
 		this.userName=username;
 		this.password=password;
 	}
-
-	public int getMemberNumber() 
+	public MemberCard getMemberCard() {
+		return myMemberCard;
+	}
+	public int getId() 
 	{
-		return memberNumber;
+		return id;
 	}
 	
 	public String getUserName() 
@@ -59,23 +61,23 @@ public class Member extends Reader implements Serializable
 		this.password = password;
 	}
 
-	public Status getUserStatus() 
+	public Status getStatus() 
 	{
-		return userStatus;
+		return status;
 	}
 
 	public void setUserStatus(int enumNumericValue) 
 	{
 		switch(enumNumericValue) {
 			case 0:
-				this.userStatus = Status.FREEZE;
+				this.status = Status.FREEZE;
 				break;
 			case 1:
-				this.userStatus = Status.LOCK;
+				this.status = Status.LOCK;
 				break;
 			case 2: // anyway default is ACTIVE
 			default:
-				this.userStatus = Status.ACTIVE;
+				this.status = Status.ACTIVE;
 				break;
 				
 		}

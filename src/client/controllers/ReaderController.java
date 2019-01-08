@@ -9,7 +9,7 @@ import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
 import common.Member;
-import javafx.collections.ObservableList;
+import common.MemberCard;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -55,6 +55,14 @@ public class ReaderController {
     private ImageView loginPicture;
     @FXML
     private ImageView loginButton;
+    /* This method removes objects from a pane */
+	private void removeFrom(Pane pane, ArrayList<String> names) {
+		ArrayList<Node> list = new ArrayList<>();
+		for (Node n : pane.getChildren())
+			if (names.contains(n.getId()))
+				list.add(n);
+		pane.getChildren().removeAll(list);
+	}
     /* This method removes an object from a pane */
 	private boolean removeFrom(Pane pane, String name) {
 		for (Node n : pane.getChildren()) {
@@ -113,14 +121,7 @@ public class ReaderController {
 	private boolean isValidLoginFields() {
 		return !(loginIdField.getText().isEmpty() && passField.getText().isEmpty());
 	}
-	/* This method removes objects from a pane */
-	private void removeFrom(Pane pane, ArrayList<String> names) {
-		ArrayList<Node> list = new ArrayList<>();
-		for (Node n : pane.getChildren())
-			if (names.contains(n.getId()))
-				list.add(n);
-		pane.getChildren().removeAll(list);
-	}
+	
 	/* This method handles a user logout
 	 * input: none
 	 * output: none
@@ -218,6 +219,12 @@ public class ReaderController {
 	}
 	
 	private class ViewProfileController {
+		@FXML
+		void initialize() {
+			Member member = ((Member) cc.getReader());
+			idField.setText(String.valueOf(member.getId()));
+	//		nameField.setText(member.getMemberCard().getFirstName());
+		}
 		@FXML
 	    private TextField idField;
 
