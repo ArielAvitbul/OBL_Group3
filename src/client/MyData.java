@@ -8,10 +8,14 @@ public class MyData implements Serializable{
 	private HashMap<String,Object> data;
 	public MyData(String datatype) {
 		this.action=datatype;
+		this.data = new HashMap<>();
+	}
+	public MyData(String datatype, String what, Object item) {
+		this.action=datatype;
+		this.data = new HashMap<>();
+		add(what,item);
 	}
 	public HashMap<String,Object> getData() {
-		if (this.data==null)
-			this.data=new HashMap<>();
 		return data;
 	}
 	public void add(String datatype, Object data) {

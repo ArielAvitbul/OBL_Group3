@@ -20,7 +20,7 @@ import ocsf.client.AbstractClient;
  */
 public class ChatClient extends AbstractClient
 {
-	final private int delay=3;
+	final private int delay=3; // how long will the client wait for a server response
   //Instance variables **********************************************
   
   /**
@@ -28,7 +28,6 @@ public class ChatClient extends AbstractClient
    * the display method in the client.
    */
   CommonIF clientUI; 
-
   
   //Constructors ****************************************************
   

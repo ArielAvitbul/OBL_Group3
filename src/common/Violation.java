@@ -1,10 +1,11 @@
 package common;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 //import common.Member.Status;
 
-public class Violation {
+public class Violation implements Serializable	{
 
 	private enum type
 	{

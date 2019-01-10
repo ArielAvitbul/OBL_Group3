@@ -7,7 +7,6 @@ import client.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
 import common.Member;
-import common.Reader;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -34,8 +33,9 @@ public class ClientConsole extends Application implements CommonIF
   /**
    * The instance of the client that created this ConsoleChat.
    */
-  ChatClient client;
-  MyData fromServer;
+  protected ChatClient client;
+  protected MyData fromServer;
+  private int userid=0;
   
   //Instance methods ************************************************
   
@@ -59,8 +59,11 @@ public class ClientConsole extends Application implements CommonIF
   public void handle(Object message)
   {
 	  fromServer = (MyData) message;
-		  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
-		  // TODO: work on client's response to server messages.
+	  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
+	  if (fromServer.getAction().equals("login_approved"))
+			  this.userid = ((Member)fromServer.getData("MemberLoggedIn")).getId();
+	  else if (fromServer.getAction().equals("successful_logout"))
+		  this.userid = 0; // back to default, forget the user.
   }
   public MyData getFromServer() {
 	  return fromServer;
@@ -107,7 +110,7 @@ public class ClientConsole extends Application implements CommonIF
 	@Override
 		public void stop() throws Exception {
 			MyData data = new MyData("client_stopped");
-			data.add("ip", client.getInetAddress().toString());
+			data.add("id", this.userid);
 			send(data);
 			client.closeConnection();
 			super.stop();

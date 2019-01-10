@@ -20,9 +20,9 @@
             <TextField fx:id="emailField" />
             <TextField fx:id="phoneField" />
             <TextField fx:id="statusField" editable="false" />
-            <TextField fx:id="nameField" />
+            <TextField fx:id="nameField" editable="false" />
             <TextField fx:id="idField" editable="false" />
-            <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#setBottom" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#saveInfo" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/save.jpg" />
                </image>
@@ -31,17 +31,17 @@
       </VBox>
       <HBox layoutX="40.0" layoutY="113.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
          <children>
-            <ImageView fx:id="history" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#setBottom" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="history" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/history.jpg" />
                </image>
             </ImageView>
-            <ImageView onMouseEntered="#entered" onMouseExited="#exited" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="orderBook" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/orderBook.jpg" />
                </image>
             </ImageView>
-            <ImageView onMouseEntered="#entered" onMouseExited="#exited" pickOnBounds="true" preserveRatio="true">
+            <ImageView onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/askForExtend.jpg" />
                </image>

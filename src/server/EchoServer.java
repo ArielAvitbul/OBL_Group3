@@ -4,11 +4,10 @@ package server;
 // license found at www.lloseng.com 
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import client.MyData;
-import common.Student;
+import common.Member;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
@@ -30,7 +29,7 @@ public class EchoServer extends AbstractServer
    * The default port to listen on.
    */
 	private MyDB db;
-	private ReaderServerController readerCont;
+	private ServerController serverCont;
   
   //Constructors ****************************************************
   
@@ -49,7 +48,7 @@ public class EchoServer extends AbstractServer
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	readerCont = new ReaderServerController();
+	serverCont = new ServerController(db);
   }
 
   
@@ -69,21 +68,24 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
-	  		    case "search_book":
-	  				client.sendToClient(readerCont.search(db,data));
-	  				break;
 	  		    case "login":
 	  		    	System.out.println((Integer)data.getData("id")+" had logged in (IP:"+ client.getInetAddress().toString()+")");
-	  		    	readerCont.updateIP(db, client.getInetAddress().toString(), (Integer)data.getData("id"));
-	  		    	client.sendToClient(readerCont.login(db, data));
+	  		    	serverCont.updateIP(client.getInetAddress().toString(), (Integer)data.getData("id"));
+	  		    	client.sendToClient(serverCont.login(data));
+	  		    	break;
+	  		    case "orderBook":
+	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Integer)data.getData("bookID")));
+	  		    	break;
+	  		    case "getBooks":
+	  		    	MyData books = new MyData("getBooks");
+	  		    	books.add("books", serverCont.getAllBooks());
+	  		    	client.sendToClient(books); // TODO: returns all the books.. replace this with search result!
 	  		    	break;
 	  		    case "client_stopped":
-	  		    	readerCont.setLoggedIn(db, false, (String)data.getData("ip"));
-	  		    	break;
 	  		    case "logout":
-	  		    	readerCont.setLoggedIn(db, false, (Integer)data.getData("id"));
+	  		    	serverCont.setLoggedIn(false, (Integer)data.getData("id"));
 	  		    	System.out.println(data.getData("id") +" has logged out");
-	  		    	client.sendToClient(new MyData("successful_logout"));
+	  		    	client.sendToClient(data);
 	  		    	break;
 	  			default:
 	  					client.sendToClient(o);

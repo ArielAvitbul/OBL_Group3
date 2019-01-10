@@ -1,6 +1,7 @@
 package common;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class MemberCard implements Serializable{
 	
@@ -8,12 +9,13 @@ public class MemberCard implements Serializable{
 	private String lastName="";
 	private String phoneNumber="";
 	private String emailAddress="";
-	private Borrow[] borrowHistory=null;
-	private Violation[] violationHostory=null;
+	private ArrayList<Borrow> borrowHistory=null;
+	private ArrayList<Violation> violationHostory=null;
+	private ArrayList<BookReservation> reservationHistory=null;
 	private int lateReturns=0;
 
 	public MemberCard(String firstName, String lastName, String phoneNumber, String emailAddress,
-			Borrow[] borrowHistory, Violation[] violationHostory, int lateReturns) 
+			ArrayList<Borrow> borrowHistory, ArrayList<Violation> violationHostory, ArrayList<BookReservation> reservationHistory, int lateReturns) 
 	{
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -22,10 +24,31 @@ public class MemberCard implements Serializable{
 		this.borrowHistory = borrowHistory;
 		this.violationHostory = violationHostory;
 		this.lateReturns = lateReturns;
+		this.reservationHistory=reservationHistory;
 	}
 	
+	public ArrayList<BookReservation> getReservationHistory() {
+		System.out.println(reservationHistory);
+		return reservationHistory;
+	}
+	public boolean checkBookReserved(int bookid) {
+		for (BookReservation br : reservationHistory)
+			if (br.getBookID()==bookid)
+				return true;
+		return false;
+	}
+	public BookReservation addBookReservation(BookReservation reservation) {
+		this.reservationHistory.add(reservation);
+		return reservation;
+	}
+	public void setReservationHistory(ArrayList<BookReservation> reservationHistory) {
+		this.reservationHistory = reservationHistory;
+	}
+
 	public MemberCard() {
-		
+		this.borrowHistory = new ArrayList<>();
+		this.violationHostory = new ArrayList<>();
+		this.reservationHistory = new ArrayList<>();
 	}
 	
 	public String getFirstName() 
@@ -58,22 +81,22 @@ public class MemberCard implements Serializable{
 		this.emailAddress = emailAddress;
 	}
 	
-	public Borrow[] getBorrowHistory() 
+	public ArrayList<Borrow> getBorrowHistory() 
 	{
 		return borrowHistory;
 	}
 	
-	public void setBorrowHistory(Borrow[] borrowHistory) 
+	public void setBorrowHistory(ArrayList<Borrow> borrowHistory) 
 	{
 		this.borrowHistory = borrowHistory;
 	}
 	
-	public Violation[] getViolationHostory() 
+	public ArrayList<Violation> getViolationHostory() 
 	{
 		return violationHostory;
 	}
 	
-	public void setViolationHostory(Violation[] violationHostory) 
+	public void setViolationHostory(ArrayList<Violation> violationHostory) 
 	{
 		this.violationHostory = violationHostory;
 	}

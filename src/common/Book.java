@@ -1,18 +1,22 @@
 package common;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 import com.itextpdf.text.Document;
 
-public class Book {
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
 
-	private final int bookID;
-	private final String bookName;
-	private final String[] authorsNames;
+public class Book implements Serializable{
+
+	private int bookID;
+	private String bookName;
+	private String authorsNames;
 	private float editionNumber;
 	private Date printDate;
-	private final String[] topic;
-	private final String shortDescription;
+	private  String topic;
+	private String shortDescription;
 	private int numberOfCopies;
 	private Date purchaseDate;
 	private String shellLocation;
@@ -20,11 +24,10 @@ public class Book {
 	private boolean isPopular;
 	private int currentNumberOfCopies;
 	
-	public Book(int bookID, String bookName, String[] authorsNames, float editionNumber, Date printDate, String[] topic,
+	public Book(int bookID, String bookName, String authorsNames, float editionNumber, Date printDate, String topic,
 			String shortDescription, int numberOfCopies, Date purchaseDate, String shellLocation, boolean isPopular,
 			int currentNumberOfCopies) 
 	{
-		super();
 		this.bookID = bookID;
 		this.bookName = bookName;
 		this.authorsNames = authorsNames;
@@ -39,6 +42,11 @@ public class Book {
 		this.currentNumberOfCopies = currentNumberOfCopies;
 	}
 	
+	public Book(int bookID, String bookName) {
+		this.bookID = bookID;
+		this.bookName = bookName;
+	}
+
 	public int getBookID() 
 	{
 		return bookID;
@@ -48,8 +56,20 @@ public class Book {
 	{
 		return bookName;
 	}
+	
+	public SimpleStringProperty bookName() {
+		return new SimpleStringProperty(bookName);
+	}
 
-	public String[] getAuthorsNames() 
+	public SimpleStringProperty topic() {
+		return new SimpleStringProperty(topic);
+	}
+	
+	public SimpleStringProperty authorsNames() {
+		return new SimpleStringProperty(authorsNames);
+	}
+	
+	public String getAuthorsNames() 
 	{
 		return authorsNames;
 	}
@@ -74,7 +94,7 @@ public class Book {
 		this.printDate = printDate;
 	}
 
-	public String[] getTopic() 
+	public String getTopic() 
 	{
 		return topic;
 	}
@@ -132,6 +152,11 @@ public class Book {
 	public void setCurrentNumberOfCopies(int currentNumberOfCopies) 
 	{
 		this.currentNumberOfCopies = currentNumberOfCopies;
+	}
+	
+	@Override
+	public String toString() {
+		return this.bookName;
 	}
 
 }

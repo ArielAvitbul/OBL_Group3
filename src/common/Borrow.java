@@ -1,8 +1,9 @@
 package common;
 
+import java.io.Serializable;
 import java.sql.Date;
 
-public class Borrow {
+public class Borrow implements Serializable {
 
 
 	private final int borrowID;

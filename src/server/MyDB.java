@@ -4,7 +4,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import common.Book;
 
 public class MyDB {
 	private final String IP= "localhost";
@@ -26,9 +29,16 @@ public class MyDB {
 		return conn.createStatement().executeQuery(query);
 	}
 	
+	public int insert(String query) throws SQLException {
+		return conn.createStatement().executeUpdate(query);
+	}
+	
 	public PreparedStatement update(String query) throws SQLException {
 			return conn.prepareStatement(query);
 	}
+	public int updateWithExecute(String query) throws SQLException {
+		return conn.prepareStatement(query).executeUpdate();
+}
 	public boolean hasResults(ResultSet rs) throws SQLException {
 		return rs.first();
 	}

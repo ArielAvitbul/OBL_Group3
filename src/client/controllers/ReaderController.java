@@ -5,15 +5,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import com.sun.prism.paint.Stop;
 
 import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
+import common.ChatClient;
 import common.Member;
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -30,6 +34,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 public class ReaderController {
 	private ClientConsole cc;
@@ -112,7 +117,7 @@ public class ReaderController {
     protected void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
     	String fxml = ((ImageView)ev.getSource()).getId();
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
-    	if (!controllers.containsKey(fxml)) {
+    	if (!this.controllers.containsKey(fxml)) {
     		switch (fxml) {
     		case "searchBook":
     			controllers.put(fxml, new SearchController());
@@ -123,6 +128,9 @@ public class ReaderController {
     		case "history":
     			controllers.put("history",((MemberController.ViewProfileController)controllers.get("viewProfile")).new HistoryController());
     			break;
+    		case "orderBook":
+    			controllers.put("orderBook",((MemberController.ViewProfileController)controllers.get("viewProfile")).new OrderBookController());
+    			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
     				//System.exit(1);
@@ -131,7 +139,7 @@ public class ReaderController {
     	loader.setController(controllers.get(fxml));
 		try {
 			((BorderPane)topPane.getScene().getRoot()).setCenter(loader.load());
-		} catch (IOException e) {}
+		} catch (IOException e) {e.printStackTrace();}
     }     
     /* This function checks if login fields are empty after clicking the login button
      * input: none
@@ -207,7 +215,22 @@ public class ReaderController {
 				
 			} catch (InterruptedException e) {e.printStackTrace();}
    }
-	private class SearchController {
+		public void popup(MouseEvent event, Object controller) {
+			String fxml = ((ImageView)event.getSource()).getId();
+			if (fxml.equals("orderBook"))
+				fxml="searchBook";
+	        try {
+	        	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
+				loader.setController(controller);
+				Stage stage = new Stage();
+				stage.setScene(new Scene(loader.load()));
+				stage.show();
+	        }
+	        catch (IOException e) {
+	            e.printStackTrace();
+	        }
+		}
+	protected class SearchController {
 
 		@FXML
 	    private Button searchButton;
@@ -223,7 +246,6 @@ public class ReaderController {
 
 	    @FXML
 	    private TextField genreField;
-
 	    @FXML
 	    void submitSearch(ActionEvent event) {
 	    	MyData data = new MyData("search_book");
