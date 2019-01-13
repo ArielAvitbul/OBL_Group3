@@ -15,6 +15,7 @@ public class MyData implements Serializable{
 		this.data = new HashMap<>();
 		add(what,item);
 	}
+	
 	public HashMap<String,Object> getData() {
 		return data;
 	}

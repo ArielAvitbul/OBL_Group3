@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/orderBook.jpg" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="386.0" layoutY="341.0" onMouseEntered="#enetered" onMouseExited="#exited" onMouseReleased="#orderBook" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/orderBook.jpg" />
+         </image>
+      </ImageView>
+      <TableView fx:id="resultTable" editable="true" layoutX="217.0" layoutY="130.0" prefHeight="200.0" prefWidth="466.0">
+        <columns>
+          <TableColumn fx:id="nameCol" editable="false" prefWidth="255.0" text="Name" />
+            <TableColumn fx:id="authorsCol" prefWidth="145.0" text="Author(s)" />
+            <TableColumn fx:id="genreCol" minWidth="0.0" prefWidth="65.0" text="Genre" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

@@ -43,7 +43,7 @@ public class EchoServer extends AbstractServer
     super(port);
 	db = new MyDB();
 	try {
-		db.update("UPDATE users set loggedin=0").executeUpdate();
+		db.updateWithExecute("UPDATE members set loggedin=0");
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -72,6 +72,9 @@ public class EchoServer extends AbstractServer
 	  		    	System.out.println((Integer)data.getData("id")+" had logged in (IP:"+ client.getInetAddress().toString()+")");
 	  		    	serverCont.updateIP(client.getInetAddress().toString(), (Integer)data.getData("id"));
 	  		    	client.sendToClient(serverCont.login(data));
+	  		    	break;
+	  		  case "saveInfo":
+	  		    	client.sendToClient(serverCont.saveInfo((Integer)data.getData("id"),data));
 	  		    	break;
 	  		    case "orderBook":
 	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Integer)data.getData("bookID")));

@@ -24,7 +24,7 @@ public class ServerController {
 	public ArrayList<Book> getAllBooks() {
 		ArrayList<Book> books = new ArrayList<>();
 		try {
-		ResultSet rs = db.select("SELECT * from book");
+		ResultSet rs = db.select("SELECT * from books");
 		while (rs.next()) {//TODO: add table of content PDF.
 			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topic"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 			books.add(book);
@@ -35,7 +35,7 @@ public class ServerController {
 		return books;
 	}
 	public Book getBook(int bookID) throws SQLException {
-		ResultSet rs = db.select("SELECT * from book WHERE bookid="+ bookID);
+		ResultSet rs = db.select("SELECT * from books WHERE bookid="+ bookID);
 		if (db.hasResults(rs))
 			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topic"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 		return null;
@@ -46,32 +46,28 @@ public class ServerController {
 	 * Guy Wrote This
 	 */
 	public MyData login (MyData data) throws SQLException {
-		String MyQuery = "SELECT *"
-							+ "FROM users "
-							+ "WHERE id = '"+ data.getData("id")+"' "
-							+ "AND password = '"+data.getData("password")+"';";
-		ResultSet memberMatch = db.select(MyQuery);
+		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ="+ data.getData("id")+" AND password ="+data.getData("password"));
 		MyData ret = new MyData("login_failed");
 		if(!db.hasResults(memberMatch))
-			data.add("reason", "ID or password incorrect");
+			ret.add("reason", "ID or password incorrect");
 		else if (memberMatch.getBoolean("loggedin"))
-			data.add("reason", "Already logged in!");
+			ret.add("reason", "Already logged in!");
 		else {
-			data.setAction("login_approved");
+			ret.setAction("login_approved");
 			setLoggedIn(true,memberMatch.getInt("id"));
-			data.add("MemberLoggedIn",createMember(memberMatch));
+			ret.add("MemberLoggedIn",createMember(memberMatch));
 			}
-		return data;
+		return ret;
 	}
 	
 	public void setLoggedIn(boolean value, int id) throws SQLException { // TODO change name to id...
-		PreparedStatement ps = db.update("UPDATE users SET loggedin =? WHERE id =?");
+		PreparedStatement ps = db.update("UPDATE members SET loggedin =? WHERE id =?");
 		ps.setBoolean(1, value);
 		ps.setInt(2, id);
 		ps.executeUpdate();
 	}
 	public void updateIP(String ip,int id) throws SQLException {
-		PreparedStatement ps = db.update("UPDATE users SET ip=? WHERE id =?");
+		PreparedStatement ps = db.update("UPDATE members SET ip=? WHERE id =?");
 		ps.setString(1, ip);
 		ps.setInt(2, id);
 		ps.executeUpdate();
@@ -83,9 +79,9 @@ public class ServerController {
 	public Member createMember(ResultSet rs) throws SQLException {
 			Member toReturn=null;
 			ResultSet localRS;
-			if (db.hasResults(localRS = db.select("SELECT * FROM Manager where id = "+ rs.getInt("id")))) 
+			if (db.hasResults(localRS = db.select("SELECT * FROM managers where id = "+ rs.getInt("id")))) 
 				toReturn = new Manager(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),1);
-			else if (db.hasResults(localRS = db.select("SELECT * FROM Librarian where id = "+ rs.getInt("id"))))
+			else if (db.hasResults(localRS = db.select("SELECT * FROM librarians where id = "+ rs.getInt("id"))))
 				toReturn = new Librarian(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),localRS.getInt("permissionLevel"));
 			else // member
 				toReturn = new Member(rs.getInt("id"),rs.getString("username"),rs.getString("password"));
@@ -94,8 +90,7 @@ public class ServerController {
 	}
 	/* fetch membercard*/
 	private MemberCard getMemberCard(int id) throws SQLException {
-		ResultSet rs = db.select("SELECT * from member_card WHERE userID = "+ id);
-		System.out.println(getMemberReservations(id));
+		ResultSet rs = db.select("SELECT * from member_cards WHERE userID = "+ id);
 		if (db.hasResults(rs))
 		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), getMemberBorrows(id), getMemberViolations(id), getMemberReservations(id),rs.getInt("lateReturns"));
 		return new MemberCard(); // TODO: incase no member card exists in the db, perhaps remove this later
@@ -106,8 +101,7 @@ public class ServerController {
 		 */
 	public ArrayList<Borrow> getMemberBorrows(int memberID) throws SQLException {
 		ArrayList<Borrow> memberBorrows = new ArrayList<Borrow>();
-		String MyQuery = "SELECT * FROM Borrow WHERE memberID ="+memberID;
-		ResultSet rs = db.select(MyQuery);
+		ResultSet rs = db.select("SELECT * FROM borrows WHERE memberID ="+memberID);
 		while(rs.next())
 			memberBorrows.add(new Borrow(rs.getInt(1),rs.getInt(2),rs.getDate(3),rs.getDate(4),rs.getDate(5),rs.getBoolean(6)));
 		return memberBorrows;
@@ -118,7 +112,7 @@ public class ServerController {
 	 */
 	public ArrayList<Violation> getMemberViolations(int memberID) throws SQLException {
 		ArrayList<Violation> memberViolations = new ArrayList<Violation>();
-		String MyQuery = "SELECT * FROM Violation WHERE memberID ="+memberID;
+		String MyQuery = "SELECT * FROM violations WHERE memberID ="+memberID;
 		ResultSet rs = db.select(MyQuery);
 		while(rs.next()) {
 			memberViolations.add(new Violation(rs.getInt(1),rs.getDate(2),rs.getString(3),rs.getInt(4)));
@@ -131,11 +125,28 @@ public class ServerController {
 	 */
 	public ArrayList<BookReservation> getMemberReservations(int memberID) throws SQLException {
 		ArrayList<BookReservation> memberReservations = new ArrayList<BookReservation>();
-		ResultSet rs = db.select("SELECT * FROM book_reservation WHERE memberID ="+memberID);
+		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE memberID ="+memberID);
 		while(rs.next()) {
 			memberReservations.add(new BookReservation(memberID, rs.getDate("orderDate"),rs.getInt("bookID")));
 		}
 		return memberReservations;
+	}
+	
+	public MyData saveInfo(int userid, MyData data) throws SQLException {
+		MyData result = new MyData("fail");
+		switch (db.updateWithExecute("UPDATE member_cards set emailAddress="+ data.getData("email") +", phoneNumber="+data.getData("phone")+" WHERE userID = "+userid)) {
+		case 1: // 1 row found in db.
+			result.setAction("success");
+			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
+			break;
+		case 0: // member was not found, keep the fail action, add a message
+			result.add("message", "Member card was not found in the database.");
+			break;
+		default:
+			result.add("message", "Something went wrong."); // doubt this will happen, but we'll cover that too.
+			break;
+		}
+		return result;
 	}
 	public MyData orderBook(int userid, int bookID) throws SQLException {
 		Book book = getBook(bookID);
@@ -143,7 +154,7 @@ public class ServerController {
 			return new MyData("fail","message","The book doesn't exists.");
 			if (book.getCurrentNumberOfCopies()==0) { // can order
 				Date date = new Date(System.currentTimeMillis());
-				db.insert("INSERT INTO book_reservation (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+date+"', '"+bookID+"')");
+				db.insert("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+date+"', '"+bookID+"')");
 				return new MyData("success","reservation",new BookReservation(userid, date,bookID));
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
