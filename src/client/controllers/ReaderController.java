@@ -57,6 +57,8 @@ public class ReaderController {
     private HBox MenuBox;
 	@FXML
     private AnchorPane topPane;
+	@FXML
+    private BorderPane borderPane;
     @FXML
     private PasswordField passField;
     @FXML
@@ -115,6 +117,9 @@ public class ReaderController {
     protected void mouseExited(MouseEvent ev) {
     	((ImageView)ev.getSource()).setEffect(null);
     }
+    private void resetBottom() {
+			borderPane.setCenter(new ImageView(new Image("client/images/bottom.jpg")));
+    }
     @FXML
     protected void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
     	String fxml = ((ImageView)ev.getSource()).getId();
@@ -140,7 +145,7 @@ public class ReaderController {
     	}
     	loader.setController(controllers.get(fxml));
 		try {
-			((BorderPane)topPane.getScene().getRoot()).setCenter(loader.load());
+			borderPane.setCenter(loader.load());
 		} catch (IOException e) {e.printStackTrace();}
     }     
     /* This function checks if login fields are empty after clicking the login button
@@ -214,8 +219,9 @@ public class ReaderController {
 				Member member = ((MemberController)controllers.get("member")).getMember();
 				data.add("id", member.getId());
 				cc.send(data);
-				
+				resetBottom();
 			} catch (InterruptedException e) {e.printStackTrace();}
+			
    }
 		public void popup(MouseEvent event, Object controller) {
 			String fxml = ((ImageView)event.getSource()).getId();
