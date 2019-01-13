@@ -90,8 +90,10 @@ public class ReaderController {
 	}
     void addTo(Pane pane, Node button, boolean enteredexit) {
     	pane.getChildren().add(button);
-    	if (pane.equals(MenuBox))
+    	if (pane.equals(MenuBox)) {
     		pane.getChildren().add(new ImageView(new Image("client/images/buttons/separator.png")));
+    		button.setPickOnBounds(true); // since the image has a transparent background, we want the mouse to be able to click on it's bounds instead of it's visible graphics.
+    	}
     	if (enteredexit) {
     	button.setOnMouseEntered(e-> mouseEntered(e));
     	button.setOnMouseExited(e->mouseExited(e));
