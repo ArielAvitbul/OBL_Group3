@@ -159,4 +159,37 @@ public class ServerController {
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
+	public MyData searchBook(MyDB db, MyData data) throws SQLException {
+		ArrayList<Book> bookList = new ArrayList<>();
+		
+		int flag = 0;
+		String MyQuery = "SELECT BookID "
+				+ "FROM books "
+				+ "WHERE bookName = '"+ data.getData("bookName")+"' "
+				+ "AND authorsNames = '"+data.getData("authorName")+"';";
+		ResultSet rs = db.select(MyQuery);
+		data.getData().clear();
+		while (rs.next()) 
+		{	
+			System.out.println(rs.getInt("BookID"));
+					bookList.add(getBook(rs.getInt("BookID")));		
+					flag=1;
+			
+		}
+		rs.close();
+		
+		if (flag ==1)
+		{
+		
+			data.add("booklist", bookList);
+			data.setAction("listOfBooks");
+			return data;
+		}
+		else 
+		{
+			data.setAction("unfind_book");
+			data.add("reason", "No book found!");
+			return data;
+		}
+	}
 }

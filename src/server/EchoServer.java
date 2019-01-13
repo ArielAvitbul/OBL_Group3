@@ -68,6 +68,9 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		  case "searchBook":
+	  				client.sendToClient(serverCont.searchBook(db,data));
+	  				break;
 	  		    case "login":
 	  		    	System.out.println((Integer)data.getData("id")+" had logged in (IP:"+ client.getInetAddress().toString()+")");
 	  		    	serverCont.updateIP(client.getInetAddress().toString(), (Integer)data.getData("id"));

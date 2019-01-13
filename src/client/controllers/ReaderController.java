@@ -4,24 +4,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import com.sun.prism.paint.Stop;
+import java.util.Iterator;
 
 import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
-import common.ChatClient;
+import common.Book;
 import common.Member;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
@@ -238,40 +239,82 @@ public class ReaderController {
 	            e.printStackTrace();
 	        }
 		}
-	protected class SearchController {
+		private class SearchController {
+			@FXML
+				void initialize() {
+			choiceGenere.getItems().add("Drama");
+			choiceGenere.getItems().add("Thriller");
+			choiceGenere.getItems().add("Adventure");
+			TableColumn Name = new TableColumn("Name");
+			TableColumn Author = new TableColumn("Author");
+			TableColumn Genere = new TableColumn("Genere");
+			tableBooks.getColumns().addAll(Name, Author, Genere);			
+				}
 
-		@FXML
-	    private Button searchButton;
+		    @FXML
+		    private TextField nameField;
 
-	    @FXML
-	    private TextField authorField;
+		    @FXML
+		    private TextField authorField;
 
-	    @FXML
-	    private TextArea freetextField;
+		    @FXML
+		    private ChoiceBox<String> choiceGenere;
+		    
 
-	    @FXML
-	    private TextField nameField;
+		    @FXML
+		    private TextArea freetextField;
+		    
 
-	    @FXML
-	    private TextField genreField;
-	    @FXML
-	    void submitSearch(ActionEvent event) {
-	    	MyData data = new MyData("search_book");
-	    	if (!nameField.getText().isEmpty())
-	    	data.add("name", nameField.getText());
-	    	if (!authorField.getText().isEmpty())
-	    	data.add("author", authorField.getText());
-	    	if (!genreField.getText().isEmpty())
-	    	data.add("genre", genreField.getText());
-	    	if (!freetextField.getText().isEmpty())
-	    	data.add("freetext", freetextField.getText());
-	    	try {
-	    	cc.send(data);
-	    	}
-			catch (InterruptedException e)
-			{
-				ClientConsole.newAlert(AlertType.ERROR, null, "Search failure", "Something went wrong..");
-			}
-	}
-	}
+		    @FXML
+		    private ListView<String> searchResultList;
+		    @FXML
+		    private TableView<String> tableBooks;
+
+		    @FXML
+		    void entered(MouseEvent event) {
+
+		    }
+
+		    @FXML
+		    void exited(MouseEvent event) {
+
+		    }
+
+
+		    @FXML
+		    void submitSearch(MouseEvent  event) {
+		    	MyData searchBook = new MyData ("searchBook");
+		    	searchBook.add("bookName", nameField.getText());
+		    	searchBook.add("authorName", authorField.getText());
+		    	//search.add("authorName", choiceGenere.getUserData());
+		    	
+		    	try {
+    				cc.send(searchBook);
+    			}
+		    	catch (InterruptedException e)
+    			{
+    				ClientConsole.newAlert(AlertType.ERROR, null,"OBL System Error","Login denied!");
+    			}
+		    	String result = (String)cc.getFromServer().getAction();
+		
+	    		if (result.equals("listOfBooks")) {
+	    	    	ArrayList<Book> booksList = (ArrayList<Book>) cc.getFromServer().getData("booklist");
+	    	    	
+	    	    	Iterator<Book> it = booksList.iterator();
+	    	    	while(it.hasNext())
+	    	    	{
+	    	    		tableBooks.getItems().add(it.next().getBookName());
+	    	    		tableBooks.getItems().add(it.next().getAuthorsNames());
+	    	    		tableBooks.getItems().add(it.next().getTopic());
+	    	    	}
+
+	    		}
+	    		/*else if (result.equals("unfind_book")) {
+	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No book found!", (String)cc.getFromServer().getData("reason"));
+	    			nameField.clear();
+	    			authorField.clear();
+	    			}*/
+		    }
+
+		}
 }
