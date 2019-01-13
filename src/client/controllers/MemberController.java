@@ -29,7 +29,6 @@ public class MemberController {
 	public Member getMember() {
 		return member;
 	}
-	protected class ViewProfileController {
 		@FXML
 		void initialize() {
 			idField.setText(String.valueOf(member.getId()));
@@ -94,77 +93,76 @@ public class MemberController {
 	    		}
 	    	}
 	    }
-	    	protected class HistoryController {
-	    		
-	    	}
-	    	protected class OrderBookController {
-	    		@FXML
-	    		void initialize() {
-	    			//TODO: replace this with actual search results
-	    	//		resultTable.getItems().addAll(Arrays.asList("Harry Potter and the Chamber of Secrets","lolz","The Ugev","The Ugev 2"));
-	    			try { // TODO replace this with actual book results!
-						rc.getCC().send(new MyData("getBooks"));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-	    			System.out.println(rc.getCC().getFromServer().getData("books"));
-	    			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
-	    			resultTable.getItems().addAll(books);
-	    			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
-	    			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
-	    			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
-	    		}
+	    protected class HistoryController {
+    		// sapir's
+    	}
+    	protected class OrderBookController {
+    		@FXML
+    		void initialize() {
+    			//TODO: replace this with actual search results
+    	//		resultTable.getItems().addAll(Arrays.asList("Harry Potter and the Chamber of Secrets","lolz","The Ugev","The Ugev 2"));
+    			try { // TODO replace this with actual book results!
+					rc.getCC().send(new MyData("getBooks"));
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+    			System.out.println(rc.getCC().getFromServer().getData("books"));
+    			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
+    			resultTable.getItems().addAll(books);
+    			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
+    			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
+    			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
+    		}
 
-	    	    @FXML
-	    	    private TableColumn<Book, String> genreCol;
+    	    @FXML
+    	    private TableColumn<Book, String> genreCol;
 
-	    	    @FXML
-	    	    private TableColumn<Book, String> nameCol;
-	    	    
-	    	    @FXML
-	    	    private TableColumn<Book, String> authorsCol;
-	    	    
-	    		@FXML
-	    		private TableView<Book> resultTable;
+    	    @FXML
+    	    private TableColumn<Book, String> nameCol;
+    	    
+    	    @FXML
+    	    private TableColumn<Book, String> authorsCol;
+    	    
+    		@FXML
+    		private TableView<Book> resultTable;
 
-	    		@FXML
-	    		private AnchorPane pane;
+    		@FXML
+    		private AnchorPane pane;
 
-	    	    @FXML
-	    	    void enetered(MouseEvent event) {
-	    	    	rc.mouseEntered(event);
-	    	    }
+    	    @FXML
+    	    void enetered(MouseEvent event) {
+    	    	rc.mouseEntered(event);
+    	    }
 
-	    	    @FXML
-	    	    void exited(MouseEvent event) {
-	    	    	rc.mouseExited(event);
-	    	    }
+    	    @FXML
+    	    void exited(MouseEvent event) {
+    	    	rc.mouseExited(event);
+    	    }
 
-	    	    @FXML
-	    	    void orderBook(MouseEvent event) {
-	    	    	Book book = resultTable.getSelectionModel().getSelectedItem();
-					if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
-	    	    	MyData data = new MyData("orderBook");
-	    	    	data.add("id", getMember().getId());
-	    	    	data.add("bookID", book.getBookID());
-	    	    	try {
-	    	    	rc.getCC().send(data);
-	    	    	} catch (InterruptedException e) {}
-					switch (rc.getCC().getFromServer().getAction()) {
-					case "success":
-						getMember().getMemberCard().addBookReservation(((BookReservation)rc.getCC().getFromServer().getData("reservation")));
-						ClientConsole.newAlert(AlertType.INFORMATION, null, "Success!", book.getBookName() +" was successfuly ordered.");
-						break;
-					case "fail":
-						ClientConsole.newAlert(AlertType.WARNING, null, "", (String)rc.getCC().getFromServer().getData("message"));
-						break;
-						default:
-							System.out.println("Something went wrong...");
-					}
-	    	    	} else
-	    	    		ClientConsole.newAlert(AlertType.WARNING, null, "Reserved already", "You have already reserved that book.");
-	    	    }
-	    	    
-	    	}
-	}
+    	    @FXML
+    	    void orderBook(MouseEvent event) {
+    	    	Book book = resultTable.getSelectionModel().getSelectedItem();
+				if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
+    	    	MyData data = new MyData("orderBook");
+    	    	data.add("id", getMember().getId());
+    	    	data.add("bookID", book.getBookID());
+    	    	try {
+    	    	rc.getCC().send(data);
+    	    	} catch (InterruptedException e) {}
+				switch (rc.getCC().getFromServer().getAction()) {
+				case "success":
+					getMember().getMemberCard().addBookReservation(((BookReservation)rc.getCC().getFromServer().getData("reservation")));
+					ClientConsole.newAlert(AlertType.INFORMATION, null, "Success!", book.getBookName() +" was successfuly ordered.");
+					break;
+				case "fail":
+					ClientConsole.newAlert(AlertType.WARNING, null, "", (String)rc.getCC().getFromServer().getData("message"));
+					break;
+					default:
+						System.out.println("Something went wrong...");
+				}
+    	    	} else
+    	    		ClientConsole.newAlert(AlertType.WARNING, null, "Reserved already", "You have already reserved that book.");
+    	    }
+    	    
+    	}
 }

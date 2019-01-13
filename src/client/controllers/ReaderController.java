@@ -130,14 +130,14 @@ public class ReaderController {
     		case "searchBook":
     			controllers.put(fxml, new SearchController());
     			break;
-    		case "viewProfile":
-    			controllers.put("viewProfile", ((MemberController)controllers.get("member")).new ViewProfileController());
+    		case "memberArea":
+    			controllers.put("memberArea", controllers.get("member"));
     			break;
     		case "history":
-    			controllers.put("history",((MemberController.ViewProfileController)controllers.get("viewProfile")).new HistoryController());
+    			controllers.put("history",((MemberController)controllers.get("memberArea")).new HistoryController());
     			break;
     		case "orderBook":
-    			controllers.put("orderBook",((MemberController.ViewProfileController)controllers.get("viewProfile")).new OrderBookController());
+    			controllers.put("orderBook",((MemberController)controllers.get("memberArea")).new OrderBookController());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
@@ -188,13 +188,13 @@ public class ReaderController {
     			}
     		String result = cc.getFromServer().getAction();
     		if (result.equals("login_approved")) {
-    			addTo(topPane,new MyImage("logout","client/images/buttons/logout.png", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
+    			addTo(topPane,new MyImage("logout","client/images/buttons/logout.jpg", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
     			addTo(topPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),false);
     			welcomeMsg.setId("welcomeMsg");
     			welcomeMsg.setLayoutX(loginPicture.getLayoutX());
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
     			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
-    			addTo(MenuBox, new MyImage("viewProfile","client/images/buttons/viewProfile.png",e1->setBottom(e1)),true);
+    			addTo(MenuBox, new MyImage("memberArea","client/images/buttons/memberArea.png",e1->setBottom(e1)),true);
     			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
     		} else if (result.equals("login_failed")) {
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
@@ -214,7 +214,7 @@ public class ReaderController {
 			loginIdField.clear();
 			addTo(topPane,loginPicture,false);
 			addTo(topPane,loginButton,false); // no need for boolean value to be true; it remembers.
-			removeFrom(MenuBox,"viewProfile");
+			removeFrom(MenuBox,"memberArea");
 			try {
 				MyData data = new MyData("logout");
 				Member member = ((MemberController)controllers.get("member")).getMember();

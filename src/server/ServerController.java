@@ -134,7 +134,7 @@ public class ServerController {
 	
 	public MyData saveInfo(int userid, MyData data) throws SQLException {
 		MyData result = new MyData("fail");
-		switch (db.updateWithExecute("UPDATE member_cards set emailAddress="+ data.getData("email") +", phoneNumber="+data.getData("phone")+" WHERE userID = "+userid)) {
+		switch (db.updateWithExecute("UPDATE member_cards set emailAddress='"+ data.getData("email") +"', phoneNumber='"+data.getData("phone")+"' WHERE userID = "+userid)) {
 		case 1: // 1 row found in db.
 			result.setAction("success");
 			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
