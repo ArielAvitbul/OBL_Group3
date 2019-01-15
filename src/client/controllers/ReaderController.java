@@ -10,6 +10,8 @@ import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
 import common.Book;
+import common.Librarian;
+import common.Manager;
 import common.Member;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -74,17 +76,19 @@ public class ReaderController {
 	private void removeFrom(Pane pane, ArrayList<String> names) {
 		ArrayList<Node> list = new ArrayList<>();
 		for (Node n : pane.getChildren())
-			if (names.contains(n.getId()))
+			if (names.contains(n.getId())) {
 				list.add(n);
+				if (pane.equals(MenuBox))
+					list.add(MenuBox.getChildren().get(MenuBox.getChildren().indexOf(n)+1));
+			}
 		pane.getChildren().removeAll(list);
 	}
     /* This method removes an object from a pane */
 	private boolean removeFrom(Pane pane, String name) {
 		for (Node n : pane.getChildren()) {
 			if (name.equals(n.getId())) {
-				if (pane.equals(MenuBox)) {
+				if (pane.equals(MenuBox))
 					MenuBox.getChildren().remove(MenuBox.getChildren().indexOf(n)+1); // delete his separator
-				}
 				pane.getChildren().remove(n);
 				return true;
 			}
@@ -132,6 +136,12 @@ public class ReaderController {
     			break;
     		case "memberArea":
     			controllers.put("memberArea", controllers.get("member"));
+    			break;
+    		case "librarianArea":
+    			controllers.put("librarianArea", controllers.get("librarian"));
+    			break;
+    		case "managerArea":
+    			controllers.put("managerArea", controllers.get("manager"));
     			break;
     		case "history":
     			controllers.put("history",((MemberController)controllers.get("memberArea")).new HistoryController());
@@ -194,8 +204,17 @@ public class ReaderController {
     			welcomeMsg.setLayoutX(loginPicture.getLayoutX());
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
     			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
-    			addTo(MenuBox, new MyImage("memberArea","client/images/buttons/memberArea.png",e1->setBottom(e1)),true);
-    			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
+    			if (cc.getFromServer().getData("MemberLoggedIn") instanceof Member) {
+    				addTo(MenuBox, new MyImage("memberArea","client/images/buttons/memberArea.png",e1->setBottom(e1)),true);
+        			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
+    			} if (cc.getFromServer().getData("MemberLoggedIn") instanceof Librarian) {
+    				addTo(MenuBox, new MyImage("librarianArea","client/images/buttons/librarianArea.png",e1->setBottom(e1)),true);
+        			controllers.put("librarian", new LibrarianController(this,(Librarian) cc.getFromServer().getData("MemberLoggedIn")));
+    			} if (cc.getFromServer().getData("MemberLoggedIn") instanceof Manager) {
+    				addTo(MenuBox, new MyImage("managerArea","client/images/buttons/managerArea.png",e1->setBottom(e1)),true);
+        			controllers.put("manager", new ManagerController(this,(Manager) cc.getFromServer().getData("MemberLoggedIn")));
+    			}
+    			
     		} else if (result.equals("login_failed")) {
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
     			passField.clear();
@@ -214,7 +233,7 @@ public class ReaderController {
 			loginIdField.clear();
 			addTo(topPane,loginPicture,false);
 			addTo(topPane,loginButton,false); // no need for boolean value to be true; it remembers.
-			removeFrom(MenuBox,"memberArea");
+			removeFrom(MenuBox,new ArrayList<>(Arrays.asList("memberArea","librarianArea","managerArea")));
 			try {
 				MyData data = new MyData("logout");
 				Member member = ((MemberController)controllers.get("member")).getMember();

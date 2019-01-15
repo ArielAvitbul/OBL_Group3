@@ -12,7 +12,7 @@
    <children>
       <ImageView fx:id="saveInfo" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/viewProfile.jpg" />
+            <Image url="@../images/memberArea.jpg" />
          </image>
       </ImageView>
       <VBox alignment="TOP_CENTER" layoutX="132.0" layoutY="160.0" prefHeight="258.0" prefWidth="158.0" spacing="22.0">

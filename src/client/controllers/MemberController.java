@@ -106,7 +106,6 @@ public class MemberController {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-    			System.out.println(rc.getCC().getFromServer().getData("books"));
     			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
     			resultTable.getItems().addAll(books);
     			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
