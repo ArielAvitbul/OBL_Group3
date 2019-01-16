@@ -76,7 +76,7 @@ public class ChatClient extends AbstractClient
     catch(Exception e)
     {
     	MyData error = new MyData("error");
-    	error.add("msg", "Could not send message to server.  Terminating client.");
+    	error.add("msg", "Could not send "+ o+" to server.  Terminating client.");
       clientUI.handle(error);
       e.printStackTrace();
     }

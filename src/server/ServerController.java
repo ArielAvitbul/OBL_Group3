@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+
 import client.MyData;
 import common.Book;
 import common.BookReservation;
@@ -72,7 +74,27 @@ public class ServerController {
 		ps.setInt(2, id);
 		ps.executeUpdate();
 	}
-	/*this method creates Member instance for the member that has logged in
+	/** this method inserts a new user to the database
+	 * @throws SQLException */
+	public MyData createUser(MyData data) {
+		MyData ret = new MyData("fail");
+		try {
+		 db.insert("INSERT INTO members (`id`, `username`, `password`) "
+				 + "VALUES ('"+data.getData("id")+"', '"+data.getData("username")+"', '"+data.getData("password")+"')");
+		 db.insert("INSERT INTO member_cards (`userID`, `firstName`, `lastName`, `phoneNumber`, `emailAddress`) "
+		 		+ "VALUES ('"+data.getData("id")+"', '"+data.getData("firstname")+"', '"+data.getData("lastname")+"', '"+data.getData("phone")+"', '"+data.getData("email")+"')");
+		} catch (SQLException e) {
+			if (e instanceof MySQLIntegrityConstraintViolationException)
+				ret.add("reason", "That user already exists!");
+			else
+				ret.add("reason", "Could not add a new user to the database");
+			e.printStackTrace();
+			return ret;
+		}
+		ret.setAction("success");
+		return ret;
+	}
+	/**this method creates Member instance for the member that has logged in
 	 * input: ResultSet (member details) and MyDB instance
 	 * output: Member instance
 	 */

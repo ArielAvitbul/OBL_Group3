@@ -13,7 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
@@ -44,9 +44,8 @@ public class ClientConsole extends Application implements CommonIF
    * received, it sends it to the client's message handler.
  * @throws InterruptedException 
    */
-  public void send(Object o) throws InterruptedException 
+  public void send(Object o)
   {
-	  
         client.handleMessageFromClientUI(o);
   }
   /**
@@ -80,9 +79,8 @@ public class ClientConsole extends Application implements CommonIF
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/gui.fxml"));
 		      client= new ChatClient(getParameters().getRaw().get(0), Integer.parseInt(getParameters().getRaw().get(1)), this);
 			loader.setController(new ReaderController(this));
-			BorderPane root = loader.load();
+			AnchorPane root = loader.load();
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		}

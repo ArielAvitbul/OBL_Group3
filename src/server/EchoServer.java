@@ -68,6 +68,9 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		    case "createUser":
+	  		    	client.sendToClient(serverCont.createUser(data));
+	  		    	break;
 	  		  case "searchBook":
 	  				client.sendToClient(serverCont.searchBook(db,data));
 	  				break;

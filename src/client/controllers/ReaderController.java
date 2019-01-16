@@ -34,6 +34,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -55,13 +56,15 @@ public class ReaderController {
 		controllers = new HashMap<>();
 	}
 	@FXML
+    private AnchorPane page;
+	@FXML
+    private ImageView background;
+	@FXML
     private ImageView searchBook;
 	@FXML
     private HBox MenuBox;
 	@FXML
-    private AnchorPane topPane;
-	@FXML
-    private BorderPane borderPane;
+    private AnchorPane mainPane;
     @FXML
     private PasswordField passField;
     @FXML
@@ -95,13 +98,13 @@ public class ReaderController {
 		}
 		return false;
 	}
-    void addTo(Pane pane, Node button, boolean enteredexit) {
+    void addTo(Pane pane, Node button, boolean enteredexited) {
     	pane.getChildren().add(button);
     	if (pane.equals(MenuBox)) {
     		pane.getChildren().add(new ImageView(new Image("client/images/buttons/separator.png")));
     		button.setPickOnBounds(true); // since the image has a transparent background, we want the mouse to be able to click on it's bounds instead of it's visible graphics.
     	}
-    	if (enteredexit) {
+    	if (enteredexited) {
     	button.setOnMouseEntered(e-> mouseEntered(e));
     	button.setOnMouseExited(e->mouseExited(e));
     	}
@@ -123,7 +126,7 @@ public class ReaderController {
     	((ImageView)ev.getSource()).setEffect(null);
     }
     private void resetBottom() {
-			borderPane.setCenter(new ImageView(new Image("client/images/bottom.jpg")));
+    	mainPane.getChildren().remove(page); // removes the previous page.
     }
     @FXML
     protected void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
@@ -131,6 +134,9 @@ public class ReaderController {
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     	if (!this.controllers.containsKey(fxml)) {
     		switch (fxml) {
+    		case "createUser":
+    			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new CreateUser());
+    			break;
     		case "searchBook":
     			controllers.put(fxml, new SearchController());
     			break;
@@ -155,10 +161,12 @@ public class ReaderController {
     		}
     	}
     	loader.setController(controllers.get(fxml));
+    	mainPane.getChildren().remove(page); // removes the previous page.
 		try {
-			borderPane.setCenter(loader.load());
+			mainPane.getChildren().add(page = loader.load()); // adds the new one
 		} catch (IOException e) {e.printStackTrace();}
-    }     
+		page.setLayoutY(240); // sets to the current layout Y value
+    }
     /* This function checks if login fields are empty after clicking the login button
      * input: none
      * output: T/F
@@ -189,21 +197,15 @@ public class ReaderController {
     		MyData login = new MyData ("login");
     		login.add("id", Integer.valueOf(loginIdField.getText()));
     		login.add("password", passField.getText());
-    		try {
     				cc.send(login);
-    			}
-    		catch (InterruptedException e)
-    			{
-    				ClientConsole.newAlert(AlertType.ERROR, null,"OBL System Error","Login denied!");
-    			}
     		String result = cc.getFromServer().getAction();
     		if (result.equals("login_approved")) {
-    			addTo(topPane,new MyImage("logout","client/images/buttons/logout.jpg", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
-    			addTo(topPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),false);
+    			addTo(mainPane,new MyImage("logout","client/images/buttons/logout.jpg", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
+    			addTo(mainPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),false);
     			welcomeMsg.setId("welcomeMsg");
     			welcomeMsg.setLayoutX(loginPicture.getLayoutX());
     			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
-    			removeFrom(topPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
+    			removeFrom(mainPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
     			if (cc.getFromServer().getData("MemberLoggedIn") instanceof Member) {
     				addTo(MenuBox, new MyImage("memberArea","client/images/buttons/memberArea.png",e1->setBottom(e1)),true);
         			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
@@ -226,22 +228,19 @@ public class ReaderController {
     }
     
 		private void submitLogout(MouseEvent event) {
-			removeFrom(topPane, new ArrayList<>(Arrays.asList("welcomeMsg","logout")));
-			addTo(topPane,passField,false);
+			removeFrom(mainPane, new ArrayList<>(Arrays.asList("welcomeMsg","logout")));
+			addTo(mainPane,passField,false);
 			passField.clear();
-			addTo(topPane,loginIdField,false);
+			addTo(mainPane,loginIdField,false);
 			loginIdField.clear();
-			addTo(topPane,loginPicture,false);
-			addTo(topPane,loginButton,false); // no need for boolean value to be true; it remembers.
+			addTo(mainPane,loginPicture,false);
+			addTo(mainPane,loginButton,false); // no need for boolean value to be true; it remembers.
 			removeFrom(MenuBox,new ArrayList<>(Arrays.asList("memberArea","librarianArea","managerArea")));
-			try {
 				MyData data = new MyData("logout");
 				Member member = ((MemberController)controllers.get("member")).getMember();
 				data.add("id", member.getId());
 				cc.send(data);
 				resetBottom();
-			} catch (InterruptedException e) {e.printStackTrace();}
-			
    }
 		public void popup(MouseEvent event, Object controller) {
 			String fxml = ((ImageView)event.getSource()).getId();
@@ -267,7 +266,7 @@ public class ReaderController {
 			TableColumn Name = new TableColumn("Name");
 			TableColumn Author = new TableColumn("Author");
 			TableColumn Genere = new TableColumn("Genere");
-			tableBooks.getColumns().addAll(Name, Author, Genere);			
+			tableBooks.getColumns().addAll(Name, Author, Genere);
 				}
 
 		    @FXML
@@ -306,14 +305,7 @@ public class ReaderController {
 		    	searchBook.add("bookName", nameField.getText());
 		    	searchBook.add("authorName", authorField.getText());
 		    	//search.add("authorName", choiceGenere.getUserData());
-		    	
-		    	try {
     				cc.send(searchBook);
-    			}
-		    	catch (InterruptedException e)
-    			{
-    				ClientConsole.newAlert(AlertType.ERROR, null,"OBL System Error","Login denied!");
-    			}
 		    	String result = (String)cc.getFromServer().getAction();
 		
 	    		if (result.equals("listOfBooks")) {

@@ -78,9 +78,7 @@ public class MemberController {
 	    		data.add("id", Integer.parseInt(idField.getText()));
 	    		data.add("email", emailField.getText());
 	    		data.add("phone", phoneField.getText());
-	    		try {
 	    			rc.getCC().send(data);
-	    		} catch (InterruptedException e) {e.printStackTrace();}
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
@@ -101,11 +99,7 @@ public class MemberController {
     		void initialize() {
     			//TODO: replace this with actual search results
     	//		resultTable.getItems().addAll(Arrays.asList("Harry Potter and the Chamber of Secrets","lolz","The Ugev","The Ugev 2"));
-    			try { // TODO replace this with actual book results!
 					rc.getCC().send(new MyData("getBooks"));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
     			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
     			resultTable.getItems().addAll(books);
     			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
@@ -145,9 +139,7 @@ public class MemberController {
     	    	MyData data = new MyData("orderBook");
     	    	data.add("id", getMember().getId());
     	    	data.add("bookID", book.getBookID());
-    	    	try {
     	    	rc.getCC().send(data);
-    	    	} catch (InterruptedException e) {}
 				switch (rc.getCC().getFromServer().getAction()) {
 				case "success":
 					getMember().getMemberCard().addBookReservation(((BookReservation)rc.getCC().getFromServer().getData("reservation")));

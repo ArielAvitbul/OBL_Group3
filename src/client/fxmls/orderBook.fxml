@@ -10,9 +10,9 @@
 
 <AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="363.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/orderBook.jpg" />
+            <Image url="@../images/texts/titles/orderBook.png" />
          </image>
       </ImageView>
       <ImageView layoutX="386.0" layoutY="341.0" onMouseEntered="#enetered" onMouseExited="#exited" onMouseReleased="#orderBook" pickOnBounds="true" preserveRatio="true">
@@ -27,5 +27,10 @@
             <TableColumn fx:id="genreCol" minWidth="0.0" prefWidth="65.0" text="Genre" />
         </columns>
       </TableView>
+      <ImageView layoutX="398.0" layoutY="90.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/serch_results.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
