@@ -5,23 +5,24 @@ import java.io.Serializable;
 public class Member extends Reader implements Serializable
 {
 	
-	private enum Status
+	public enum Status
 	{
+		ACTIVE,
 		FREEZE,
-		LOCK,
-		ACTIVE
+		LOCK
 	}
 	
 	private int id;
-	private String userName="";
+	private String userName;
 	private String password;
 	private Status status=Status.ACTIVE;
 	private MemberCard myMemberCard;
 	
-	public Member(int id, String username, String password) {
+	public Member(int id, String username, String password,Status status) {
 		this.id=id;
 		this.userName=username;
 		this.password=password;
+		this.status=status;
 	}
 	
 	public void setMemberCard(MemberCard card) {
@@ -31,7 +32,7 @@ public class Member extends Reader implements Serializable
 	public MemberCard getMemberCard() {
 		return myMemberCard;
 	}
-	public int getId() 
+	public int getID() 
 	{
 		return id;
 	}
@@ -59,17 +60,16 @@ public class Member extends Reader implements Serializable
 	public void setUserStatus(int enumNumericValue) 
 	{
 		switch(enumNumericValue) {
-			case 0:
+		case 0: // anyway default is ACTIVE
+		default:
+			this.status = Status.ACTIVE;
+			break;
+			case 1:
 				this.status = Status.FREEZE;
 				break;
-			case 1:
+			case 2:
 				this.status = Status.LOCK;
 				break;
-			case 2: // anyway default is ACTIVE
-			default:
-				this.status = Status.ACTIVE;
-				break;
-				
 		}
 	}
 	@Override

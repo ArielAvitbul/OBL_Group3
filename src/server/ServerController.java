@@ -74,6 +74,17 @@ public class ServerController {
 		ps.setInt(2, id);
 		ps.executeUpdate();
 	}
+	/** this method searches for a member in the database, by given ID
+	 * returns: key: member is HashMap incase a result was found!
+	 * 			or an empty HashMap incase a resultw as not found!
+	 * @throws SQLException */
+	public MyData searchMember(int id) throws SQLException {
+		MyData ret = new MyData("result");
+		ResultSet rs = db.select("SELECT * FROM members where id='"+id+"'");
+		if (rs.next()) // such member exists
+			ret.add("member", createMember(rs));
+		return ret;
+	}
 	/** this method inserts a new user to the database
 	 * @throws SQLException */
 	public MyData createUser(MyData data) {
@@ -106,7 +117,7 @@ public class ServerController {
 			else if (db.hasResults(localRS = db.select("SELECT * FROM librarians where id = "+ rs.getInt("id"))))
 				toReturn = new Librarian(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),localRS.getInt("permissionLevel"));
 			else // member
-				toReturn = new Member(rs.getInt("id"),rs.getString("username"),rs.getString("password"));
+				toReturn = new Member(rs.getInt("id"),rs.getString("username"),rs.getString("password"),Member.Status.valueOf(rs.getString("status")));
 			toReturn.setMemberCard(getMemberCard(rs.getInt("id")));
 			return toReturn;
 	}
@@ -154,20 +165,23 @@ public class ServerController {
 		return memberReservations;
 	}
 	
-	public MyData saveInfo(int userid, MyData data) throws SQLException {
+	public MyData saveInfo(int userid, String firstName,String lastName, String password, String email, String phone) throws SQLException {
 		MyData result = new MyData("fail");
-		switch (db.updateWithExecute("UPDATE member_cards set emailAddress='"+ data.getData("email") +"', phoneNumber='"+data.getData("phone")+"' WHERE userID = "+userid)) {
-		case 1: // 1 row found in db.
+		if (db.updateWithExecute("UPDATE member_cards set firstName='"+firstName+"',lastName='"+lastName+"',emailAddress='"+ email +"', phoneNumber='"+phone+"' WHERE userID='"+userid+"'")==1
+				&& db.updateWithExecute("UPDATE members set password='"+password+"' WHERE id='"+userid+"'")==1) {//user found
 			result.setAction("success");
 			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
-			break;
-		case 0: // member was not found, keep the fail action, add a message
-			result.add("message", "Member card was not found in the database.");
-			break;
-		default:
-			result.add("message", "Something went wrong."); // doubt this will happen, but we'll cover that too.
-			break;
-		}
+		}else // member was not found, keep the fail action, add a message
+			result.add("message", "Member was not found in the database.");
+		return result;
+	}
+	public MyData saveInfoAdmin(int userid, String username, String status) throws SQLException {
+		MyData result = new MyData("fail");
+		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
+			result.setAction("success");
+			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
+		}else // member was not found, keep the fail action, add a message
+			result.add("message", "Member was not found in the database.");
 		return result;
 	}
 	public MyData orderBook(int userid, int bookID) throws SQLException {

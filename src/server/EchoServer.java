@@ -68,6 +68,9 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		    case "search_member":
+	  		    	client.sendToClient(serverCont.searchMember((Integer)data.getData("id")));
+	  		    	break;
 	  		    case "createUser":
 	  		    	client.sendToClient(serverCont.createUser(data));
 	  		    	break;
@@ -80,7 +83,12 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.login(data));
 	  		    	break;
 	  		  case "saveInfo":
-	  		    	client.sendToClient(serverCont.saveInfo((Integer)data.getData("id"),data));
+	  			  MyData normalSave = serverCont.saveInfo((Integer)data.getData("id"),(String)data.getData("firstName"),(String)data.getData("lastName"),(String)data.getData("password"),(String)data.getData("email"),(String)data.getData("phone"));
+	  			  if (normalSave.getAction().equals("success") && data.getData().containsKey("admin")) { // Member Management saveInfo
+	  				// TODO: add change log
+	  				  client.sendToClient(serverCont.saveInfoAdmin((Integer)data.getData("id"), (String)data.getData("username"), (String)data.getData("status")));
+	  		    	} else // Member Area saveInfo
+	  		    		client.sendToClient(normalSave);
 	  		    	break;
 	  		    case "orderBook":
 	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Integer)data.getData("bookID")));

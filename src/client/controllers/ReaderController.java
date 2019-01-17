@@ -34,8 +34,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -116,6 +114,7 @@ public class ReaderController {
     	ImageView image = ((ImageView)ev.getSource());
     	ColorAdjust effect = new ColorAdjust();
     	double num = 0.1;
+    	
     	if (image.getParent().equals(MenuBox))
     		num=0.5;
     	effect.setBrightness(-num);
@@ -129,11 +128,26 @@ public class ReaderController {
     	mainPane.getChildren().remove(page); // removes the previous page.
     }
     @FXML
-    protected void setBottom(MouseEvent ev) { // button name must be equal to the fxml name
-    	String fxml = ((ImageView)ev.getSource()).getId();
+    protected void setBottom(MouseEvent ev) {
+    	setBottom(ev,((ImageView)ev.getSource()).getId());
+    }
+    protected void setBottom(MouseEvent ev,String fxml) {
+    	setBottom(ev,fxml,null);
+    }
+    /** Sets the bottom GUI
+     * values:
+     * 	ev: MouseEvent (button that summoned the function by mouse release)
+     * 	fxml : the id of the case
+     * objects : used for controllers's builders.		
+     * */
+    protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
+    	
     	if (!this.controllers.containsKey(fxml)) {
     		switch (fxml) {
+    		case "memberManagement":
+    			loader.setController(((LibrarianController)controllers.get("librarian")).new MemberManagement((Member)objects[0]));
+    			break;
     		case "createUser":
     			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new CreateUser());
     			break;
@@ -141,25 +155,26 @@ public class ReaderController {
     			controllers.put(fxml, new SearchController());
     			break;
     		case "memberArea":
-    			controllers.put("memberArea", controllers.get("member"));
+    			controllers.put(fxml, controllers.get("member"));
     			break;
     		case "librarianArea":
-    			controllers.put("librarianArea", controllers.get("librarian"));
+    			controllers.put(fxml, controllers.get("librarian"));
     			break;
     		case "managerArea":
-    			controllers.put("managerArea", controllers.get("manager"));
+    			controllers.put(fxml, controllers.get("manager"));
     			break;
     		case "history":
-    			controllers.put("history",((MemberController)controllers.get("memberArea")).new HistoryController());
+    			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new HistoryController());
     			break;
     		case "orderBook":
-    			controllers.put("orderBook",((MemberController)controllers.get("memberArea")).new OrderBookController());
+    			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
     				//System.exit(1);
     		}
     	}
+    	if (!fxml.equals("memberManagement")) // we don't want to remember the previous memberManagement
     	loader.setController(controllers.get(fxml));
     	mainPane.getChildren().remove(page); // removes the previous page.
 		try {
@@ -238,9 +253,10 @@ public class ReaderController {
 			removeFrom(MenuBox,new ArrayList<>(Arrays.asList("memberArea","librarianArea","managerArea")));
 				MyData data = new MyData("logout");
 				Member member = ((MemberController)controllers.get("member")).getMember();
-				data.add("id", member.getId());
+				data.add("id", member.getID());
 				cc.send(data);
 				resetBottom();
+				controllers.clear();
    }
 		public void popup(MouseEvent event, Object controller) {
 			String fxml = ((ImageView)event.getSource()).getId();

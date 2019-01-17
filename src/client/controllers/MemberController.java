@@ -11,11 +11,11 @@ import common.MemberCard;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -31,32 +31,31 @@ public class MemberController {
 	}
 		@FXML
 		void initialize() {
-			idField.setText(String.valueOf(member.getId()));
-			nameField.setText(member.getMemberCard().getFirstName());
-			statusField.setText(String.valueOf(member.getStatus()));
+			idField.setText(String.valueOf(member.getID()));
+			usernameField.setText(member.getUserName());
+			passwordField.setText(member.getPassword());
+			firstnameField.setText(member.getMemberCard().getFirstName());
+			lastnameField.setText(member.getMemberCard().getLastName());
 			emailField.setText(member.getMemberCard().getEmailAddress());
 			phoneField.setText(member.getMemberCard().getPhoneNumber());
+			statusField.setText(String.valueOf(member.getStatus()));
 		}
 		@FXML
+	    private TextField usernameField;
+	    @FXML
 	    private TextField idField;
-
-	    @FXML
-	    private TextField statusField;
-
-	    @FXML
-	    private TextField nameField;
-
 	    @FXML
 	    private TextField emailField;
-
 	    @FXML
 	    private TextField phoneField;
-	    
 	    @FXML
-	    private ImageView saveButton;
-
+	    private TextField statusField;
 	    @FXML
-	    private AnchorPane pane;
+	    private TextField lastnameField;
+	    @FXML
+	    private PasswordField passwordField;
+	    @FXML
+	    private TextField firstnameField;
 	    @FXML
 	    void entered(MouseEvent e) {
 	    	rc.mouseEntered(e);
@@ -76,6 +75,9 @@ public class MemberController {
 	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    		MyData data = new MyData("saveInfo");
 	    		data.add("id", Integer.parseInt(idField.getText()));
+	    		data.add("firstName", firstnameField.getText());
+	    		data.add("lastName", lastnameField.getText());
+	    		data.add("password", passwordField.getText());
 	    		data.add("email", emailField.getText());
 	    		data.add("phone", phoneField.getText());
 	    			rc.getCC().send(data);
@@ -102,9 +104,9 @@ public class MemberController {
 					rc.getCC().send(new MyData("getBooks"));
     			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
     			resultTable.getItems().addAll(books);
-    			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
-    			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
-    			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
+    			nameCol.setCellValueFactory(new PropertyValueFactory<>("bookName"));
+    			genreCol.setCellValueFactory(new PropertyValueFactory<>("topic"));
+    			authorsCol.setCellValueFactory(new PropertyValueFactory<>("authorsNames"));
     		}
 
     	    @FXML
@@ -137,7 +139,7 @@ public class MemberController {
     	    	Book book = resultTable.getSelectionModel().getSelectedItem();
 				if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
     	    	MyData data = new MyData("orderBook");
-    	    	data.add("id", getMember().getId());
+    	    	data.add("id", getMember().getID());
     	    	data.add("bookID", book.getBookID());
     	    	rc.getCC().send(data);
 				switch (rc.getCC().getFromServer().getAction()) {

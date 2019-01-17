@@ -11,9 +11,9 @@ public class Librarian extends Member{
 	private final int employeeID;
 	private levels permissionLevel;
 	
-	public Librarian(int userID,String username,String password, int workerNum, int permissionLevel)
+	public Librarian(int userID,String username,String password,int workerNum, int permissionLevel)
 	{
-		super(userID,username,password);
+		super(userID,username,password,Member.Status.ACTIVE);
 		this.workerNum=workerNum;
 		this.employeeID=userID;
 		this.permissionLevel=(permissionLevel==0 ? levels.REGULAR : levels.SPECIAL);

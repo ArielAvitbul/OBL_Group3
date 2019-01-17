@@ -60,7 +60,7 @@ public class ClientConsole extends Application implements CommonIF
 	  fromServer = (MyData) message;
 	  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
 	  if (fromServer.getAction().equals("login_approved"))
-			  this.userid = ((Member)fromServer.getData("MemberLoggedIn")).getId();
+			  this.userid = ((Member)fromServer.getData("MemberLoggedIn")).getID();
 	  else if (fromServer.getAction().equals("successful_logout"))
 		  this.userid = 0; // back to default, forget the user.
   }

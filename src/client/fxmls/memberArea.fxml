@@ -10,26 +10,12 @@
 
 <AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="saveInfo" layoutX="40.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="saveInfo" layoutX="350.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/memberArea.png" />
          </image>
       </ImageView>
-      <VBox alignment="TOP_CENTER" layoutX="132.0" layoutY="160.0" prefHeight="258.0" prefWidth="158.0" spacing="22.0">
-         <children>
-            <TextField fx:id="emailField" />
-            <TextField fx:id="phoneField" />
-            <TextField fx:id="statusField" editable="false" />
-            <TextField fx:id="nameField" editable="false" />
-            <TextField fx:id="idField" editable="false" />
-            <ImageView fx:id="saveButton" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#saveInfo" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/buttons/save.jpg" />
-               </image>
-            </ImageView>
-         </children>
-      </VBox>
-      <HBox layoutX="40.0" layoutY="113.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
+      <HBox layoutX="242.0" layoutY="60.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
          <children>
             <ImageView fx:id="history" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -48,5 +34,81 @@
             </ImageView>
          </children>
       </HBox>
+      <GridPane hgap="15.0" layoutX="333.0" layoutY="131.0" vgap="5.0">
+         <children>
+            <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="usernameField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="firstnameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="lastnameField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="statusField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <ImageView pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/texts/id.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="2">
+               <image>
+                  <Image url="@../images/texts/password.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="3">
+               <image>
+                  <Image url="@../images/texts/first_name.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="4">
+               <image>
+                  <Image url="@../images/texts/last_name.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="5">
+               <image>
+                  <Image url="@../images/texts/email.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="6">
+               <image>
+                  <Image url="@../images/texts/phone.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="1">
+               <image>
+                  <Image url="@../images/texts/user_name.png" />
+               </image>
+            </ImageView>
+            <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="7">
+               <image>
+                  <Image url="@../images/texts/status.png" />
+               </image>
+            </ImageView>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="140.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <ImageView fx:id="saveButton" layoutX="400.0" layoutY="414.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#saveInfo" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/save.jpg" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="408.0" layoutY="107.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/member_card.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
