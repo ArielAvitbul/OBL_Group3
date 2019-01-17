@@ -51,7 +51,6 @@ public class LibrarianController {
     	rc.getCC().send(data);
     	MyData result = (MyData) rc.getCC().getFromServer();
     	if (result.getData().containsKey("member")) {
-        	System.out.println("RESULT:"+((Member)result.getData("member")).getUserName());
     		Member member = (Member)result.getData("member");
     		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Is this the member you were looking for?", 
     				member.getMemberCard().getFirstName() +" "+member.getMemberCard().getLastName()+" ("+member.getID()+") was found! Click OK to work on member.").get()==ButtonType.OK) {
@@ -69,6 +68,13 @@ public class LibrarianController {
     	public MemberManagement(Member member) {
     		this.member=member;
     	}
+    	protected Member getMember() {
+    		return member;
+    	}
+    	@FXML
+	    void replacePage(MouseEvent event) {
+	    	rc.setBottom(event);
+	    }
     	@FXML
     	void initialize() {
     			statusBox.getItems().addAll(Member.Status.values());
@@ -136,6 +142,48 @@ public class LibrarianController {
 	    		}
 	    	}
         }
+        protected class ViewRequests {
+    		@FXML
+    		void entered(MouseEvent e) {
+    			rc.mouseEntered(e);
+    		}
+    		@FXML
+    		void exited(MouseEvent e) {
+    			rc.mouseExited(e);
+    		}
+    		@FXML
+    		void goBack(MouseEvent event) {
+    			rc.setBottom(event, "memberManagement");
+    		}
+    	}
+    	protected class BorrowCopy {
+    		@FXML
+    		void entered(MouseEvent e) {
+    			rc.mouseEntered(e);
+    		}
+    		@FXML
+    		void exited(MouseEvent e) {
+    			rc.mouseExited(e);
+    		}
+    		@FXML
+    		void goBack(MouseEvent event) {
+    			rc.setBottom(event, "memberManagement");
+    		}
+    	}
+    	protected class ReturnCopy {
+    		@FXML
+    		void entered(MouseEvent e) {
+    			rc.mouseEntered(e);
+    		}
+    		@FXML
+    		void exited(MouseEvent e) {
+    			rc.mouseExited(e);
+    		}
+    		@FXML
+    		void goBack(MouseEvent event) {
+    			rc.setBottom(event, "memberManagement");
+    		}
+    	}
     }
     
 	protected class CreateUser {

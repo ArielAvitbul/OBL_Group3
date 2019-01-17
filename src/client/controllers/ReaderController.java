@@ -9,6 +9,7 @@ import java.util.Iterator;
 import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
+import client.controllers.LibrarianController.MemberManagement;
 import common.Book;
 import common.Librarian;
 import common.Manager;
@@ -142,11 +143,25 @@ public class ReaderController {
      * */
     protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
-    	
+    	try {
+    	if (controllers.containsKey("memberManagement") && fxml.equals("memberManagement") && !((Member)objects[0]).equals(((MemberManagement)controllers.get("memberManagement")).getMember()))
+    		/* if we got different results from the previous search, forget the previous search.*/
+    		controllers.remove(fxml);
+    	} catch (NullPointerException e) {/* we wanna catch the exception and do nothing
+    		 since if objects[0] is null that means we're going back from an inner class*/};
     	if (!this.controllers.containsKey(fxml)) {
     		switch (fxml) {
     		case "memberManagement":
-    			loader.setController(((LibrarianController)controllers.get("librarian")).new MemberManagement((Member)objects[0]));
+    			controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new MemberManagement((Member)objects[0])));
+    			break;
+    		case "viewRequests":
+    			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new ViewRequests());
+    			break;
+    		case "borrowCopy":
+    			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new BorrowCopy());
+    			break;
+    		case "returnCopy":
+    			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new ReturnCopy());
     			break;
     		case "createUser":
     			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new CreateUser());
@@ -174,7 +189,7 @@ public class ReaderController {
     				//System.exit(1);
     		}
     	}
-    	if (!fxml.equals("memberManagement")) // we don't want to remember the previous memberManagement
+    	//if (!fxml.equals("memberManagement")) // we don't want to remember the previous memberManagement
     	loader.setController(controllers.get(fxml));
     	mainPane.getChildren().remove(page); // removes the previous page.
 		try {
