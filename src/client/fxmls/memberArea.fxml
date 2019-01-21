@@ -27,7 +27,7 @@
                   <Image url="@../images/buttons/orderBook.jpg" />
                </image>
             </ImageView>
-            <ImageView onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="extensionRequest" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/askForExtend.jpg" />
                </image>

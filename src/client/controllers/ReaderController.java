@@ -181,6 +181,9 @@ public class ReaderController {
     		case "history":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new HistoryController());
     			break;
+    		case "extensionRequest":
+    			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new ExtensionRequestController());
+    			break;
     		case "orderBook":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
     			break;

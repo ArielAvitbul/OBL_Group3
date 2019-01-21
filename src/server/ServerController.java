@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
@@ -12,6 +13,7 @@ import client.MyData;
 import common.Book;
 import common.BookReservation;
 import common.Borrow;
+import common.CopyInBorrow;
 import common.Librarian;
 import common.Manager;
 import common.Member;
@@ -227,5 +229,29 @@ public class ServerController {
 			data.add("reason", "No book found!");
 			return data;
 		}
+	}
+	
+	public ArrayList<CopyInBorrow> getCopiesInBorrow(ArrayList<Borrow> myBorrows) throws SQLException
+	{
+		ArrayList<CopyInBorrow> toReturn = new ArrayList<CopyInBorrow>();
+		for(int i = 0; i< myBorrows.size(); i++) {
+		ResultSet rs = db.select("SELECT * FROM copy_in_borrow WHERE borrowID="+myBorrows.get(i).getBorrowID());
+		if(db.hasResults(rs)) {
+				toReturn.add(new CopyInBorrow(getBook(rs.getInt("BookID")), myBorrows.get(i), rs.getInt("copyNumber")));
+			}
+		}
+		return toReturn;
+	}
+	
+	public MyData updateExtension(Borrow toUpdate) throws SQLException {
+		Calendar c = Calendar.getInstance();
+		c.setTime(toUpdate.getReturnDate());
+		c.add(Calendar.DAY_OF_MONTH, 7);
+		toUpdate.setReturnDate((Date) c.getTime());
+		String query = "UPDATE borrows SET returnDate="+toUpdate.getReturnDate()+" WHERE borrowID="+toUpdate.getBorrowID();
+		db.updateWithExecute(query);
+		MyData toReturn = new MyData("ExtensionSucceed");
+		toReturn.add("updaedBorrow", toUpdate);
+		return toReturn;
 	}
 }

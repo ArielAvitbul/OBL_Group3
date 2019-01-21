@@ -5,9 +5,10 @@ package server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import client.MyData;
-import common.Member;
+import common.Borrow;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
@@ -68,6 +69,16 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		  case "BorrowToExtend":
+	  		    	MyData extensionResult = serverCont.updateExtension((Borrow)data.getData("TheBorrow"));
+	  		    	extensionResult.add("UpdatedBorrow", data.getData("TheBorrow"));
+	  		    	client.sendToClient(extensionResult);
+	  		    	break;
+	  		  case "getCopiesInBorrow":
+  		    	MyData copiesInBorrow = new MyData("copiesInBorrow");
+  		    	copiesInBorrow.add("copies", serverCont.getCopiesInBorrow((ArrayList<Borrow>)data.getData("borrows")));
+  		    	client.sendToClient(copiesInBorrow);
+  		    	break;
 	  		    case "search_member":
 	  		    	client.sendToClient(serverCont.searchMember((Integer)data.getData("id")));
 	  		    	break;

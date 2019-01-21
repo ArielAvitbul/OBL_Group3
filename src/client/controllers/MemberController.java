@@ -1,11 +1,15 @@
 package client.controllers;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 import client.ClientConsole;
 import client.MyData;
+import client.MyImage;
 import common.Book;
 import common.BookReservation;
+import common.Borrow;
+import common.CopyInBorrow;
 import common.Member;
 import common.MemberCard;
 import javafx.fxml.FXML;
@@ -16,6 +20,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 
@@ -96,6 +101,75 @@ public class MemberController {
 	    protected class HistoryController {
     		// sapir's
     	}
+	    protected class ExtensionRequestController {
+	    	    @FXML
+	    	    private AnchorPane ExtensionAnPane;
+
+	    	    @FXML
+	    	    private ImageView ExtensionImage;
+	    	    
+	    	    @FXML
+	    	    private ImageView ExtensionHeader;
+
+	    	    @FXML
+	    	    private TableView<CopyInBorrow> ExtensionCurrBooks;
+
+	    	    @FXML
+	    	    private TableColumn<CopyInBorrow, String> BookNameCol;
+	    	    
+	    	    @FXML
+	    	    private TableColumn<CopyInBorrow, Date> RetDateCol;
+	    	    
+	    	    @FXML
+	    	    private TableColumn<CopyInBorrow, String> BookAuthorCol;
+
+	    	    @FXML
+	    	    void initialize() {
+	    	    	ArrayList<CopyInBorrow> copies = null;
+	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
+	    	    	int i = 0;
+	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
+	    	    		if(isCurrentBorrow(i))
+	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
+	    	    			i++;
+	    	    	}
+	    	    	MyData data = new MyData("getCopiesInBorrow");
+	    	    	data.add("borrows", currBorrows);
+	    	    		rc.getCC().send(data);
+	    	    	switch(rc.getCC().getFromServer().getAction()) {
+	    	    	case "copiesInBorrow":
+	    	    		if((ArrayList<Book>) rc.getCC().getFromServer().getData("copies")==null) 
+	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
+	    	    		else {
+	    	    			copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
+	    	    			ExtensionCurrBooks.getItems().addAll(copies);
+	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
+	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
+	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Date>("returnDate"));
+	    	    			
+	    	    		}
+	    				rc.addTo(ExtensionAnPane, new MyImage("askForExtend", "\\client\\images\\buttons\\askForExtend.jpg", 231, 358, e->submitExtensionRequest(e)), true);
+	    	    		break;
+	    	    		}
+	    	    	}
+	    	    
+
+				private boolean isCurrentBorrow(int i) {
+					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
+				}	    	
+				private void submitExtensionRequest(MouseEvent e) {
+	    			CopyInBorrow selected = (CopyInBorrow)ExtensionCurrBooks.getSelectionModel().getSelectedItem();
+	    			if(selected.getBorroBook().isPopular()) {
+	    				rc.getCC().newAlert(AlertType.INFORMATION, "Popular book!", null, "This book is popular therfore you cannot extend your borrow!");
+	    				return;
+	    				}
+	    			else {
+	    					MyData data = new MyData("BorrowToExtend");
+	    					data.add("TheBorrow", selected.getNewBorrow());
+	    						rc.getCC().send(data);					
+	    				}
+	    			}
+				}
     	protected class OrderBookController {
     		@FXML
     		void initialize() {
