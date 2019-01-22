@@ -1,10 +1,14 @@
 package client.controllers;
 
+import java.awt.Desktop;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
+
+import java.io.File;
 
 import client.ClientConsole;
 import client.MyData;
@@ -14,12 +18,14 @@ import common.Book;
 import common.Librarian;
 import common.Manager;
 import common.Member;
+import common.MyFile;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -28,6 +34,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -295,15 +302,48 @@ public class ReaderController {
 		private class SearchController {
 			@FXML
 				void initialize() {
-			choiceGenere.getItems().add("Drama");
+			//	addTo(borderPane, new MyImage("searchBook", "client/images/buttons/searchButton.jpg",searchButton.getLayoutX(),searchButton.getLayoutY(), e->submitSearch(e)), true);
+		/*	choiceGenere.getItems().add("Drama");
 			choiceGenere.getItems().add("Thriller");
 			choiceGenere.getItems().add("Adventure");
-			TableColumn Name = new TableColumn("Name");
+			choiceGenere.getItems().add("Science fiction");
+			choiceGenere.getItems().add("Text Book");
+			choiceGenere.getItems().add("Kids");*/
+		/*	TableColumn Name = new TableColumn("Name");
 			TableColumn Author = new TableColumn("Author");
 			TableColumn Genere = new TableColumn("Genere");
-			tableBooks.getColumns().addAll(Name, Author, Genere);
+			TableColumn bookIsAvalible = new TableColumn("Book is avalible?");
+			tableBooks.getColumns().addAll(Name, Author, Genere, bookIsAvalible);	*/
+			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
+			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
+			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
+		//	IndexCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
+			availbleCol.setCellValueFactory(new PropertyValueFactory<Book, String>("currentNumberOfCopies"));
+			tableBooks.setPlaceholder(new Label("Enter search details"));
 				}
+		    @FXML
+		    private ImageView orderBookButton;
+		    
+		    @FXML
+		    private ImageView indexBookButton;
+		    
+		    @FXML
+		    private CheckBox checkBoxDrama;
 
+		    @FXML
+		    private CheckBox checkBoxThriller;
+
+		    @FXML
+		    private CheckBox checkBoxAdventure;
+
+		    @FXML
+		    private CheckBox checkBoxSF;
+
+		    @FXML
+		    private CheckBox checkBoxKids;
+
+		    @FXML
+		    private CheckBox checkBoxTextBook;
 		    @FXML
 		    private TextField nameField;
 
@@ -312,55 +352,117 @@ public class ReaderController {
 
 		    @FXML
 		    private ChoiceBox<String> choiceGenere;
-		    
 
 		    @FXML
 		    private TextArea freetextField;
-		    
 
 		    @FXML
 		    private ListView<String> searchResultList;
 		    @FXML
-		    private TableView<String> tableBooks;
+		    private TableView<Book> tableBooks;
+		    @FXML
+		    private ImageView searchButton;
+		    @FXML
+    	    private TableColumn<Book, String> genreCol;
+
+    	    @FXML
+    	    private TableColumn<Book, String> nameCol;
+    	    
+    	    @FXML
+    	    private TableColumn<Book, String> authorsCol;
+    	    
+    	    @FXML
+    	    private TableColumn<Book, String> IndexCol;
+
+    	    @FXML
+    	    private TableColumn<Book, String> availbleCol;
 
 		    @FXML
 		    void entered(MouseEvent event) {
 
 		    }
-
 		    @FXML
 		    void exited(MouseEvent event) {
 
 		    }
-
-
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
+		    	tableBooks.getItems().clear();
+    	    	orderBookButton.setVisible(false);
+    	    	indexBookButton.setVisible(false);
 		    	MyData searchBook = new MyData ("searchBook");
+		    //boolean arrayOfCheckBoxSelected[] = new boolean[6];
 		    	searchBook.add("bookName", nameField.getText());
 		    	searchBook.add("authorName", authorField.getText());
-		    	//search.add("authorName", choiceGenere.getUserData());
+		    	//searchBook.add("genre",choiceGenere.getSelectionModel().getSelectedItem());
+		    /*	arrayOfCheckBoxSelected[0]= checkBoxDrama.isSelected();
+		    	arrayOfCheckBoxSelected[1]= checkBoxThriller.isSelected();
+		    	arrayOfCheckBoxSelected[2]= checkBoxAdventure.isSelected();
+		    	arrayOfCheckBoxSelected[3]= checkBoxSF.isSelected();
+		    	arrayOfCheckBoxSelected[4]= checkBoxKids.isSelected();
+		    	arrayOfCheckBoxSelected[5]= checkBoxTextBook.isSelected();*/
+		    	searchBook.add("genreDrama",checkBoxDrama.isSelected());
+		    	searchBook.add("genreThriller",checkBoxThriller.isSelected());
+		    	searchBook.add("genreAdventure",checkBoxAdventure.isSelected());
+		    	searchBook.add("genreBoxSF",checkBoxSF.isSelected());
+		    	searchBook.add("genreKids",checkBoxKids.isSelected());
+		    	searchBook.add("genreTextBook",checkBoxTextBook.isSelected());
     				cc.send(searchBook);
 		    	String result = (String)cc.getFromServer().getAction();
-		
+		    	
 	    		if (result.equals("listOfBooks")) {
 	    	    	ArrayList<Book> booksList = (ArrayList<Book>) cc.getFromServer().getData("booklist");
+	    	    	tableBooks.getItems().addAll(booksList);
+	    	    	orderBookButton.setVisible(true);
+	    	    	indexBookButton.setVisible(true);
 	    	    	
-	    	    	Iterator<Book> it = booksList.iterator();
-	    	    	while(it.hasNext())
+
+	    	    //	Iterator<Book> it = booksList.iterator();
+	    	   /*	while(it.hasNext())
 	    	    	{
 	    	    		tableBooks.getItems().add(it.next().getBookName());
 	    	    		tableBooks.getItems().add(it.next().getAuthorsNames());
 	    	    		tableBooks.getItems().add(it.next().getTopic());
-	    	    	}
+	    	    	}*/
 
 	    		}
-	    		/*else if (result.equals("unfind_book")) {
+	    		else if (result.equals("unfind_book")) {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No book found!", (String)cc.getFromServer().getData("reason"));
 	    			nameField.clear();
 	    			authorField.clear();
-	    			}*/
+	    			}
+	    		else if (result.equals("empty_fields")) {
+	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Your fields are empty", (String)cc.getFromServer().getData("reason"));
+	    			}
 		    }
+		    
+		    @FXML
+		    void tableOfContent(MouseEvent event) throws IOException {
+		    		Book book = tableBooks.getSelectionModel().getSelectedItem();
+		    		MyData tableOfContents = new MyData ("tableOfContents");
+		    		tableOfContents.add("book", book);
+	    				cc.send(tableOfContents);	    		
+		        	MyFile fileToUpload = (MyFile) cc.getFromServer().getData("getFile");
+		        	fileToUpload.initArray(((MyFile) cc.getFromServer().getData("getFile")).getSize());
+		            
+		            	File newFile = new File(((MyFile) cc.getFromServer().getData("getFile")).getWriteToPath()+"/"+((MyFile) cc.getFromServer().getData("getFile")).getFileName());
+		      		  if (!newFile.exists()) {
+		  				newFile.createNewFile();
+		      		  }
+		                byte[] mybytearray = new byte[(int) fileToUpload.getSize()]; 
+		                FileOutputStream fis = null;
+						fis = new FileOutputStream(newFile);
+		                BufferedOutputStream bos = new BufferedOutputStream(fis);
+						bos.write(((MyFile) cc.getFromServer().getData("getFile")).getMybytearray(), 0, (((MyFile) cc.getFromServer().getData("getFile")).getSize()));
+						bos.close();
+						if (Desktop.isDesktopSupported())
+						{
+							 File myFile = new File("./src/client/ClientTableOfContents/"+book.getBookID()+".pdf");
+						     Desktop.getDesktop().open(myFile);
+						}
+		   
+		    }
+		    
 
 		}
 }

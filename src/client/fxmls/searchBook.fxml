@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ChoiceBox?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -8,34 +14,66 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="356.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/searchBack.jpg" />
+            <Image url="@../images/texts/titles/searchBook.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="72.0" fitWidth="161.0" layoutX="70.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="searchButton" layoutX="184.0" layoutY="393.0" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/header/searchheader.jpg" />
+            <Image url="@../images/buttons/search.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="34.0" fitWidth="95.0" layoutX="177.0" layoutY="362.0" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="orderBookButton" layoutX="633.0" layoutY="393.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
-            <Image url="@../images/buttons/searchbutton.jpg" />
+            <Image url="@../images/buttons/orderBook.jpg" />
          </image>
       </ImageView>
-      <VBox layoutX="158.0" layoutY="136.0" prefHeight="190.0" prefWidth="132.0" spacing="20.0">
+      <ImageView fx:id="indexBookButton" layoutX="479.0" layoutY="393.0" onMouseReleased="#tableOfContent" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../images/buttons/watchIndex.jpg" />
+         </image>
+      </ImageView>
+      <VBox layoutX="158.0" layoutY="136.0" prefHeight="195.0" prefWidth="161.0" spacing="20.0">
          <children>
             <TextField fx:id="nameField" />
             <TextField fx:id="authorField" />
-            <ChoiceBox fx:id="choiceGenere" prefWidth="150.0" />
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="24.0">
+               <children>
+                  <CheckBox fx:id="checkBoxDrama" mnemonicParsing="false" text="Drama" />
+                  <CheckBox fx:id="checkBoxThriller" mnemonicParsing="false" text="Thriller" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+               <children>
+                  <CheckBox fx:id="checkBoxAdventure" mnemonicParsing="false" text="Adventure" />
+                  <CheckBox fx:id="checkBoxSF" mnemonicParsing="false" text="SF" />
+               </children>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="37.0">
+               <children>
+                  <CheckBox fx:id="checkBoxKids" mnemonicParsing="false" text="Kids" />
+                  <CheckBox fx:id="checkBoxTextBook" mnemonicParsing="false" text="Text Book" />
+               </children>
+            </HBox>
             <TextArea fx:id="freetextField" prefHeight="49.0" prefWidth="149.0" />
          </children>
       </VBox>
-      <TableView fx:id="tableBooks" layoutX="404.0" layoutY="117.0" prefHeight="222.0" prefWidth="360.0">
+      <TableView fx:id="tableBooks" layoutX="371.0" layoutY="122.0" prefHeight="253.0" prefWidth="482.0">
+       <columns>
+          <TableColumn fx:id="nameCol" editable="false" prefWidth="143.19998168945312" text="Name" />
+            <TableColumn fx:id="authorsCol" prefWidth="108.0" text="Author(s)" />
+            <TableColumn fx:id="genreCol" minWidth="0.0" prefWidth="123.2000732421875" text="Genre" />
+            <TableColumn fx:id="availbleCol" prefWidth="108.0" text="Book is availble ?" />
+        </columns>
       </TableView>
    </children>
 </AnchorPane>

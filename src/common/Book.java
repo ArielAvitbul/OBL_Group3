@@ -20,7 +20,6 @@ public class Book implements Serializable{
 	private int numberOfCopies;
 	private Date purchaseDate;
 	private String shellLocation;
-	private Document tableOfContent;
 	private boolean isPopular;
 	private int currentNumberOfCopies;
 	
@@ -41,7 +40,6 @@ public class Book implements Serializable{
 		this.isPopular = isPopular;
 		this.currentNumberOfCopies = currentNumberOfCopies;
 	}
-	
 	public Book(int bookID, String bookName) {
 		this.bookID = bookID;
 		this.bookName = bookName;

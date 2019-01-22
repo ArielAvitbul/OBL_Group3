@@ -1,5 +1,8 @@
 package server;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,6 +22,7 @@ import common.Librarian;
 import common.Manager;
 import common.Member;
 import common.MemberCard;
+import common.MyFile;
 import common.Violation;
 
 public class ServerController {
@@ -198,28 +202,166 @@ public class ServerController {
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
-	public MyData searchBook(MyDB db, MyData data) throws SQLException {
-		ArrayList<Book> bookList = new ArrayList<>();
+	
+public MyData getTableOfContents(MyDB db, MyData data) throws SQLException {
 		
-		int flag = 0;
-		String MyQuery = "SELECT BookID "
-				+ "FROM books "
-				+ "WHERE bookName = '"+ data.getData("bookName")+"' "
-				+ "AND authorsNames = '"+data.getData("authorName")+"';";
+		Book b = (Book) data.getData("book");
+		 File myFile = new File("./src/server/TableOfContents/"+b.getBookID()+".pdf");
+		  MyFile msg= new MyFile(b);
+		  msg.setWriteToPath("./src/client/ClientTableOfContents");
+		  String LocalfilePath="./src/server/TableOfContents/"+ b.getBookID()+".pdf";
+		  try{
+			      File newFile = new File (LocalfilePath);
+			      		      
+			      byte [] mybytearray  = new byte [(int)newFile.length()];
+			      FileInputStream fis = new FileInputStream(newFile);
+			      BufferedInputStream bis = new BufferedInputStream(fis);			  
+			      
+			      msg.initArray(mybytearray.length);
+			      msg.setSize(mybytearray.length);
+			      
+			      bis.read(msg.getMybytearray(),0,mybytearray.length);
+			      data.add("getFile", msg);
+				  data.setAction("getFile");
+				  bis.close();
+			      return data;
+			    }
+			catch (Exception e) {
+				System.out.println("Error send (Files)msg) to Server");
+			}
+		return data;
+		
+	}
+public Borrow getBorrow(int borrowID) throws SQLException {
+	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
+	rs.next();
+	int borrowdID = rs.getInt("borrowID");
+	int memberID = rs.getInt("memberID");
+	Date borrowDate = rs.getDate("borrowDate");
+	Date returnDate = rs.getDate("returnDate");
+	Date actualReturnDate = rs.getDate("actualReturnDate");
+	boolean isLate=rs.getBoolean("isLate");
+	if (db.hasResults(rs))
+		return new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"),rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate"));
+	return null;
+}
+public MyData getReturnBooks(MyDB db, MyData data) throws SQLException {
+	ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
+	int flag =0;
+	String MyQuery = "SELECT copy_in_borrow.borrowID, copy_in_borrow.copyNumber, copy_in_borrow.BookID "
+			+ "FROM oblg3.copy_in_borrow "
+			+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID "
+			+ "AND borrows.memberID='"
+			+ data.getData("ID")
+			+"';";
 		ResultSet rs = db.select(MyQuery);
-		data.getData().clear();
 		while (rs.next()) 
-		{	
-			System.out.println(rs.getInt("BookID"));
-					bookList.add(getBook(rs.getInt("BookID")));		
-					flag=1;
-			
+		{
+			Book book = getBook(rs.getInt("BookID"));
+			int num = rs.getInt("borrowID");
+			Borrow borrow =  getBorrow(num);
+			returnBookList.add(new CopyInBorrow(book, borrow, rs.getInt("copyNumber")));
 		}
 		rs.close();
 		
 		if (flag ==1)
 		{
+			data.add("returnBooklist", returnBookList);
+			data.setAction("listOfReturnBooks");
+			return data;
+		}
+		else 
+		{
+			data.setAction("unfind_borrows_Book");
+			data.add("reason", "There is no books in borrow!");
+			return data;
+		}
+	
+	}
+	public MyData searchBook(MyDB db, MyData data) throws SQLException {
+		ArrayList<Book> bookList = new ArrayList<>();
 		
+		int checkFlag = 0;
+		int flag = 0;
+		String MyQuery = "SELECT BookID "
+				+ "FROM books "
+				+ "WHERE ";
+		if (!data.getData("bookName").equals(""))
+		{
+			MyQuery = MyQuery + "bookName = '"+ data.getData("bookName")+"'";
+			checkFlag = 1;
+		}
+		if (!data.getData("authorName").equals(""))
+		{
+			if(checkFlag ==0)
+			MyQuery = MyQuery + "authorsNames  = '"+ data.getData("authorName")+"'";
+			else MyQuery = MyQuery + "AND authorsNames = '"+data.getData("authorName")+"'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreDrama"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'Drama' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'Drama' '%'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreThriller"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'Thriller' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'Thriller' '%'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreAdventure"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'Adventure' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'Adventure' '%'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreBoxSF"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'SF' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'SF' '%'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreKids"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'Kids' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'Kids' '%'";
+			checkFlag =1;
+		}
+		if ((boolean) data.getData("genreTextBook"))
+		{
+			if (checkFlag == 0)
+			MyQuery = MyQuery + "topic LIKE '%' 'TextBook' '%'";
+			else MyQuery = MyQuery + "AND topic LIKE '%' 'TextBook' '%'";
+			checkFlag =1;
+		}
+		MyQuery = MyQuery + ";";
+		
+		if (checkFlag == 0)
+		{
+		data.setAction("empty_fields");
+		data.add("reason", "Your fields are empty");
+		return data;
+		}
+	
+			
+		ResultSet rs = db.select(MyQuery);
+		data.getData().clear();
+		while (rs.next()) 
+		{	
+					bookList.add(getBook(rs.getInt("BookID")));		
+					flag=1;
+		}
+		rs.close();
+		
+		
+		if (flag ==1)
+		{
 			data.add("booklist", bookList);
 			data.setAction("listOfBooks");
 			return data;
