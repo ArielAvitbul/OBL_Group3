@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import client.ClientConsole;
 import client.MyData;
 import common.Book;
+import common.CopyInBorrow;
 import common.Librarian;
 import common.Member;
 import common.MemberCard;
@@ -20,7 +21,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 
 public class LibrarianController {
 	private ReaderController rc;
@@ -175,6 +175,43 @@ public class LibrarianController {
     		}
     	}
     	protected class ReturnCopy {
+    		@FXML
+			void initialize() {
+    			bookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, String>("bookName"));
+    			borrowIDCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Integer>("borrowID"));
+    			borrowDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Object>("borrowDate"));
+    			returnDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Object>("returnDate"));
+    			MyData returnBook = new MyData ("returnBook");
+    			returnBook.add("ID", member.getID());
+    				rc.getCC().send(returnBook);
+    			String result = (String)rc.getCC().getFromServer().getAction();
+	    			if (result.equals("listOfReturnBooks")) 
+	    			{
+	    				ArrayList<CopyInBorrow> returnBookList = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("returnBooklist");
+	    				returnsTable.getItems().addAll(returnBookList);
+	    			}
+	    		}
+    		
+		    @FXML
+    	    private TableColumn<CopyInBorrow, String> bookNameCol;
+
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, Integer> borrowIDCol;
+    	    
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, Object> borrowDateCol;
+    	    
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, Object> returnDateCol;
+    	    
+    	    @FXML
+    	    private AnchorPane pane;
+
+    	    @FXML
+    	    private ImageView saveInfo;
+
+    	    @FXML
+    	    private TableView<CopyInBorrow> returnsTable;
     		@FXML
     		void entered(MouseEvent e) {
     			rc.mouseEntered(e);

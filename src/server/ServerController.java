@@ -206,20 +206,16 @@ public class ServerController {
 public MyData getTableOfContents(MyDB db, MyData data) throws SQLException {
 		
 		Book b = (Book) data.getData("book");
-		 File myFile = new File("./src/server/TableOfContents/"+b.getBookID()+".pdf");
 		  MyFile msg= new MyFile(b);
-		  msg.setWriteToPath("./src/client/ClientTableOfContents");
-		  String LocalfilePath="./src/server/TableOfContents/"+ b.getBookID()+".pdf";
+		  msg.setWriteToPath("./src/client/TableOfContents");
 		  try{
-			      File newFile = new File (LocalfilePath);
+			      File newFile = new File ("./src/server/TableOfContents/"+ b.getBookID()+".pdf");
 			      		      
 			      byte [] mybytearray  = new byte [(int)newFile.length()];
 			      FileInputStream fis = new FileInputStream(newFile);
 			      BufferedInputStream bis = new BufferedInputStream(fis);			  
 			      
 			      msg.initArray(mybytearray.length);
-			      msg.setSize(mybytearray.length);
-			      
 			      bis.read(msg.getMybytearray(),0,mybytearray.length);
 			      data.add("getFile", msg);
 				  data.setAction("getFile");

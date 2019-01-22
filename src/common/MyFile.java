@@ -1,13 +1,11 @@
 package common;
 
-import java.io.File;
 import java.io.Serializable;
 
 public class MyFile implements Serializable {
 	
 	private String Description=null;
 	private String fileName=null;	
-	private int size=0;
 	public  byte[] mybytearray;
 	private String writeToPath = null;
 	
@@ -18,7 +16,7 @@ public class MyFile implements Serializable {
 	}
 	
 	public MyFile(Book book) {
-		this.fileName = book.getBookName();
+		this.fileName = String.valueOf(book.getBookID());
 	}
 	
 	
@@ -31,11 +29,7 @@ public class MyFile implements Serializable {
 	}
 	
 	public int getSize() {
-		return size;
-	}
-
-	public void setSize(int size) {
-		this.size = size;
+		return mybytearray.length;
 	}
 
 	public byte[] getMybytearray() {

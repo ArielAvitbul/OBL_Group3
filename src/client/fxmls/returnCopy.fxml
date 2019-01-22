@@ -1,14 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
 <?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="back_memberManagement" layoutX="398.0" layoutY="60.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+      <TableView fx:id="returnsTable" layoutX="287.0" layoutY="121.0" prefHeight="218.0" prefWidth="327.0">
+         <columns>
+            <TableColumn fx:id="bookNameCol" prefWidth="75.0" text="Book Name" />
+            <TableColumn fx:id="borrowIDCol" prefWidth="75.0" text="Borrow ID" />
+            <TableColumn fx:id="borrowDateCol" prefWidth="75.0" text="Borrow Date" />
+            <TableColumn fx:id="returnDateCol" prefWidth="98.39996337890625" text="Return Date" />
+         </columns></TableView>
+      <ImageView fx:id="back_memberManagement" layoutX="426.0" layoutY="60.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="385.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/titles/returnCopy.png" />
          </image>
       </ImageView>
    </children>

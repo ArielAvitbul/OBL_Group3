@@ -439,27 +439,18 @@ public class ReaderController {
 		    @FXML
 		    void tableOfContent(MouseEvent event) throws IOException {
 		    		Book book = tableBooks.getSelectionModel().getSelectedItem();
-		    		MyData tableOfContents = new MyData ("tableOfContents");
+		    		MyData tableOfContents = new MyData("tableOfContents");
 		    		tableOfContents.add("book", book);
-	    				cc.send(tableOfContents);	    		
-		        	MyFile fileToUpload = (MyFile) cc.getFromServer().getData("getFile");
-		        	fileToUpload.initArray(((MyFile) cc.getFromServer().getData("getFile")).getSize());
-		            
-		            	File newFile = new File(((MyFile) cc.getFromServer().getData("getFile")).getWriteToPath()+"/"+((MyFile) cc.getFromServer().getData("getFile")).getFileName());
-		      		  if (!newFile.exists()) {
+	    				cc.send(tableOfContents);
+	    		    	MyFile mf = (MyFile) cc.getFromServer().getData("getFile");
+		            	File newFile = new File(mf.getWriteToPath()+"/"+((MyFile) cc.getFromServer().getData("getFile")).getFileName()+".pdf");
+		      		  if (!newFile.exists()) 
 		  				newFile.createNewFile();
-		      		  }
-		                byte[] mybytearray = new byte[(int) fileToUpload.getSize()]; 
-		                FileOutputStream fis = null;
-						fis = new FileOutputStream(newFile);
-		                BufferedOutputStream bos = new BufferedOutputStream(fis);
-						bos.write(((MyFile) cc.getFromServer().getData("getFile")).getMybytearray(), 0, (((MyFile) cc.getFromServer().getData("getFile")).getSize()));
+		                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
+						bos.write(mf.getMybytearray(), 0, (((MyFile) cc.getFromServer().getData("getFile")).getSize()));
 						bos.close();
 						if (Desktop.isDesktopSupported())
-						{
-							 File myFile = new File("./src/client/ClientTableOfContents/"+book.getBookID()+".pdf");
-						     Desktop.getDesktop().open(myFile);
-						}
+						     Desktop.getDesktop().open(new File("./src/client/TableOfContents/"+book.getBookID()+".pdf"));
 		   
 		    }
 		    
