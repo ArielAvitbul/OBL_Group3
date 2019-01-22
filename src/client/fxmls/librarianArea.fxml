@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="page" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView layoutX="344.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/titles/librarianArea.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="title" layoutX="383.0" layoutY="114.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/search_member.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="member_search" layoutX="517.0" layoutY="137.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#searchMember" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/etc/search.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="searchIDField" alignment="CENTER" layoutX="380.0" layoutY="139.0" prefHeight="25.0" prefWidth="129.0" promptText="9 Digit number" />
+      <ImageView fitHeight="46.0" fitWidth="12.0" layoutX="355.0" layoutY="147.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/id.png" />
+         </image>
+      </ImageView>
+      <HBox layoutX="315.0" layoutY="60.0" prefHeight="32.0" prefWidth="103.0" spacing="15.0">
+         <children>
+            <ImageView fx:id="createUser" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/createUser.jpg" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="inventoryManagement" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/inventoryManagement.png" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

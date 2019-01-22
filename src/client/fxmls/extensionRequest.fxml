@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="ExtensionAnPane" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="ExtensionCurrBooks" layoutX="57.0" layoutY="140.0" prefHeight="200.0" prefWidth="516.0">
+        <columns>
+          <TableColumn fx:id="BookNameCol" prefWidth="239.0" text="Book name" />
+          <TableColumn fx:id="BookAuthorCol" prefWidth="147.0" text="Author" />
+            <TableColumn fx:id="RetDateCol" prefWidth="129.0" text="Date" />
+        </columns>
+      </TableView>
+      <ImageView fitHeight="34.0" fitWidth="124.0" layoutX="231.0" layoutY="358.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/askForExtend.jpg" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="ExtensionHeader" layoutX="310.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/titles/extension_request.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
