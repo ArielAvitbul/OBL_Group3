@@ -69,6 +69,9 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		  case "history":
+	  		    	client.sendToClient(serverCont.history((Integer)data.getData("id")));
+	  		    	break;
 	  		  case "BorrowToExtend":
 	  		    	MyData extensionResult = serverCont.updateExtension((Borrow)data.getData("TheBorrow"));
 	  		    	extensionResult.add("UpdatedBorrow", data.getData("TheBorrow"));

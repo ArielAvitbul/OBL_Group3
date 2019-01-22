@@ -14,6 +14,7 @@ import common.Book;
 import common.BookReservation;
 import common.Borrow;
 import common.CopyInBorrow;
+import common.History;
 import common.Librarian;
 import common.Manager;
 import common.Member;
@@ -138,7 +139,7 @@ public class ServerController {
 		ArrayList<Borrow> memberBorrows = new ArrayList<Borrow>();
 		ResultSet rs = db.select("SELECT * FROM borrows WHERE memberID ="+memberID);
 		while(rs.next())
-			memberBorrows.add(new Borrow(rs.getInt(1),rs.getInt(2),rs.getDate(3),rs.getDate(4),rs.getDate(5),rs.getBoolean(6)));
+			memberBorrows.add(new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"), rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate")));
 		return memberBorrows;
 	}
 	/* function to get all of the specified member violations
@@ -253,5 +254,20 @@ public class ServerController {
 		MyData toReturn = new MyData("ExtensionSucceed");
 		toReturn.add("updaedBorrow", toUpdate);
 		return toReturn;
+	}
+	
+	public MyData history(int id) throws SQLException{
+		MyData ret = new MyData("result");
+		ArrayList<History> myHistory = new ArrayList<>();
+		try {
+			ResultSet rs= db.select("SELECT books.bookName , borrows.borrowDate, borrows.actualReturnDate FROM books JOIN borrows WHERE books.bookID=borrows.bookID AND borrows.memberID="+ id);
+			while (rs.next())
+				myHistory.add(new History(rs.getString("bookName"), rs.getDate("borrowDate"), rs.getDate("actualReturnDate")));
+		}
+		catch (SQLException e) {
+			System.out.println("History FAILED to load! "+ e.getMessage());
+		}
+		ret.add("list", myHistory);
+			return ret;
 	}
 }

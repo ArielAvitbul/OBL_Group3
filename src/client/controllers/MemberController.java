@@ -10,6 +10,7 @@ import common.Book;
 import common.BookReservation;
 import common.Borrow;
 import common.CopyInBorrow;
+import common.History;
 import common.Member;
 import common.MemberCard;
 import javafx.fxml.FXML;
@@ -99,7 +100,35 @@ public class MemberController {
 	    	}
 	    }
 	    protected class HistoryController {
-    		// sapir's
+    		@FXML
+    		void initialize() {
+    			MyData data = new MyData("history");
+    			data.add("id", member.getID());
+				rc.getCC().send(data);
+			ArrayList<History> arrOb = (ArrayList<History>)rc.getCC().getFromServer().getData("list");
+			BorrowTable.getItems().addAll(arrOb);
+			System.out.println(arrOb);
+			colname.setCellValueFactory(new PropertyValueFactory<History, String>("bookName"));
+			colborrowdate.setCellValueFactory(new PropertyValueFactory<History,Date>("borrowDate"));
+			colreturndate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualReturnDate"));
+		}
+        @FXML
+    	private AnchorPane pane;
+        @FXML
+        private ImageView r;
+        
+		@FXML
+		private TableColumn<History, String> colname;
+
+		@FXML
+		private TableColumn<History, Date> colborrowdate;
+
+		@FXML
+		private TableColumn<History, Date> colreturndate;
+		    
+		@FXML
+		private TableView<History> BorrowTable;
+			
     	}
 	    protected class ExtensionRequestController {
 	    	    @FXML

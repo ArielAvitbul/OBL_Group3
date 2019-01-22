@@ -1,10 +1,10 @@
 package client.controllers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import client.ClientConsole;
 import client.MyData;
+import common.Book;
 import common.Librarian;
 import common.Member;
 import common.MemberCard;
@@ -13,9 +13,14 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 
 public class LibrarianController {
 	private ReaderController rc;
@@ -62,7 +67,6 @@ public class LibrarianController {
     		ClientConsole.newAlert(AlertType.ERROR, null, "ID Field", "9 digits only in ID field!");
     	}
     }
-    
     protected class MemberManagement {
     	private Member member;
     	public MemberManagement(Member member) {
@@ -245,4 +249,58 @@ public class LibrarianController {
 	    }
 
 	}
+	protected class BookManagement {
+    	public BookManagement(Book book) {
+    		System.out.println("book on management: "+book);
+    	}
+    }
+	protected class InventoryManagementController {
+		private ArrayList<Book> books;
+		@FXML
+		void initialize() {
+				rc.getCC().send(new MyData("getBooks"));
+			books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
+			inventoryTable.getItems().addAll(books);
+			colNameInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
+			colTopicInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
+			colAuthorsInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
+		}
+		@FXML
+		 void handle(MouseEvent event) {
+		        if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && 
+		            ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna update this book?", "Once changed, the old information would be lost.").get() == ButtonType.OK)
+		            	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
+		        }
+		@FXML
+		private TableView<Book> inventoryTable;
+	    @FXML
+	    private TableColumn<Book, String> colNameInventory;
+
+	    @FXML
+	    private TableColumn<Book, String> colTopicInventory;
+
+	    @FXML
+	    private TableColumn<Book, String> colAuthorsInventory;
+
+
+	    @FXML
+	    private ImageView searchBook;
+
+	    @FXML
+	    void entered(MouseEvent event) {
+	    	rc.mouseEntered(event);
+	    }
+	    @FXML
+	    void exited(MouseEvent event) {
+	    	rc.mouseExited(event);
+	    }
+	    @FXML
+	    void replacePage(MouseEvent event) {
+	    	rc.setBottom(event);
+	    }
+	    @FXML
+	    void add(MouseEvent event) {
+	    	rc.setBottom(event);
+	}
+}
 }

@@ -143,16 +143,19 @@ public class ReaderController {
      * */
     protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
-    	try {
-    	if (controllers.containsKey("memberManagement") && fxml.equals("memberManagement") && !((Member)objects[0]).equals(((MemberManagement)controllers.get("memberManagement")).getMember()))
-    		/* if we got different results from the previous search, forget the previous search.*/
-    		controllers.remove(fxml);
-    	} catch (NullPointerException e) {/* we wanna catch the exception and do nothing
-    		 since if objects[0] is null that means we're going back from an inner class*/};
-    	if (!this.controllers.containsKey(fxml)) {
     		switch (fxml) {
+    		case "inventoryManagement":
+    			controllers.put(fxml, ((LibrarianController)controllers.get("librarian")).new InventoryManagementController());
+    			break;
+    		case "bookManagement":
+    			controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new BookManagement((Book)objects[0])));
+    			break;
     		case "memberManagement":
+    			try {
     			controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new MemberManagement((Member)objects[0])));
+    			} catch (NullPointerException e) {
+    				controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new MemberManagement(((MemberManagement)controllers.get("memberManagement")).getMember())));
+    			}
     			break;
     		case "viewRequests":
     			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new ViewRequests());
@@ -191,8 +194,6 @@ public class ReaderController {
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
     				//System.exit(1);
     		}
-    	}
-    	//if (!fxml.equals("memberManagement")) // we don't want to remember the previous memberManagement
     	loader.setController(controllers.get(fxml));
     	mainPane.getChildren().remove(page); // removes the previous page.
 		try {

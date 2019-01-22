@@ -3,29 +3,35 @@ package common;
 import java.io.Serializable;
 import java.sql.Date;
 
+import javafx.beans.property.SimpleObjectProperty;
+
 public class Borrow implements Serializable {
 
 
 	private final int borrowID;
+	private final int bookID;
 	private final int memberID;
 	private final Date borrowDate;
 	private Date returnDate;
 	private Date actualReturnDate;
-	private boolean isLate;
 	
-	public Borrow(int borrowID, int memberID, Date borrowDate, Date returnDate, Date actualReturnDate, boolean isLate) {
+	public Borrow(int borrowID,int bookID, int memberID, Date borrowDate, Date returnDate, Date actualReturnDate) {
 		super();
 		this.borrowID = borrowID;
+		this.bookID=bookID;
 		this.memberID = memberID;
 		this.borrowDate = borrowDate;
 		this.returnDate = returnDate;
 		this.actualReturnDate = actualReturnDate;
-		this.isLate = isLate;
 	}
 
 	public int getBorrowID() 
 	{
 		return borrowID;
+	}
+
+	public int getBookID() {
+		return bookID;
 	}
 
 	public int getMemberID() 
@@ -58,11 +64,11 @@ public class Borrow implements Serializable {
 		this.actualReturnDate = actualReturnDate;
 	}
 
-	public boolean isLate() {
-		return isLate;
+	public SimpleObjectProperty borrowDate() {
+		return new SimpleObjectProperty(borrowDate);
 	}
-
-	public void setLate(boolean isLate) {
-		this.isLate = isLate;
+	
+	public SimpleObjectProperty actualReturnDate() {
+		return new SimpleObjectProperty(actualReturnDate);
 	}
 }

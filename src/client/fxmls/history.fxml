@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
 <?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="saveInfo" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/bottom.jpg" />
-         </image>
-      </ImageView>
+      <Text layoutX="307.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ORDER HISTORY" textAlignment="CENTER" wrappingWidth="286.136682510376">
+         <font>
+            <Font name="System Bold" size="36.0" />
+         </font>
+      </Text>
+      <TableView fx:id="BorrowTable" layoutX="188.0" layoutY="130.0" prefHeight="200.0" prefWidth="524.0">
+        <columns>
+          <TableColumn fx:id="colname" editable="false" prefWidth="263.1999816894531" text="Name" />
+          <TableColumn fx:id="colborrowdate" editable="false" prefWidth="119.20004272460938" text="Date" />
+            <TableColumn fx:id="colreturndate" editable="false" prefWidth="142.4000244140625" text="Return Date" />
+        </columns>
+      </TableView>
    </children>
 </AnchorPane>
