@@ -4,10 +4,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import common.Book;
+import com.mysql.jdbc.Statement;
 
 public class MyDB {
 	private final String IP= "localhost";
@@ -31,6 +29,13 @@ public class MyDB {
 	
 	public int insert(String query) throws SQLException {
 		return conn.createStatement().executeUpdate(query);
+	}
+	
+	public int insertAndGetKey(String query) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+		stmt.executeUpdate();
+		ResultSet rs = stmt.getGeneratedKeys();
+		return rs.getInt(1);
 	}
 	
 	public PreparedStatement update(String query) throws SQLException {

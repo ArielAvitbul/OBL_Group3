@@ -69,6 +69,11 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		    case "Activity Report":
+	  		    case "Borrow Report":
+	  		    case "Late Return Report":
+	  		    	client.sendToClient(serverCont.report(data));
+	  		    	break;
 	  		  case "history":
 	  		    	client.sendToClient(serverCont.history((Integer)data.getData("id")));
 	  		    	break;
@@ -89,13 +94,13 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.createUser(data));
 	  		    	break;
 	  		  case "searchBook":
-	  				client.sendToClient(serverCont.searchBook(db,data));
+	  				client.sendToClient(serverCont.searchBook((ArrayList<String>)data.getData("genres"),(String)data.getData("bookName"),(String)data.getData("authorsName")));
 	  				break;
 	  		case "tableOfContents":
-  				client.sendToClient(serverCont.getTableOfContents(db,data));
+  				client.sendToClient(serverCont.getTableOfContents(data));
   				break;
 	  		case "returnBook":
-  				client.sendToClient(serverCont.getReturnBooks(db,data));
+  				client.sendToClient(serverCont.getReturnBooks(data));
   				break;
 	  		    case "login":
 	  		    	System.out.println((Integer)data.getData("id")+" had logged in (IP:"+ client.getInetAddress().toString()+")");

@@ -2,10 +2,9 @@ package common;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import com.itextpdf.text.Document;
-
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Book implements Serializable{
@@ -15,7 +14,7 @@ public class Book implements Serializable{
 	private String authorsNames;
 	private float editionNumber;
 	private Date printDate;
-	private  String topic;
+	private String topics;
 	private String shortDescription;
 	private int numberOfCopies;
 	private Date purchaseDate;
@@ -23,16 +22,15 @@ public class Book implements Serializable{
 	private boolean isPopular;
 	private int currentNumberOfCopies;
 	
-	public Book(int bookID, String bookName, String authorsNames, float editionNumber, Date printDate, String topic,
+	public Book(int bookID, String bookName, String authorsNames, float editionNumber, Date printDate, String topics,
 			String shortDescription, int numberOfCopies, Date purchaseDate, String shellLocation, boolean isPopular,
-			int currentNumberOfCopies) 
-	{
+			int currentNumberOfCopies) {
 		this.bookID = bookID;
 		this.bookName = bookName;
 		this.authorsNames = authorsNames;
 		this.editionNumber = editionNumber;
 		this.printDate = printDate;
-		this.topic = topic;
+		this.topics = topics;
 		this.shortDescription = shortDescription;
 		this.numberOfCopies = numberOfCopies;
 		this.purchaseDate = purchaseDate;
@@ -59,8 +57,8 @@ public class Book implements Serializable{
 		return new SimpleStringProperty(bookName);
 	}
 
-	public SimpleStringProperty topic() {
-		return new SimpleStringProperty(topic);
+	public SimpleStringProperty topics() {
+		return new SimpleStringProperty(topics.toString());
 	}
 	
 	public SimpleStringProperty authorsNames() {
@@ -92,9 +90,12 @@ public class Book implements Serializable{
 		this.printDate = printDate;
 	}
 
-	public String getTopic() 
+	public String getTopics() 
 	{
-		return topic;
+		return topics;
+	}
+	public void setTopics(ArrayList<String> topics) {
+		this.topics=topics.toString();
 	}
 	
 	public String getShortDescription() 
@@ -156,5 +157,4 @@ public class Book implements Serializable{
 	public String toString() {
 		return this.bookName;
 	}
-
 }

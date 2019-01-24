@@ -24,7 +24,7 @@
             <Image url="@../images/texts/titles/searchBook.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="searchButton" layoutX="137.0" layoutY="343.0" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="searchButton" layoutX="137.0" layoutY="343.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/search.png" />
          </image>
@@ -70,8 +70,8 @@
                </image>
             </ImageView>
             <TextField fx:id="nameField" GridPane.columnIndex="1" />
-            <TextField fx:id="authorField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextField fx:id="authorsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <GridPane fx:id="GenrePane" GridPane.columnIndex="1" GridPane.rowIndex="2">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" />
                 <ColumnConstraints hgrow="SOMETIMES" />
@@ -82,12 +82,12 @@
                   <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <CheckBox fx:id="checkBoxDrama" mnemonicParsing="false" text="Drama" />
-                  <CheckBox fx:id="checkBoxThriller" mnemonicParsing="false" text="Thriller" GridPane.columnIndex="1" />
-                  <CheckBox fx:id="checkBoxAdventure" mnemonicParsing="false" text="Adventure" GridPane.rowIndex="1" />
-                  <CheckBox fx:id="checkBoxSF" mnemonicParsing="false" text="SF" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <CheckBox fx:id="checkBoxKids" mnemonicParsing="false" text="Kids" GridPane.rowIndex="2" />
-                  <CheckBox fx:id="checkBoxTextBook" mnemonicParsing="false" text="Text Book" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <CheckBox fx:id="Drama" mnemonicParsing="false" text="Drama" />
+                  <CheckBox fx:id="Thriller" mnemonicParsing="false" text="Thriller" GridPane.columnIndex="1" />
+                  <CheckBox fx:id="Adventure" mnemonicParsing="false" text="Adventure" GridPane.rowIndex="1" />
+                  <CheckBox fx:id="SF" mnemonicParsing="false" text="SF" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <CheckBox fx:id="Kids" mnemonicParsing="false" text="Kids" GridPane.rowIndex="2" />
+                  <CheckBox fx:id="Book" mnemonicParsing="false" text="Text Book" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />

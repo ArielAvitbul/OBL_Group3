@@ -24,6 +24,10 @@ public class CopyInBorrow implements Serializable {
 		return new SimpleStringProperty(borroBook.getBookName());
 	}
 	
+	public String getBorroBookName() {
+		return borroBook.getBookName();
+	}
+	
 	public Date getReturnDate() {
 		return returnDate;
 	}

@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
@@ -35,7 +36,7 @@ public class ServerController {
 		try {
 		ResultSet rs = db.select("SELECT * from books");
 		while (rs.next()) {//TODO: add table of content PDF.
-			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topic"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
+			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 			books.add(book);
 		}
 		} catch (SQLException e) {
@@ -46,7 +47,7 @@ public class ServerController {
 	public Book getBook(int bookID) throws SQLException {
 		ResultSet rs = db.select("SELECT * from books WHERE bookid="+ bookID);
 		if (db.hasResults(rs))
-			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topic"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
+			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 		return null;
 	}
 	/*method for confirming login request from client
@@ -203,7 +204,7 @@ public class ServerController {
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
 	
-public MyData getTableOfContents(MyDB db, MyData data) throws SQLException {
+public MyData getTableOfContents(MyData data) throws SQLException {
 		
 		Book b = (Book) data.getData("book");
 		  MyFile msg= new MyFile(b);
@@ -241,7 +242,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"),rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate"));
 	return null;
 }
-public MyData getReturnBooks(MyDB db, MyData data) throws SQLException {
+public MyData getReturnBooks(MyData data) throws SQLException {
 	ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
 	int flag =0;
 	String MyQuery = "SELECT copy_in_borrow.borrowID, copy_in_borrow.copyNumber, copy_in_borrow.BookID "
@@ -274,100 +275,31 @@ public MyData getReturnBooks(MyDB db, MyData data) throws SQLException {
 		}
 	
 	}
-	public MyData searchBook(MyDB db, MyData data) throws SQLException {
-		ArrayList<Book> bookList = new ArrayList<>();
-		
-		int checkFlag = 0;
-		int flag = 0;
-		String MyQuery = "SELECT BookID "
-				+ "FROM books "
-				+ "WHERE ";
-		if (!data.getData("bookName").equals(""))
-		{
-			MyQuery = MyQuery + "bookName = '"+ data.getData("bookName")+"'";
-			checkFlag = 1;
+
+	public boolean compareStrings(String str1, String str2) {
+		try {
+			return str1.toLowerCase().matches(".*"+str2.toLowerCase()+".*");
+		} catch (Exception e) {
+			return true; // if one of the strings is empty, then there's nothing to check and it will get here, so just return true.
 		}
-		if (!data.getData("authorName").equals(""))
-		{
-			if(checkFlag ==0)
-			MyQuery = MyQuery + "authorsNames  = '"+ data.getData("authorName")+"'";
-			else MyQuery = MyQuery + "AND authorsNames = '"+data.getData("authorName")+"'";
-			checkFlag =1;
+	}
+	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName) throws SQLException {
+		MyData ret = new MyData("result");
+		ArrayList<Book> result = new ArrayList<>();
+		for (Book b : getAllBooks()) {
+			if (compareStrings(b.getBookName(),bookName) &&	compareStrings(b.getAuthorsNames(),authorsName)) {
+				boolean flag=true;
+				for (String g : genres) {
+					if (!b.getTopics().contains(g)) {
+						flag=false;
+					}
+				}
+				if (flag)
+				result.add(b);
+			}
 		}
-		if ((boolean) data.getData("genreDrama"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'Drama' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'Drama' '%'";
-			checkFlag =1;
-		}
-		if ((boolean) data.getData("genreThriller"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'Thriller' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'Thriller' '%'";
-			checkFlag =1;
-		}
-		if ((boolean) data.getData("genreAdventure"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'Adventure' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'Adventure' '%'";
-			checkFlag =1;
-		}
-		if ((boolean) data.getData("genreBoxSF"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'SF' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'SF' '%'";
-			checkFlag =1;
-		}
-		if ((boolean) data.getData("genreKids"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'Kids' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'Kids' '%'";
-			checkFlag =1;
-		}
-		if ((boolean) data.getData("genreTextBook"))
-		{
-			if (checkFlag == 0)
-			MyQuery = MyQuery + "topic LIKE '%' 'TextBook' '%'";
-			else MyQuery = MyQuery + "AND topic LIKE '%' 'TextBook' '%'";
-			checkFlag =1;
-		}
-		MyQuery = MyQuery + ";";
-		
-		if (checkFlag == 0)
-		{
-		data.setAction("empty_fields");
-		data.add("reason", "Your fields are empty");
-		return data;
-		}
-	
-			
-		ResultSet rs = db.select(MyQuery);
-		data.getData().clear();
-		while (rs.next()) 
-		{	
-					bookList.add(getBook(rs.getInt("BookID")));		
-					flag=1;
-		}
-		rs.close();
-		
-		
-		if (flag ==1)
-		{
-			data.add("booklist", bookList);
-			data.setAction("listOfBooks");
-			return data;
-		}
-		else 
-		{
-			data.setAction("unfind_book");
-			data.add("reason", "No book found!");
-			return data;
-		}
+		ret.add("search_results", result);
+		return ret;
 	}
 	
 	public ArrayList<CopyInBorrow> getCopiesInBorrow(ArrayList<Borrow> myBorrows) throws SQLException
@@ -407,5 +339,36 @@ public MyData getReturnBooks(MyDB db, MyData data) throws SQLException {
 		}
 		ret.add("list", myHistory);
 			return ret;
+	}
+	
+	public MyData report(MyData data) throws SQLException {
+		ResultSet rs;
+		switch (data.getAction()) {
+		case "Activity Report":
+			rs = db.select("SELECT COUNT(id) as active, (SELECT count(id) from members where `status`='LOCK') as inactive, (SELECT count(id) from members where `status`='FREEZE') as frozen, (SELECT count(*) from copy_in_borrow) as totalCopiesInBorrow, (SELECT distinct count(memberID) from borrows where actualReturnDate > returnDate) as lateMembers from members where `status`='ACTIVE'");
+			if (rs.next()) {
+			data.add("active", rs.getInt("active"));
+			data.add("inactive", rs.getInt("inactive"));
+			data.add("frozen", rs.getInt("frozen"));
+			data.add("totalCopiesInBorrow", rs.getInt("totalCopiesInBorrow"));
+			data.add("lateMembers", rs.getInt("lateMembers"));
+			}
+			break;
+		 case "Borrow Report":
+			 rs = db.select("select sum(returnDate-borrowDate) as regular, (select sum(returnDate-borrowDate) from books join borrows where isPopular=1 and borrows.bookID=books.bookID) as popular from books join borrows where isPopular=0 and borrows.bookID=books.bookID");
+			 if (rs.next()) {
+				 data.add("regular", rs.getInt("regular"));
+				 data.add("popular", rs.getInt("popular"));
+			 }
+			 break;
+		 case "Late Return Report":
+				HashMap<String,Integer> result = new HashMap<>();
+				rs= db.select("select books.bookName,count(books.bookName) as amount from books join copy_in_borrow where books.bookID=copy_in_borrow.BookID  group by books.bookName union select bookName,0 from books where bookID not in (select bookID from copy_in_borrow)");
+				while (rs.next())
+					result.put(rs.getString("bookName"), rs.getInt("amount"));
+				data.add("result", result);
+				break;
+		}
+		return data;
 	}
 }

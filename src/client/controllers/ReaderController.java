@@ -2,13 +2,12 @@ package client.controllers;
 
 import java.awt.Desktop;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import java.io.File;
 
 import client.ClientConsole;
 import client.MyData;
@@ -42,6 +41,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -151,6 +151,9 @@ public class ReaderController {
     protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     		switch (fxml) {
+    		case "managerReport":
+    			controllers.put(fxml, ((ManagerController)controllers.get("manager")).new ProduceReport());
+    			break;
     		case "inventoryManagement":
     			controllers.put(fxml, ((LibrarianController)controllers.get("librarian")).new InventoryManagementController());
     			break;
@@ -302,53 +305,24 @@ public class ReaderController {
 		private class SearchController {
 			@FXML
 				void initialize() {
-			//	addTo(borderPane, new MyImage("searchBook", "client/images/buttons/searchButton.jpg",searchButton.getLayoutX(),searchButton.getLayoutY(), e->submitSearch(e)), true);
-		/*	choiceGenere.getItems().add("Drama");
-			choiceGenere.getItems().add("Thriller");
-			choiceGenere.getItems().add("Adventure");
-			choiceGenere.getItems().add("Science fiction");
-			choiceGenere.getItems().add("Text Book");
-			choiceGenere.getItems().add("Kids");*/
-		/*	TableColumn Name = new TableColumn("Name");
-			TableColumn Author = new TableColumn("Author");
-			TableColumn Genere = new TableColumn("Genere");
-			TableColumn bookIsAvalible = new TableColumn("Book is avalible?");
-			tableBooks.getColumns().addAll(Name, Author, Genere, bookIsAvalible);	*/
 			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
-			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
+			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
-		//	IndexCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
 			availbleCol.setCellValueFactory(new PropertyValueFactory<Book, String>("currentNumberOfCopies"));
 			tableBooks.setPlaceholder(new Label("Enter search details"));
 				}
 		    @FXML
-		    private ImageView orderBookButton;
-		    
+		    private ImageView orderBookButton;	
 		    @FXML
 		    private ImageView indexBookButton;
+		    @FXML
+		    private GridPane GenrePane;
 		    
-		    @FXML
-		    private CheckBox checkBoxDrama;
-
-		    @FXML
-		    private CheckBox checkBoxThriller;
-
-		    @FXML
-		    private CheckBox checkBoxAdventure;
-
-		    @FXML
-		    private CheckBox checkBoxSF;
-
-		    @FXML
-		    private CheckBox checkBoxKids;
-
-		    @FXML
-		    private CheckBox checkBoxTextBook;
 		    @FXML
 		    private TextField nameField;
 
 		    @FXML
-		    private TextField authorField;
+		    private TextField authorsField;
 
 		    @FXML
 		    private ChoiceBox<String> choiceGenere;
@@ -360,8 +334,6 @@ public class ReaderController {
 		    private ListView<String> searchResultList;
 		    @FXML
 		    private TableView<Book> tableBooks;
-		    @FXML
-		    private ImageView searchButton;
 		    @FXML
     	    private TableColumn<Book, String> genreCol;
 
@@ -379,11 +351,11 @@ public class ReaderController {
 
 		    @FXML
 		    void entered(MouseEvent event) {
-
+		    	mouseEntered(event);
 		    }
 		    @FXML
 		    void exited(MouseEvent event) {
-
+		    	mouseExited(event);
 		    }
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
@@ -391,49 +363,20 @@ public class ReaderController {
     	    	orderBookButton.setVisible(false);
     	    	indexBookButton.setVisible(false);
 		    	MyData searchBook = new MyData ("searchBook");
-		    //boolean arrayOfCheckBoxSelected[] = new boolean[6];
 		    	searchBook.add("bookName", nameField.getText());
-		    	searchBook.add("authorName", authorField.getText());
-		    	//searchBook.add("genre",choiceGenere.getSelectionModel().getSelectedItem());
-		    /*	arrayOfCheckBoxSelected[0]= checkBoxDrama.isSelected();
-		    	arrayOfCheckBoxSelected[1]= checkBoxThriller.isSelected();
-		    	arrayOfCheckBoxSelected[2]= checkBoxAdventure.isSelected();
-		    	arrayOfCheckBoxSelected[3]= checkBoxSF.isSelected();
-		    	arrayOfCheckBoxSelected[4]= checkBoxKids.isSelected();
-		    	arrayOfCheckBoxSelected[5]= checkBoxTextBook.isSelected();*/
-		    	searchBook.add("genreDrama",checkBoxDrama.isSelected());
-		    	searchBook.add("genreThriller",checkBoxThriller.isSelected());
-		    	searchBook.add("genreAdventure",checkBoxAdventure.isSelected());
-		    	searchBook.add("genreBoxSF",checkBoxSF.isSelected());
-		    	searchBook.add("genreKids",checkBoxKids.isSelected());
-		    	searchBook.add("genreTextBook",checkBoxTextBook.isSelected());
+		    	searchBook.add("authorsName", authorsField.getText());
+		    	ArrayList<String> genres= new ArrayList<>();
+		    	for (Node p : GenrePane.getChildren())
+		    		if (((CheckBox)p).isSelected())
+		    			genres.add(p.getId());
+		    	searchBook.add("genres", genres);
     				cc.send(searchBook);
-		    	String result = (String)cc.getFromServer().getAction();
-		    	
-	    		if (result.equals("listOfBooks")) {
-	    	    	ArrayList<Book> booksList = (ArrayList<Book>) cc.getFromServer().getData("booklist");
+    				if (cc.getFromServer().getData().containsKey("search_results")) { 
+	    	    	ArrayList<Book> booksList = (ArrayList<Book>) cc.getFromServer().getData("search_results");
 	    	    	tableBooks.getItems().addAll(booksList);
 	    	    	orderBookButton.setVisible(true);
 	    	    	indexBookButton.setVisible(true);
-	    	    	
-
-	    	    //	Iterator<Book> it = booksList.iterator();
-	    	   /*	while(it.hasNext())
-	    	    	{
-	    	    		tableBooks.getItems().add(it.next().getBookName());
-	    	    		tableBooks.getItems().add(it.next().getAuthorsNames());
-	    	    		tableBooks.getItems().add(it.next().getTopic());
-	    	    	}*/
-
-	    		}
-	    		else if (result.equals("unfind_book")) {
-	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No book found!", (String)cc.getFromServer().getData("reason"));
-	    			nameField.clear();
-	    			authorField.clear();
-	    			}
-	    		else if (result.equals("empty_fields")) {
-	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Your fields are empty", (String)cc.getFromServer().getData("reason"));
-	    			}
+    				}
 		    }
 		    
 		    @FXML
