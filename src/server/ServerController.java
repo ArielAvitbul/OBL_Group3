@@ -308,13 +308,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		MyData ret=new MyData("fail");
 		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
 		try {
-			db.insert("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
-					+ " , `shellLocation` , `isPopular` , `topic` , `currentNumberOfCopies` , `tableOfContent` , `purchaseDate`) "
+			PreparedStatement ps = db.insert("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
+					+ " , `shellLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`) "
 					+ "VALUES ('"+data.getData("bookName")+"' , '"+data.getData("authorsNames")+
 					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
-					"' , '"+data.getData("shellLocation")+"' , '"+data.getData("isPopular")+"' , '"+data.getData("topic")+"' , '"+data.getData("currentNumberOfCopies")+
-					"' , '"+data.getData("tableOfContent")+"' , '"+data.getData("purchaseDate")+"')");
-			
+					"' , '"+data.getData("shellLocation")+"' , ? , '"+data.getData("topics")+"' , '"+data.getData("currentNumberOfCopies")+
+					"' , '"+data.getData("purchaseDate")+"')");
+			ps.setBoolean(1, (Boolean)data.getData("isPopular"));
+			ps.executeUpdate();
 		}
 		catch (SQLException e) {
 		if(e instanceof MySQLIntegrityConstraintViolationException)
@@ -338,7 +339,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			}
 		}
 		else {
-			String query= "UPDATE books SET shellLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=? WHERE bookID="+data.getData("bookID");
+			String query= "UPDATE books SET shellLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=?, topics='"+data.getData("genres")+"' WHERE bookID="+data.getData("bookID");
 			PreparedStatement ps=db.update(query);
 			ps.setString(1, (String) data.getData("shellLocation"));
 			ps.setInt(2, (Integer)data.getData("numberOfCopies"));

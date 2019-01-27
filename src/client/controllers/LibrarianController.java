@@ -564,15 +564,15 @@ public class LibrarianController {
 	    			Popular.setSelected(true);
 	    		shellLocation.setText(book.getShellLocation());
 	    		if(book.getTopics().contains("Kids"))
-	    			checkBoxKids.setSelected(true);
+	    			Kids.setSelected(true);
 	    		if(book.getTopics().contains("Drama"))
-	    			checkBoxDrama.setSelected(true);
+	    			Drama.setSelected(true);
 	    		if(book.getTopics().contains("Adventure"))
-	    			checkBoxAdventure.setSelected(true);
+	    			Adventure.setSelected(true);
 	    		if(book.getTopics().contains("Thriller"))
-	    			checkBoxThriller.setSelected(true);
+	    			Thriller.setSelected(true);
 	    		if(book.getTopics().contains("SF"))
-	    			checkBoxSF.setSelected(true);
+	    			SF.setSelected(true);
 	    		if(book.getTopics().contains("TextBook"))
 	    			checkBoxTextBook.setSelected(true);
 	    	}
@@ -598,25 +598,27 @@ public class LibrarianController {
 	    	    private TextField shellLocation;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxDrama;
+	    	    private CheckBox Drama;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxAdventure;
+	    	    private CheckBox Adventure;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxKids;
+	    	    private CheckBox Kids;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxThriller;
+	    	    private CheckBox Thriller;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxSF;
+	    	    private CheckBox SF;
 
 	    	    @FXML
 	    	    private CheckBox checkBoxTextBook;
 	    	    
 	    	    @FXML
 	    	    private ImageView updateButton;
+	    	    @FXML
+	    	    private GridPane genrePane;
 
 	    	    @FXML
 	    	    void entered(MouseEvent event) {
@@ -631,21 +633,19 @@ public class LibrarianController {
 	    	    @FXML
 	    	    void updateBook(MouseEvent event) {
 	    	    	Book selected = (Book)inventoryTable.getSelectionModel().getSelectedItem();
-	    	    	ArrayList<String> topics = new ArrayList<String>;
-	    	    	int currentNumber=selected.getCurrentNumberOfCopies()+Integer.parseInt(numberOfCopies.getText())-selected.getNumberOfCopies();
-	    	    	//*OBKASDFGOKSA
+	    	    	ArrayList<String> genres = new ArrayList<String>();
+	    	    	for (Node p : genrePane.getChildren())
+	    	    		if (((CheckBox)p).isSelected())
+	    	    			genres.add(p.getId());
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
-	    	    		data.add("editionNumber", editionNumber.getText());
-	    	    		data.add("numberOfCopies", numberOfCopies.getText());
+	    	    		data.add("editionNumber", Float.parseFloat(editionNumber.getText()));
+	    	    		data.add("numberOfCopies", Integer.parseInt(numberOfCopies.getText()));
 	    	    		data.add("shellLocation", shellLocation.getText());
-	    	    		data.add("currentNumberOfCopies", Integer.toString(currentNumber));
-	    	    		if(Popular.isSelected())
-	    	    			data.add("isPopular", 1);
-	    	    		else
-	    	    			data.add("isPopular", 0);
-	    	    		data.add("topics", topic);
+	    	    		data.add("currentNumberOfCopies", selected.getCurrentNumberOfCopies()+Integer.parseInt(numberOfCopies.getText())-selected.getNumberOfCopies());
+	    	    		data.add("isPopular", Popular.isSelected());
+	    	    		data.add("genres", genres);
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
@@ -694,48 +694,39 @@ public class LibrarianController {
 	        private TextField shellLocation;
 
 	        @FXML
-	        private CheckBox checkBoxDrama;
+	        private CheckBox Drama;
 
 	        @FXML
-	        private CheckBox checkBoxAdventure;
+	        private CheckBox Adventure;
 
 	        @FXML
-	        private CheckBox checkBoxKids;
+	        private CheckBox Kids;
 
 	        @FXML
-	        private CheckBox checkBoxThriller;
+	        private CheckBox Thriller;
 
 	        @FXML
-	        private CheckBox checkBoxSF;
+	        private CheckBox SF;
 
 	        @FXML
-	        private CheckBox checkBoxTextBook;
+	        private CheckBox TextBook;
 
 	        @FXML
 	        private ImageView finishButton;
-
+	        @FXML
+	        private GridPane genresPane;
 	        @FXML
 		    void addBook(MouseEvent event) {
-		    	String kindOfABook=""; 
-		    	boolean popular=true;
 		    	try {
 		    	MyData data= new MyData("addNewBook");
 		    	data.add("bookName", bookName.getText());
 		    	data.add("authorsNames", authors.getText());
 		    	data.add("editionNumber", editionNumber.getText());
 		    	data.add("printDate", printDate.getValue());
-		    	if(checkBoxDrama.isSelected())
-		    		kindOfABook+="Drama ";
-		    	if(checkBoxAdventure.isSelected())
-		    		kindOfABook+="Adventure ";
-		    	if(checkBoxKids.isSelected())
-		    		kindOfABook+="Kids ";
-		    	if(checkBoxThriller.isSelected())
-		    		kindOfABook+="Thriller ";
-		    	if(checkBoxSF.isSelected())
-		    		kindOfABook+="SF ";
-		    	if(checkBoxTextBook.isSelected())
-		    		kindOfABook+="textBook ";
+		    	ArrayList<String> genres = new ArrayList<String>();
+    	    	for (Node p : genresPane.getChildren())
+    	    		if (((CheckBox)p).isSelected())
+    	    			genres.add(p.getId());
 		    	data.add("shortDescription", shortDescription.getText());
 		    	data.add("numberOfCopies", numberOfCopies.getText());
 		    	data.add("purchaseDate", new Date(System.currentTimeMillis()));
@@ -743,7 +734,7 @@ public class LibrarianController {
 		    	if(Popular.isSelected())
 		    		data.add("isPopular", Popular.isSelected());
 		    	data.add("currentNumberOfCopies",numberOfCopies.getText());
-		    	data.add("topic",kindOfABook);
+		    	data.add("topics",genres);
 		    	data.add("tableOfContent",bookName.getText());
 		    	Calendar calendar = Calendar.getInstance();
 		    	java.sql.Date ourJavaDateObject = new java.sql.Date(calendar.getTime().getTime());

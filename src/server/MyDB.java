@@ -27,8 +27,11 @@ public class MyDB {
 		return conn.createStatement().executeQuery(query);
 	}
 	
-	public int insert(String query) throws SQLException {
+	public int insertWithExecute(String query) throws SQLException {
 		return conn.createStatement().executeUpdate(query);
+	}
+	public PreparedStatement insert(String query) throws SQLException {
+		return conn.prepareStatement(query);
 	}
 	
 	public int insertAndGetKey(String query) throws SQLException {
