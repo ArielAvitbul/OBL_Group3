@@ -633,9 +633,7 @@ public class LibrarianController {
 	    	    	Book selected = (Book)inventoryTable.getSelectionModel().getSelectedItem();
 	    	    	ArrayList<String> topics = new ArrayList<String>;
 	    	    	int currentNumber=selected.getCurrentNumberOfCopies()+Integer.parseInt(numberOfCopies.getText())-selected.getNumberOfCopies();
-	    	    	for (Node p : genresPane.getChildren())
-	    	    		if (((CheckBox)p).isSelected())
-	    	    			genres.add(p.getId());
+	    	    	//*OBKASDFGOKSA
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
