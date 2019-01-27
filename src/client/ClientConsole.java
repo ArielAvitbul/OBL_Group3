@@ -7,6 +7,7 @@ import client.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
 import common.Member;
+import common.MyData;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

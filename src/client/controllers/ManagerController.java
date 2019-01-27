@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 import com.itextpdf.text.DocumentException;
 
-import client.MyData;
 import common.Manager;
+import common.MyData;
 import common.Report;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;

@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
-import client.MyData;
 import common.Book;
 import common.BookReservation;
 import common.Borrow;
@@ -24,6 +23,7 @@ import common.Librarian;
 import common.Manager;
 import common.Member;
 import common.MemberCard;
+import common.MyData;
 import common.MyFile;
 import common.SendMail;
 import common.Violation;

@@ -4,7 +4,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 
 import client.ClientConsole;
-import client.MyData;
 import client.MyImage;
 import common.Book;
 import common.BookReservation;
@@ -13,6 +12,7 @@ import common.CopyInBorrow;
 import common.History;
 import common.Member;
 import common.MemberCard;
+import common.MyData;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;

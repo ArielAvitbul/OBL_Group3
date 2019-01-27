@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import client.ClientConsole;
-import client.MyData;
 import client.MyImage;
 import client.controllers.LibrarianController.InventoryManagement;
 import client.controllers.LibrarianController.MemberManagement;
@@ -18,6 +17,7 @@ import common.Book;
 import common.Librarian;
 import common.Manager;
 import common.Member;
+import common.MyData;
 import common.MyFile;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

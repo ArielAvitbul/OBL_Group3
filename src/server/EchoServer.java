@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import client.MyData;
 import common.Borrow;
+import common.MyData;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
