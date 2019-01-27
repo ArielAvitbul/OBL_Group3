@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import common.Manager;
 import common.Member;
 import common.MemberCard;
 import common.MyFile;
+import common.SendMail;
 import common.Violation;
 
 public class ServerController {
@@ -232,49 +234,10 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
-	int borrowdID = rs.getInt("borrowID");
-	int memberID = rs.getInt("memberID");
-	Date borrowDate = rs.getDate("borrowDate");
-	Date returnDate = rs.getDate("returnDate");
-	Date actualReturnDate = rs.getDate("actualReturnDate");
-	boolean isLate=rs.getBoolean("isLate");
 	if (db.hasResults(rs))
 		return new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"),rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate"));
 	return null;
 }
-public MyData getReturnBooks(MyData data) throws SQLException {
-	ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
-	int flag =0;
-	String MyQuery = "SELECT copy_in_borrow.borrowID, copy_in_borrow.copyNumber, copy_in_borrow.BookID "
-			+ "FROM oblg3.copy_in_borrow "
-			+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID "
-			+ "AND borrows.memberID='"
-			+ data.getData("ID")
-			+"';";
-		ResultSet rs = db.select(MyQuery);
-		while (rs.next()) 
-		{
-			Book book = getBook(rs.getInt("BookID"));
-			int num = rs.getInt("borrowID");
-			Borrow borrow =  getBorrow(num);
-			returnBookList.add(new CopyInBorrow(book, borrow, rs.getInt("copyNumber")));
-		}
-		rs.close();
-		
-		if (flag ==1)
-		{
-			data.add("returnBooklist", returnBookList);
-			data.setAction("listOfReturnBooks");
-			return data;
-		}
-		else 
-		{
-			data.setAction("unfind_borrows_Book");
-			data.add("reason", "There is no books in borrow!");
-			return data;
-		}
-	
-	}
 
 	public boolean compareStrings(String str1, String str2) {
 		try {
@@ -341,6 +304,58 @@ public MyData getReturnBooks(MyData data) throws SQLException {
 			return ret;
 	}
 	
+	public MyData addNewBook(MyData data) {
+		MyData ret=new MyData("fail");
+		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
+		try {
+			db.insert("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
+					+ " , `shellLocation` , `isPopular` , `topic` , `currentNumberOfCopies` , `tableOfContent` , `purchaseDate`) "
+					+ "VALUES ('"+data.getData("bookName")+"' , '"+data.getData("authorsNames")+
+					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
+					"' , '"+data.getData("shellLocation")+"' , '"+data.getData("isPopular")+"' , '"+data.getData("topic")+"' , '"+data.getData("currentNumberOfCopies")+
+					"' , '"+data.getData("tableOfContent")+"' , '"+data.getData("purchaseDate")+"')");
+			
+		}
+		catch (SQLException e) {
+		if(e instanceof MySQLIntegrityConstraintViolationException)
+			ret.add("reason", "That bookID already exist");
+		else
+			ret.add("reason", "Could not add a new book to the database");
+		e.printStackTrace();
+		return ret;
+		}
+		ret.setAction("success");
+		return ret;
+	}
+	
+	public MyData updateBook(MyData data) throws SQLException  {
+		MyData bookToUpdate;
+		if(((Integer)data.getData("numberOfCopies"))==0) {
+			if (db.updateWithExecute("DELETE FROM books WHERE bookID="+data.getData("bookID"))==1) {
+				bookToUpdate=new MyData("success");
+				bookToUpdate.add("updatedBook", data);
+				return bookToUpdate;
+			}
+		}
+		else {
+			String query= "UPDATE books SET shellLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=? WHERE bookID="+data.getData("bookID");
+			PreparedStatement ps=db.update(query);
+			ps.setString(1, (String) data.getData("shellLocation"));
+			ps.setInt(2, (Integer)data.getData("numberOfCopies"));
+			ps.setInt(3, (Integer)data.getData("currentNumberOfCopies"));
+			ps.setFloat(4, (Float)data.getData("editionNumber"));
+			ps.setBoolean(5, (Boolean)data.getData("isPopular"));
+			if(ps.executeUpdate()==1) {
+				bookToUpdate=new MyData("success");
+				bookToUpdate.add("updatedBook", data);
+				return bookToUpdate;
+			}
+		}
+		bookToUpdate=new MyData("failed");
+		bookToUpdate.add("reason", new String("there was an error"));
+		return bookToUpdate;
+	}
+	
 	public MyData report(MyData data) throws SQLException {
 		ResultSet rs;
 		switch (data.getAction()) {
@@ -371,4 +386,130 @@ public MyData getReturnBooks(MyData data) throws SQLException {
 		}
 		return data;
 	}
+	
+	public MyData writeNewBorrow(MyData bookAndBorrow) throws SQLException {
+		MyData toReturn;
+		int toUpdate;
+		String query = "INSERT INTO borrows(memberID,bookID,borrowDate,returnDate) "
+				+ "VALUES(?,?,?,?)";
+		PreparedStatement ps = db.update(query);
+		ps.setInt(1, ((Borrow)bookAndBorrow.getData("theBorrow")).getMemberID());
+		ps.setInt(2,((Book)bookAndBorrow.getData("theCopy")).getBookID());
+		ps.setDate(3, ((Borrow)bookAndBorrow.getData("theBorrow")).getBorrowDate());
+		ps.setDate(4, ((Borrow)bookAndBorrow.getData("theBorrow")).getReturnDate());
+		if(ps.executeUpdate()==1) {
+			ResultSet rs = db.select("SELECT LAST_INSERT_ID()");
+			rs.next();
+			System.out.println(rs.getInt(1));
+			query = "INSERT INTO copy_in_borrow(copyNumber,bookID,borrowID) "
+					+ "VALUES(?,?,?)";
+			ps = db.update(query);
+			toUpdate = ((Book)bookAndBorrow.getData("theCopy")).getCurrentNumberOfCopies();
+			ps.setInt(1, toUpdate);
+			ps.setInt(2, ((Book)bookAndBorrow.getData("theCopy")).getBookID());		
+			ps.setInt(3, rs.getInt(1));
+			if(ps.executeUpdate() == 1) {
+				 query = "UPDATE books SET currentNumberOfCopies=? WHERE bookID="+((Book)bookAndBorrow.getData("theCopy")).getBookID();
+				 ps = db.update(query);
+				 toUpdate = ((Book)bookAndBorrow.getData("theCopy")).getCurrentNumberOfCopies();
+				 ps.setInt(1, --toUpdate);
+				 if (ps.executeUpdate() == 1) {
+						toReturn = new MyData("borrowSuccess");
+						((Book)bookAndBorrow.getData("theCopy")).setCurrentNumberOfCopies(toUpdate);
+						toReturn.add("UpdatedBookAndBorrow", bookAndBorrow);
+						return toReturn;
+				 }
+			}
+		}
+			toReturn = new MyData("borrowFailed");
+			toReturn.add("reason", "Cannot write borrow in the system!");
+			return toReturn;
+	}
+	public MyData getReturnBooks(MyData data) throws SQLException {
+		ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
+		int flag =0;
+		String MyQuery = "SELECT copy_in_borrow.borrowID, copy_in_borrow.copyNumber, copy_in_borrow.BookID "
+				+ "FROM oblg3.copy_in_borrow "
+				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID "
+				+ "AND borrows.memberID='"
+				+ data.getData("ID")
+				+"';";
+			ResultSet rs = db.select(MyQuery);
+			while (rs.next()) 
+			{
+				Book book = getBook(rs.getInt("BookID"));
+				int num = rs.getInt("borrowID");
+				Borrow borrow =  getBorrow(num);
+				returnBookList.add(new CopyInBorrow(book, borrow, rs.getInt("copyNumber")));
+				flag=1;
+			}
+			rs.close();
+			
+			if (flag ==1)
+			{
+				data.add("returnBooklist", returnBookList);
+				data.setAction("listOfReturnBooks");
+				return data;
+			}
+			else 
+			{
+				data.setAction("unfind_borrows_Book");
+				data.add("reason", "There is no books in borrow!");
+				return data;
+			}
+		}
+
+		public MyData returnCopy(MyData data) throws SQLException {
+		CopyInBorrow copy =  (CopyInBorrow) data.getData("copy");
+			java.util.Date today = new java.util.Date();
+			java.sql.Date sqlDate = new java.sql.Date(today.getTime());
+			java.util.Date returnDate = new java.util.Date(copy.getNewBorrow().getReturnDate().getTime());
+			if(today.after(returnDate))
+			{
+				int lates;
+				String query = "SELECT lateReturns FROM member_cards WHERE userID="+copy.getNewBorrow().getMemberID();
+				ResultSet rs1 = db.select(query);
+				if(db.hasResults(rs1)) {
+					lates = rs1.getInt("lateReturns");
+					if (lates <3)
+					{
+						String query1 = "UPDATE members SET status = 'ACTIVE' WHERE id= '"+copy.getNewBorrow().getMemberID()+"'";
+						db.updateWithExecute(query1);
+					}
+				}
+			
+			}
+		
+			String query = "UPDATE borrows SET actualReturnDate = ? WHERE borrowID= '"+copy.getNewBorrow().getBorrowID()+"'";
+			PreparedStatement stmt = db.update(query);
+			stmt.setDate(1, sqlDate);
+			stmt.executeUpdate();
+			String deleteQuery = "DELETE FROM copy_in_borrow WHERE borrowID= ?";
+			PreparedStatement stmt1 = db.update(deleteQuery);
+			stmt1.setInt(1, copy.getNewBorrow().getBorrowID());
+			stmt1.executeUpdate();
+			
+			String reservationQuery = "SELECT * FROM book_reservations WHERE bookID='"+copy.getBorroBook().getBookID()+"'";
+			ResultSet rs1 = db.select(reservationQuery);
+			if(db.hasResults(rs1)) {
+				String memberID = rs1.getString("memberID");
+				String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
+				ResultSet rs2 = db.select(emailQuery);
+				if(db.hasResults(rs2)) {
+					String memberMail = rs2.getString("emailAddress");
+					String userName = rs2.getString("firstName");
+					String msg = "Hello "+userName+"\n\n Your Reservasion is resdy for "+copy.getBorroBook().getBookName()+"\n please come to take it";
+					new SendMail(memberMail,"Reservesion is ready",msg);
+				}
+			}
+			else {
+				String addQuery = "UPDATE books SET currentNumberOfCopies = currentNumberOfCopies + ? WHERE bookID= '"+copy.getBorroBook().getBookID()+"'";
+				PreparedStatement stmt3 = db.update(addQuery);
+				stmt3.setInt(1, 1);
+				stmt3.executeUpdate();
+			}
+			data.setAction("succeed");
+			data.add("succeed", "Return book is succeed");
+			return data;
+		}
 }

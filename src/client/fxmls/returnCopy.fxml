@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TableView fx:id="returnsTable" layoutX="287.0" layoutY="121.0" prefHeight="218.0" prefWidth="327.0">
+      <TableView fx:id="returnsTable" layoutX="226.0" layoutY="121.0" prefHeight="249.0" prefWidth="483.0">
          <columns>
-            <TableColumn fx:id="bookNameCol" prefWidth="75.0" text="Book Name" />
-            <TableColumn fx:id="borrowIDCol" prefWidth="75.0" text="Borrow ID" />
-            <TableColumn fx:id="borrowDateCol" prefWidth="75.0" text="Borrow Date" />
-            <TableColumn fx:id="returnDateCol" prefWidth="98.39996337890625" text="Return Date" />
+            <TableColumn fx:id="bookNameCol" prefWidth="116.00003051757812" text="Book Name" />
+            <TableColumn fx:id="borrowIDCol" minWidth="0.0" prefWidth="84.79998779296875" text="Borrow ID" />
+            <TableColumn fx:id="borrowDateCol" prefWidth="95.199951171875" text="Borrow Date" />
+            <TableColumn fx:id="returnDateCol" prefWidth="91.19998168945312" text="Return Date" />
+            <TableColumn fx:id="copyNumberCol" prefWidth="95.199951171875" text="Copy Number" />
          </columns></TableView>
-      <ImageView fx:id="back_memberManagement" layoutX="426.0" layoutY="60.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="back_memberManagement" layoutX="416.0" layoutY="69.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/back.jpg" />
          </image>
       </ImageView>
-      <ImageView layoutX="385.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="374.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/returnCopy.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="returnCopyButton" layoutX="416.0" layoutY="393.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#returnCopyIsSelected" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/returnCopy.jpg" />
          </image>
       </ImageView>
    </children>

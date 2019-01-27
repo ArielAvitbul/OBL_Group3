@@ -34,8 +34,7 @@ public class MyDB {
 	public int insertAndGetKey(String query) throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 		stmt.executeUpdate();
-		ResultSet rs = stmt.getGeneratedKeys();
-		return rs.getInt(1);
+		return stmt.getGeneratedKeys().getInt(1);
 	}
 	
 	public PreparedStatement update(String query) throws SQLException {

@@ -35,6 +35,37 @@ public class MemberController {
 	public Member getMember() {
 		return member;
 	}
+	private int checkFields() {
+		if(!emailField.getText().contains("@")) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+			return 0;
+		}
+		if(!emailField.getText().contains(".")) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+			return 0;
+		}
+		if(!phoneField.getText().startsWith("05")) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert number that start at 05");
+			return 0;
+		}
+		if((!phoneField.getText().contains("-"))&&(phoneField.getText().length()<10 || phoneField.getText().length()>10)) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+			return 0;
+		}
+		if((phoneField.getText().contains("-"))&&(phoneField.getText().length()<11 || phoneField.getText().length()>11)) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+			return 0;
+		}
+		if(firstnameField.getText().matches(".*\\d+.*")) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a first name with digits");
+			return 0;
+		}
+		if(lastnameField.getText().matches(".*\\d+.*")) {
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a l name with digits");
+			return 0;
+		}
+		return 1;
+	}
 		@FXML
 		void initialize() {
 			idField.setText(String.valueOf(member.getID()));
@@ -79,23 +110,25 @@ public class MemberController {
 	    @FXML
 	    void saveInfo(MouseEvent event) {
 	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
-	    		MyData data = new MyData("saveInfo");
-	    		data.add("id", Integer.parseInt(idField.getText()));
-	    		data.add("firstName", firstnameField.getText());
-	    		data.add("lastName", lastnameField.getText());
-	    		data.add("password", passwordField.getText());
-	    		data.add("email", emailField.getText());
-	    		data.add("phone", phoneField.getText());
+	    		if(checkFields()==1) {
+	    			MyData data = new MyData("saveInfo");
+	    			data.add("id", Integer.parseInt(idField.getText()));
+	    			data.add("firstName", firstnameField.getText());
+	    			data.add("lastName", lastnameField.getText());
+	    			data.add("password", passwordField.getText());
+	    			data.add("email", emailField.getText());
+	    			data.add("phone", phoneField.getText());
 	    			rc.getCC().send(data);
-	    		switch (rc.getCC().getFromServer().getAction()) {
-	    		case "success":
-	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
-	    			break;
-	    		case "fail":
-	    		default:
-	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
-	    			break;
+	    			switch (rc.getCC().getFromServer().getAction()) {
+	    			case "success":
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
+	    				member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
+	    				break;
+	    			case "fail":
+	    			default:
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
+	    				break;
+	    			}
 	    		}
 	    	}
 	    }

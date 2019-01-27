@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 public class Borrow implements Serializable {
 
 
-	private final int borrowID;
+	private int borrowID;
 	private final int bookID;
 	private final int memberID;
 	private final Date borrowDate;
@@ -23,6 +23,13 @@ public class Borrow implements Serializable {
 		this.borrowDate = borrowDate;
 		this.returnDate = returnDate;
 		this.actualReturnDate = actualReturnDate;
+	}
+
+	public Borrow(int bookID, int memberID, Date date, Date fromPicker) {
+		this.bookID=bookID;
+		this.memberID = memberID;
+		this.borrowDate = date;
+		this.returnDate = fromPicker;
 	}
 
 	public int getBorrowID() 
@@ -70,5 +77,9 @@ public class Borrow implements Serializable {
 	
 	public SimpleObjectProperty actualReturnDate() {
 		return new SimpleObjectProperty(actualReturnDate);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		return this.getBorrowID() == ((Borrow)obj).getBorrowID() ? true : false;
 	}
 }

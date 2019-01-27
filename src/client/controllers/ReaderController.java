@@ -12,6 +12,7 @@ import java.util.HashMap;
 import client.ClientConsole;
 import client.MyData;
 import client.MyImage;
+import client.controllers.LibrarianController.InventoryManagement;
 import client.controllers.LibrarianController.MemberManagement;
 import common.Book;
 import common.Librarian;
@@ -53,7 +54,20 @@ public class ReaderController {
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
-	
+	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, String FreeText, GridPane genresPane) {
+    	MyData searchBook = new MyData ("searchBook");
+    	searchBook.add("bookName", bookName);
+    	searchBook.add("authorsName", authorsName);
+    	// searchBook.add("freeText",FreeText);
+    	// TODO: add that ^
+    	ArrayList<String> genres= new ArrayList<>();
+    	for (Node p : genresPane.getChildren())
+    		if (((CheckBox)p).isSelected())
+    			genres.add(p.getId());
+    	searchBook.add("genres", genres);
+			cc.send(searchBook);
+	    	return (ArrayList<Book>) cc.getFromServer().getData("search_results");
+    }
 	protected ClientConsole getCC() {
 		return cc;
 	}
@@ -92,6 +106,7 @@ public class ReaderController {
 			}
 		pane.getChildren().removeAll(list);
 	}
+
     /* This method removes an object from a pane */
 	private boolean removeFrom(Pane pane, String name) {
 		for (Node n : pane.getChildren()) {
@@ -154,11 +169,14 @@ public class ReaderController {
     		case "managerReport":
     			controllers.put(fxml, ((ManagerController)controllers.get("manager")).new ProduceReport());
     			break;
+    		case "addBook":
+    			controllers.put(fxml, ((InventoryManagement)controllers.get("inventoryManagement")).new AddBook());
+    			break;
     		case "inventoryManagement":
-    			controllers.put(fxml, ((LibrarianController)controllers.get("librarian")).new InventoryManagementController());
+    			controllers.put(fxml, ((LibrarianController)controllers.get("librarian")).new InventoryManagement());
     			break;
     		case "bookManagement":
-    			controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new BookManagement((Book)objects[0])));
+    			controllers.put(fxml,(((InventoryManagement)controllers.get("inventoryManagement")).new BookManagement((Book)objects[0])));
     			break;
     		case "memberManagement":
     			try {
@@ -302,7 +320,7 @@ public class ReaderController {
 	            e.printStackTrace();
 	        }
 		}
-		private class SearchController {
+		protected class SearchController {
 			@FXML
 				void initialize() {
 			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
@@ -325,10 +343,7 @@ public class ReaderController {
 		    private TextField authorsField;
 
 		    @FXML
-		    private ChoiceBox<String> choiceGenere;
-
-		    @FXML
-		    private TextArea freetextField;
+		    private TextField freeTextField;
 
 		    @FXML
 		    private ListView<String> searchResultList;
@@ -362,21 +377,9 @@ public class ReaderController {
 		    	tableBooks.getItems().clear();
     	    	orderBookButton.setVisible(false);
     	    	indexBookButton.setVisible(false);
-		    	MyData searchBook = new MyData ("searchBook");
-		    	searchBook.add("bookName", nameField.getText());
-		    	searchBook.add("authorsName", authorsField.getText());
-		    	ArrayList<String> genres= new ArrayList<>();
-		    	for (Node p : GenrePane.getChildren())
-		    		if (((CheckBox)p).isSelected())
-		    			genres.add(p.getId());
-		    	searchBook.add("genres", genres);
-    				cc.send(searchBook);
-    				if (cc.getFromServer().getData().containsKey("search_results")) { 
-	    	    	ArrayList<Book> booksList = (ArrayList<Book>) cc.getFromServer().getData("search_results");
-	    	    	tableBooks.getItems().addAll(booksList);
+	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTextField.getText(),GenrePane));
 	    	    	orderBookButton.setVisible(true);
 	    	    	indexBookButton.setVisible(true);
-    				}
 		    }
 		    
 		    @FXML

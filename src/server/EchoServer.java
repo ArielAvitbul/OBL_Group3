@@ -69,6 +69,16 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		  case "newBorrowRequest":
+	  		    	client.sendToClient(serverCont.writeNewBorrow(data));
+	  		    	break;
+	  		  case "addNewBook":
+	  		    	client.sendToClient(serverCont.addNewBook(data));
+	  		    	break;
+	  		case "updateBook":
+  		    	MyData save=serverCont.updateBook(data);
+  		    	client.sendToClient(save);
+  		    	break;
 	  		    case "Activity Report":
 	  		    case "Borrow Report":
 	  		    case "Late Return Report":
@@ -83,10 +93,14 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(extensionResult);
 	  		    	break;
 	  		  case "getCopiesInBorrow":
-  		    	MyData copiesInBorrow = new MyData("copiesInBorrow");
-  		    	copiesInBorrow.add("copies", serverCont.getCopiesInBorrow((ArrayList<Borrow>)data.getData("borrows")));
-  		    	client.sendToClient(copiesInBorrow);
-  		    	break;
+	  		    	MyData copiesInBorrow = new MyData("copiesInBorrow");
+	  		    	copiesInBorrow.add("copies", serverCont.getCopiesInBorrow((ArrayList<Borrow>)data.getData("borrows")));
+	  		    	client.sendToClient(copiesInBorrow);
+	  		    	break;
+		  		case "copyToReturn":
+	  				client.sendToClient(serverCont.returnCopy(data));
+
+	  				break;
 	  		    case "search_member":
 	  		    	client.sendToClient(serverCont.searchMember((Integer)data.getData("id")));
 	  		    	break;

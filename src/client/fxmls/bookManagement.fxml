@@ -1,24 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView layoutX="306.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/bookManagement.png" />
          </image>
       </ImageView>
+      <TextField fx:id="bookName" editable="false" layoutX="142.0" layoutY="103.0" />
+      <TextField fx:id="authors" editable="false" layoutX="142.0" layoutY="159.0" />
+      <TextField fx:id="editionNumber" layoutX="142.0" layoutY="214.0" />
+      <TextField fx:id="shortDescription" editable="false" layoutX="609.0" layoutY="103.0" />
+      <TextField fx:id="numberOfCopies" layoutX="609.0" layoutY="159.0" />
+      <TextField fx:id="shellLocation" layoutX="609.0" layoutY="214.0" />
+      <Text layoutX="19.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name of book:" wrappingWidth="115.99999237060547">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="19.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="author(s):" wrappingWidth="88.53674232959747">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="19.0" layoutY="232.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edition number:" wrappingWidth="126.39998161792755">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="19.0" layoutY="351.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Topic" wrappingWidth="115.99998772144318">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="406.0" layoutY="122.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Short description:" wrappingWidth="148.7999975681305">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="406.0" layoutY="175.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of copies:" wrappingWidth="148.79999756813038">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="406.0" layoutY="232.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shell location:" wrappingWidth="155.73678588867188">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <Text layoutX="406.0" layoutY="288.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popularity " wrappingWidth="202.13678076863278">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Text>
+      <GridPane layoutX="108.0" layoutY="307.0" prefHeight="76.0" prefWidth="200.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <CheckBox fx:id="checkBoxDrama" mnemonicParsing="false" text="Drama" />
+            <CheckBox fx:id="checkBoxAdventure" mnemonicParsing="false" text="Adventure" GridPane.rowIndex="1" />
+            <CheckBox fx:id="checkBoxKids" mnemonicParsing="false" text="Kids" GridPane.rowIndex="2" />
+            <CheckBox fx:id="checkBoxThriller" mnemonicParsing="false" text="Thriller" GridPane.columnIndex="1" />
+            <CheckBox fx:id="checkBoxSF" mnemonicParsing="false" text="SF" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <CheckBox fx:id="checkBoxTextBook" mnemonicParsing="false" text="Text Book" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <ImageView fx:id="updateButton" fitHeight="44.0" fitWidth="107.0" layoutX="652.0" layoutY="333.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#updateBook" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/update.png" />
+         </image>
+      </ImageView>
+      <CheckBox fx:id="Popular" layoutX="608.0" layoutY="274.0" mnemonicParsing="false" text="yes" />
    </children>
 </AnchorPane>
