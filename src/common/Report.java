@@ -27,7 +27,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import client.ClientConsole;
-import client.MyData;
 import javafx.scene.control.Alert.AlertType;
 
 public class Report {

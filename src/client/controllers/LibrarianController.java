@@ -7,16 +7,17 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import client.ClientConsole;
-import client.MyData;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
 import common.Librarian;
+import common.Manager;
 import common.Member;
 import common.MemberCard;
+import common.MyData;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -24,7 +25,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -94,7 +94,10 @@ public class LibrarianController {
 	    }
     	@FXML
     	void initialize() {
+    		if (librarian instanceof Manager) 
     			statusBox.getItems().addAll(Member.Status.values());
+    		else
+    			statusBox.getItems().add(member.getStatus());
     			statusBox.getSelectionModel().select(member.getStatus());
     			usernameField.setText(member.getUserName());
     			idField.setText(String.valueOf(member.getID()));

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="pane" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ExternalSystem.ExternalServer">
+   <children>
+      <Label layoutX="31.0" layoutY="14.0" text="External System">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Button layoutX="74.0" layoutY="149.0" mnemonicParsing="false" onMouseReleased="#connect" text="Connect" />
+      <Label layoutX="21.0" layoutY="44.0" text="Send student graduation notice" />
+      <TextField fx:id="ipField" alignment="CENTER" layoutX="21.0" layoutY="75.0" promptText="IP" text="localhost" />
+      <TextField fx:id="portField" alignment="CENTER" layoutX="21.0" layoutY="114.0" promptText="PORT" text="6001" />
+   </children>
+</AnchorPane>

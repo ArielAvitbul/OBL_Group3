@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
-import client.MyData;
 import common.Book;
 import common.BookReservation;
 import common.Borrow;
@@ -24,6 +23,7 @@ import common.Librarian;
 import common.Manager;
 import common.Member;
 import common.MemberCard;
+import common.MyData;
 import common.MyFile;
 import common.SendMail;
 import common.Violation;
@@ -58,7 +58,7 @@ public class ServerController {
 	 * Guy Wrote This
 	 */
 	public MyData login (MyData data) throws SQLException {
-		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ="+ data.getData("id")+" AND password ="+data.getData("password"));
+		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ='"+ data.getData("id")+"' AND password ='"+data.getData("password")+"'");
 		MyData ret = new MyData("login_failed");
 		if(!db.hasResults(memberMatch))
 			ret.add("reason", "ID or password incorrect");
@@ -72,7 +72,7 @@ public class ServerController {
 		return ret;
 	}
 	
-	public void setLoggedIn(boolean value, int id) throws SQLException { // TODO change name to id...
+	public void setLoggedIn(boolean value, int id) throws SQLException {
 		PreparedStatement ps = db.update("UPDATE members SET loggedin =? WHERE id =?");
 		ps.setBoolean(1, value);
 		ps.setInt(2, id);
@@ -136,7 +136,7 @@ public class ServerController {
 		ResultSet rs = db.select("SELECT * from member_cards WHERE userID = "+ id);
 		if (db.hasResults(rs))
 		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), getMemberBorrows(id), getMemberViolations(id), getMemberReservations(id),rs.getInt("lateReturns"));
-		return new MemberCard(); // TODO: incase no member card exists in the db, perhaps remove this later
+		return null;
 	}
 		/* function to get all of the specified member borrows
 		 * input: memberID (unique) , MyDB instance.
@@ -513,4 +513,40 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("succeed", "Return book is succeed");
 			return data;
 		}
+		/**
+		 * 
+		 * @param studentid - Student's ID
+		 * @return the MyData's data key "message" will contain the message received from server.
+		 * @return the action will be Success/Fail
+		 * @throws SQLException
+		 */
+		protected MyData notifyGraduation(int studentid) throws SQLException {
+			MyData data = new MyData();
+			int status;
+			ResultSet rs = db.select("SELECT * FROM members WHERE id ="+ studentid);
+			if (!db.hasResults(rs)) { // no such student in DB
+				data.setAction("Fail");
+				 data.add("message", "Student was not found");
+				 return data;
+			}
+			if (rs.getBoolean("graduated")) { // if true : student already known as graduated.
+				data.setAction("Fail");
+				 data.add("message", "OBL is was already updated regarding this student's graduation.");
+				 return data;
+			}
+			 // check is student has copies in borrow
+			status = db.select("SELECT * FROM borrows join copy_in_borrow WHERE borrows.borrowID=copy_in_borrow.BookID AND memberID="+studentid).next() ? 1 : 2;
+			 PreparedStatement ps = db.update("UPDATE members SET graduated=?,status=? where id=?");
+			 ps.setBoolean(1, true);
+			 ps.setString(2, Member.Status.values()[status].toString());
+			 ps.setInt(3, studentid);
+			 if (ps.executeUpdate()==1) {
+				 data.setAction("Success");
+				 data.add("message", "Successfuly updated the system.");
+			 } else {
+				 data.setAction("Fail");
+				 data.add("message", "Failed to update the system");
+			 }
+			 return data;
+		  }
 }

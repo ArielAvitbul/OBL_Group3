@@ -6,7 +6,6 @@ package common;
 
 import java.io.IOException;
 
-import client.MyData;
 import ocsf.client.AbstractClient;
 
 /**

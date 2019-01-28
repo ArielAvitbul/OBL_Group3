@@ -56,7 +56,13 @@ public class Member extends Reader implements Serializable
 	{
 		return status;
 	}
-
+/**
+ * 
+ * @param enumNumericValue
+ * 0 : ACTIVE
+ * 1 : FREEZE
+ * 2 : LOCK
+ */
 	public void setUserStatus(int enumNumericValue) 
 	{
 		switch(enumNumericValue) {

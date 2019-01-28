@@ -6,9 +6,13 @@ package server;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import client.MyData;
 import common.Borrow;
+import common.MyData;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
@@ -38,18 +42,35 @@ public class EchoServer extends AbstractServer
    * Constructs an instance of the echo server.
    *
    * @param port The port number to connect on.
+ * @throws IOException 
+ * @throws SQLException 
    */
-  public EchoServer(int port) 
+  public EchoServer(int port) throws IOException, SQLException 
   {
     super(port);
 	db = new MyDB();
-	try {
-		db.updateWithExecute("UPDATE members set loggedin=0");
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	listen();
+		initialize();
 	serverCont = new ServerController(db);
+  }
+  
+  private void initialize() throws SQLException {
+	  db.updateWithExecute("UPDATE members set loggedin=0");
+	  Date now = Calendar. getInstance().getTime(), nextMidnight = new Date(now.getYear(),now.getMonth(),now.getDate()+1,0,0,0);
+	  checkLateReturns(nextMidnight);
+  }
+  
+  private void checkLateReturns(Date executeTime) {
+	  // TODO: update late return members in database
+	  Timer timer = new Timer();
+	  TimerTask task = new TimerTask() {
+		@Override
+		public void run() {
+			executeTime.setDate(executeTime.getDate()+1); // next midnight
+			checkLateReturns(executeTime); // repeat the process
+		}
+	};
+	timer.schedule(task, executeTime);
   }
 
   
@@ -69,9 +90,12 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
-	  		  case "newBorrowRequest":
-	  		    	client.sendToClient(serverCont.writeNewBorrow(data));
+	  		  case "notify_graduation":
+	  		    	client.sendToClient(serverCont.notifyGraduation((Integer)data.getData("id")));
 	  		    	break;
+	  		case "newBorrowRequest":
+  		    	client.sendToClient(serverCont.writeNewBorrow(data));
+  		    	break;
 	  		  case "addNewBook":
 	  		    	client.sendToClient(serverCont.addNewBook(data));
 	  		    	break;
@@ -172,30 +196,4 @@ public class EchoServer extends AbstractServer
     System.out.println
       ("Server has stopped listening for connections.");
   }
-  
-  //Class methods ***************************************************
-  
-  /**
-   * This method is responsible for the creation of 
-   * the server instance (there is no UI in this phase).
-   *
-   * @param args[0] The port number to listen on.  Defaults to 5555 
-   *          if no argument is entered.
-   */
-  public static void main(String[] args) 
-  {
-    
-    try {
-    	EchoServer sv = new EchoServer(Integer.parseInt(args[0]));
-      sv.listen(); //Start listening for connections
-    } 
-    catch (IOException e) 
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    } catch (IndexOutOfBoundsException e) {
-		System.out.println("Enter port.");
-		System.exit(1);
-	}
-  }
 }
-//End of EchoServer class

@@ -1,4 +1,4 @@
-package client;
+package common;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -8,6 +8,9 @@ public class MyData implements Serializable{
 	private HashMap<String,Object> data;
 	public MyData(String datatype) {
 		this.action=datatype;
+		this.data = new HashMap<>();
+	}
+	public MyData() {
 		this.data = new HashMap<>();
 	}
 	public MyData(String datatype, String what, Object item) {
