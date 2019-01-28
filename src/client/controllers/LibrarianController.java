@@ -513,7 +513,7 @@ public class LibrarianController {
 			books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
 			inventoryTable.getItems().addAll(books);
 			colNameInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
-			colTopicInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("topic"));
+			colTopicInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			colAuthorsInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
 		}
 		@FXML
@@ -574,7 +574,7 @@ public class LibrarianController {
 	    		if(book.getTopics().contains("SF"))
 	    			SF.setSelected(true);
 	    		if(book.getTopics().contains("TextBook"))
-	    			checkBoxTextBook.setSelected(true);
+	    			TextBook.setSelected(true);
 	    	}
 	    	 @FXML
 	    	    private TextField bookName;
@@ -613,7 +613,7 @@ public class LibrarianController {
 	    	    private CheckBox SF;
 
 	    	    @FXML
-	    	    private CheckBox checkBoxTextBook;
+	    	    private CheckBox TextBook;
 	    	    
 	    	    @FXML
 	    	    private ImageView updateButton;

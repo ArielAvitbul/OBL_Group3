@@ -12,7 +12,7 @@ public class MyDB {
 	private final String port="3306";
 	private final String schema="oblg3";
 	private final String user="root";
-	private final String pass="arielsql";
+	private final String pass="123321";
 	private Connection conn;
 	public MyDB() {
 		try {
