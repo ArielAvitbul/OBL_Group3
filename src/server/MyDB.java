@@ -11,10 +11,8 @@ public class MyDB {
 	private final String IP= "localhost";
 	private final String port="3306";
 	private final String schema="oblg3";
-	private final String user="root";
-	private final String pass="arielsql";
 	private Connection conn;
-	public MyDB() {
+	public MyDB(String user, String pass) {
 		try {
 			   Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://"+IP+":"+port+"/"+schema,user,pass);

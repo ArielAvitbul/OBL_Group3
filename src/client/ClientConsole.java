@@ -71,6 +71,14 @@ public class ClientConsole extends Application implements CommonIF
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
+				if (userid!=-1) {
+					MyData data = new MyData("client_stopped");
+					data.add("id", userid);
+					send(data);
+					}
+					try {
+						client.closeConnection();
+					} catch (IOException e) {e.printStackTrace();}
 					Platform.exit();
 			        System.exit(0);
 			}
@@ -147,14 +155,4 @@ public class ClientConsole extends Application implements CommonIF
 	{
 		launch(args);
 	}
-	@Override
-		public void stop() throws Exception {
-		if (userid!=-1) {
-		MyData data = new MyData("client_stopped");
-		data.add("id", userid);
-		send(data);
-		}
-		client.closeConnection();
-			super.stop();
-		}
 }

@@ -14,6 +14,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -33,21 +34,26 @@ import javafx.stage.WindowEvent;
 public class serverGUI extends Application
 {
 	private EchoServer sv=null;
+	 @FXML
+	    private TextField sqlUserField;
+
+	    @FXML
+	    private AnchorPane mainPane;
+
+	    @FXML
+	    private PasswordField sqlPassField;
+
+	    @FXML
+	    private TextField portField;
     @FXML
-    private TextField portField;
-    @FXML
-    private AnchorPane mainPane;
-    @FXML
-    private Label title;
-    @FXML
-    void connect(MouseEvent event) throws Exception {
+    void launchServer(MouseEvent event) throws Exception {
     	try {
-	    	sv = new EchoServer(Integer.valueOf(portField.getText()));
+	    	sv = new EchoServer(sqlUserField.getText(),sqlPassField.getText(),Integer.valueOf(portField.getText()));
 	      sv.listen(); //Start listening for connections
   		mainPane.getChildren().clear();
   		Label label = new Label("Server connected.");
-  		label.setLayoutX(portField.getLayoutX());
-  		label.setLayoutY(portField.getLayoutY());
+  		label.setLayoutX(50);
+  		label.setLayoutY(mainPane.getHeight()/2);
   		Button b = new Button("Launch External System");
   		b.setOnMouseReleased(new EventHandler<Event>() {
 			@Override

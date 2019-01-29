@@ -370,12 +370,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("lateMembers", rs.getInt("lateMembers"));
 			}
 			break;
-		 case "Borrow Report":
-			 rs = db.select("select sum(returnDate-borrowDate) as regular, (select sum(returnDate-borrowDate) from books join borrows where isPopular=1 and borrows.bookID=books.bookID) as popular from books join borrows where isPopular=0 and borrows.bookID=books.bookID");
-			 if (rs.next()) {
-				 data.add("regular", rs.getInt("regular"));
-				 data.add("popular", rs.getInt("popular"));
+		 case "Borrow Report": // TODO: maybe get only 1 view, by not using getBook
+			 HashMap<Book,ArrayList<Integer>> books = new HashMap<>();
+			 rs = db.select("select books.bookID, ifnull(returnDate-borrowDate,0) as borrowDuration from borrows right join books on books.bookID = borrows.bookID order by bookID");
+			 while (rs.next()) {
+				 Book book = getBook(rs.getInt("bookID"));
+				 if (!books.containsKey(book))
+				 books.put(book, new ArrayList<>());
+				 books.get(book).add(rs.getInt("borrowDuration"));
 			 }
+			 data.add("books", books);
 			 break;
 		 case "Late Return Report":
 				HashMap<String,Integer> result = new HashMap<>();

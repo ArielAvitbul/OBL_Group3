@@ -45,10 +45,10 @@ public class EchoServer extends AbstractServer
  * @throws IOException 
  * @throws SQLException 
    */
-  public EchoServer(int port) throws IOException, SQLException 
+  public EchoServer(String sqlUser, String sqlPass, int port) throws IOException, SQLException 
   {
     super(port);
-	db = new MyDB();
+	db = new MyDB(sqlUser,sqlPass);
 	listen();
 		initialize();
 	serverCont = new ServerController(db);

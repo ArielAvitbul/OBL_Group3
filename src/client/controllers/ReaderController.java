@@ -166,8 +166,8 @@ public class ReaderController {
     protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     		switch (fxml) {
-    		case "managerReport":
-    			controllers.put(fxml, ((ManagerController)controllers.get("manager")).new ProduceReport());
+    		case "report":
+    			controllers.put(fxml, ((ManagerController)controllers.get("manager")).new Report());
     			break;
     		case "addBook":
     			controllers.put(fxml, ((InventoryManagement)controllers.get("inventoryManagement")).new AddBook());
