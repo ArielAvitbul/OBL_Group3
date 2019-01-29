@@ -77,8 +77,6 @@ public class MemberController {
 			phoneField.setText(member.getMemberCard().getPhoneNumber());
 			statusField.setText(String.valueOf(member.getStatus()));
 		}
-	    @FXML
-	    private ImageView showInbox;
 		@FXML
 	    private TextField usernameField;
 	    @FXML
