@@ -3,6 +3,7 @@ package client.controllers;
 import java.sql.Date;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -17,6 +18,7 @@ import common.Member;
 import common.MemberCard;
 import common.Message;
 import common.MyData;
+import common.Violation;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Alert.AlertType;
@@ -99,8 +101,24 @@ public class LibrarianController {
     	}
     	@FXML
 	    void replacePage(MouseEvent event) {
-	    	rc.setBottom(event);
+    		if(checkPossibility( event)==0)
+    			return;
+    		else
+    			rc.setBottom(event);
 	    }
+  	  private int checkPossibility(MouseEvent event) {
+			// TODO Auto-generated method stub
+	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is freeze. He can't borrow any book");
+	    		return 0;
+	    	}
+	    	if (member.getStatus().equals(Member.Status.LOCK) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is lock. He can't borrow any book");
+	    		return 0;
+	    	}
+	    	return 1;
+
+		}
     	@FXML
     	void initialize() {
     			statusBox.getItems().addAll(Member.Status.values());
@@ -168,6 +186,66 @@ public class LibrarianController {
 	    		}
 	    	}
         }
+    	protected class ExceptionalEvent{
+    		@FXML
+    		void initialize() {
+    			exceptionEventList.getItems().addAll(Violation.Type.values());
+    		}
+
+    	    @FXML
+    	    private ChoiceBox<Violation.Type> exceptionEventList;
+
+    	    @FXML
+    	    private ImageView addButton;
+
+    	    @FXML
+    	    void addException(MouseEvent event) {
+    	    	MyData data=new MyData("addViolation");
+    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna add this violation?", "Press ok to add this violation.").get() == ButtonType.OK) {
+    	    		data.add("id", member.getID());
+    	    		Calendar calendar = Calendar.getInstance();
+    	    		java.sql.Date ourJavaDateObject = new java.sql.Date(calendar.getTime().getTime());
+    		    	data.add("violationDate", ourJavaDateObject);
+    	    		data.add("violation",exceptionEventList.getSelectionModel().getSelectedItem().toString() );
+    	    		switch(exceptionEventList.getSelectionModel().getSelectedItem().toString()) {
+    				case "LATE_RETURN":
+    					data.add("violationType", 0);
+    					break;
+    				case "BOOK_IS_LOST":
+    					data.add("violationType", 1);
+    					break;
+    				case "DAMAGED_BOOK":
+    					data.add("violationType", 2);
+    					break;
+    				case "OTHER":
+    					data.add("violationType", 3);
+    					break;
+    	    	}
+    	    		rc.getCC().send(data);
+    	    }
+    	    	switch (rc.getCC().getFromServer().getAction()) {
+	    		case "success":
+	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
+	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
+	    			break;
+	    		case "fail":
+	    		default:
+	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
+	    			break;
+	    		}
+    	    }
+
+    	    @FXML
+    	    void entered(MouseEvent event) {
+
+    	    }
+
+    	    @FXML
+    	    void exited(MouseEvent event) {
+
+    	    }
+
+    	}
         protected class ViewRequests {
     		@FXML
     		void entered(MouseEvent e) {
@@ -280,7 +358,8 @@ public class LibrarianController {
 		    void submitSearch(MouseEvent  event) {
 		    	selected = null;
 		    	SearchResultTable.getItems().clear();
-    				ArrayList<Book> result = rc.getSearchResults(nameField.getText(), authorsField.getText(), freeTextField.getText(), GenrePane);
+		    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
+    				ArrayList<Book> result = rc.getSearchResults(nameField.getText(), authorsField.getText(), freeTxt, GenrePane);
     				/* TODO: // Add condition here, incase all field are empty
     					SearchResultTable.setVisible(false);
     	    	    	dateSelector.setVisible(false);

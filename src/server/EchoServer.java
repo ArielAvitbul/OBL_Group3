@@ -100,8 +100,10 @@ public class EchoServer extends AbstractServer
 	  		    	break;
 		  		case "copyToReturn":
 	  				client.sendToClient(serverCont.returnCopy(data));
-
 	  				break;
+	  		    case "addViolation":
+	  		    	client.sendToClient(serverCont.addViolation(data));
+	  		    	break;
 	  		    case "search_member":
 	  		    	client.sendToClient(serverCont.searchMember((Integer)data.getData("id")));
 	  		    	break;
@@ -109,7 +111,7 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.createUser(data));
 	  		    	break;
 	  		  case "searchBook":
-	  				client.sendToClient(serverCont.searchBook((ArrayList<String>)data.getData("genres"),(String)data.getData("bookName"),(String)data.getData("authorsName")));
+	  				client.sendToClient(serverCont.searchBook((ArrayList<String>)data.getData("genres"),(String)data.getData("bookName"),(String)data.getData("authorsName"), (ArrayList<String>)data.getData("freeText")));
 	  				break;
 	  		case "tableOfContents":
   				client.sendToClient(serverCont.getTableOfContents(data));

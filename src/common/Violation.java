@@ -7,7 +7,7 @@ import java.sql.Date;
 
 public class Violation implements Serializable	{
 
-	private enum type
+	public enum Type
 	{
 		LATE_RETURN,
 		BOOK_IS_LOST,
@@ -17,7 +17,7 @@ public class Violation implements Serializable	{
 	private final int MemberID;
 	private Date violationDate;
 	private String description;
-	private type violationType;
+	private Type violationType;
 	
 	public Violation(int memberID, Date violationDate, String description, int violationType) 
 	{
@@ -53,7 +53,7 @@ public class Violation implements Serializable	{
 		this.description = description;
 	}
 
-	public type getViolationType() 
+	public Type getViolationType() 
 	{
 		return violationType;
 	}
@@ -62,16 +62,16 @@ public class Violation implements Serializable	{
 	{
 		switch(enumNumericValue) {
 		case 0:
-			this.violationType = type.LATE_RETURN;
+			this.violationType = Type.LATE_RETURN;
 			break;
 		case 1:
-			this.violationType = type.BOOK_IS_LOST;
+			this.violationType = Type.BOOK_IS_LOST;
 			break;
 		case 2:		
-			this.violationType = type.DAMAGED_BOOK;
+			this.violationType = Type.DAMAGED_BOOK;
 			break; 
 		default://anyway default is other
-			this.violationType = type.OTHER;
+			this.violationType = Type.OTHER;
 		}
 	}
 }

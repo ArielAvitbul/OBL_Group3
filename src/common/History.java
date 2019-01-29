@@ -5,34 +5,39 @@ import java.util.Date;
 
 public class History implements Serializable {
 
-	private String bookName;
-	private final Date borrowDate;
-	private Date actualReturnDate;
+	private String name;
+	private final String type;
+	private Date actualDate;
 	
-	public History(String bookName, Date borrowDate, Date actualReturnDate) {
+	public History( String type,String name, Date actualDate) {
 		super();
-		this.bookName = bookName;
-		this.borrowDate = borrowDate;
-		this.actualReturnDate = actualReturnDate;
+		this.type = type;
+		this.actualDate = actualDate;
+		this.name=name;
 	}
-	
-	public String getBookName() {
-		return bookName;
+
+	public String getName() {
+		return name;
 	}
-	public void setBookName(String bookName) {
-		this.bookName = bookName;
+
+	public void setName(String name) {
+		this.name = name;
 	}
-	public Date getBorrowDate() {
-		return borrowDate;
+
+	public Date getActualDate() {
+		return actualDate;
 	}
-	public Date getActualReturnDate() {
-		return actualReturnDate;
+
+	public void setActualDate(Date actualDate) {
+		this.actualDate = actualDate;
 	}
-	public void setActualReturnDate(Date actualReturnDate) {
-		this.actualReturnDate = actualReturnDate;
+
+	public String getType() {
+		return type;
 	}
-	
 	public String toString() {
-		return ("name= "+this.getBookName() + " date= "+ this.getBorrowDate());
+		return ("type= "+ this.type+" name= "+this.name+" date= "+this.actualDate);
+		
 	}
-}
+	}
+	

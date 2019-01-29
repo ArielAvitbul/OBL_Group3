@@ -65,6 +65,8 @@ public class ServerController {
 			ret.add("reason", "ID or password incorrect");
 		else if (memberMatch.getBoolean("loggedin"))
 			ret.add("reason", "Already logged in!");
+		else if(memberMatch.getString("status").equals("LOCK"))
+			ret.add("reason", "Your user is lock!");
 		else {
 			ret.setAction("login_approved");
 			setLoggedIn(true,memberMatch.getInt("id"));
@@ -247,7 +249,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return true; // if one of the strings is empty, then there's nothing to check and it will get here, so just return true.
 		}
 	}
-	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName) throws SQLException {
+	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName , ArrayList<String>freeTxt) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<Book> result = new ArrayList<>();
 		for (Book b : getAllBooks()) {
@@ -258,12 +260,30 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 						flag=false;
 					}
 				}
+				if(!resultByFreeText(b, freeTxt)) {
+					flag = false;
+				}
 				if (flag)
 				result.add(b);
 			}
 		}
 		ret.add("search_results", result);
 		return ret;
+	}
+	
+	public boolean resultByFreeText(Book b , ArrayList<String> freeTxt) {
+		boolean result = false;
+		for(String s : freeTxt) {
+			if(b.getAuthorsNames().contains(s))
+				result = true;
+			if(b.getBookName().contains(s))
+				result = true;
+			if(b.getTopics().contains(s))
+				result = true;
+			if(b.getShortDescription().contains(s))
+				result=true;
+		}
+		return result;
 	}
 	
 	public ArrayList<CopyInBorrow> getCopiesInBorrow(ArrayList<Borrow> myBorrows) throws SQLException
@@ -354,10 +374,24 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<History> myHistory = new ArrayList<>();
 		try {
-			ResultSet rs= db.select("SELECT books.bookName , borrows.borrowDate, borrows.actualReturnDate FROM books JOIN borrows WHERE books.bookID=borrows.bookID AND borrows.memberID="+ id);
+			ResultSet rs= db.select("SELECT violations.description, violations.violationDate FROM violations WHERE violations.memberID="+ id);
 			while (rs.next())
-				myHistory.add(new History(rs.getString("bookName"), rs.getDate("borrowDate"), rs.getDate("actualReturnDate")));
-		}
+				myHistory.add(new History( "Violation" ,rs.getString("description"), rs.getDate("violationDate")));
+			ResultSet rs1= db.select("SELECT books.bookName, Borrows.borrowDate FROM books JOIN borrows WHERE borrows.bookID=books.bookID AND borrows.memberID="+ id);
+			while (rs1.next())
+				myHistory.add(new History( "Borrow" ,rs1.getString("bookName"), rs1.getDate("borrowDate")));
+			ResultSet rs2= db.select("SELECT books.bookName, book_reservations.orderDate FROM books JOIN book_reservations WHERE books.bookID=book_reservations.bookID AND book_reservations.memberID="+ id);
+			while (rs2.next())
+				myHistory.add(new History( "order" ,rs2.getString("bookName"), rs2.getDate("orderDate")));
+			ResultSet rs3= db.select("SELECT books.bookName, Borrows.actualReturnDate FROM books JOIN borrows WHERE borrows.bookID=books.bookID AND borrows.memberID="+ id);
+			while (rs3.next())
+				if(rs3.getDate("actualReturnDate")!=null)
+					myHistory.add(new History( "Return" ,rs3.getString("bookName"), rs3.getDate("actualReturnDate")));
+			ResultSet rs4= db.select("SELECT books.bookName, extensions.newReturnDate FROM books JOIN borrows JOIN extensions WHERE borrows.bookID=books.bookID AND borrows.borrowID=extensions.borrowID AND borrows.memberID="+ id);
+			while (rs4.next()) {
+				myHistory.add(new History( "Extension" ,rs4.getString("bookName"), rs4.getDate("newReturnDate")));
+			}
+			}
 		catch (SQLException e) {
 			System.out.println("History FAILED to load! "+ e.getMessage());
 		}
@@ -598,4 +632,20 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			}
 			return toReturn;
 		}
+		public MyData addViolation(MyData data) {
+			MyData ret=new MyData("fail");
+			try {
+				PreparedStatement ps = db.insert("INSERT INTO violations (`memberID`, `ViolationDate` , `description` , `violationType`) "
+						+ "VALUES ('"+data.getData("id")+"' , '"+data.getData("violationDate")+
+						"' , '"+data.getData("violation")+"' , '"+data.getData("violationType")+"')");
+				ps.executeUpdate();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+				return ret;
+				}
+			ret.setAction("success");
+			return ret;
+		}
+
 }

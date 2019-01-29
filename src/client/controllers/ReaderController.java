@@ -55,11 +55,11 @@ public class ReaderController {
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
-	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, String FreeText, GridPane genresPane) {
+	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, ArrayList<String> FreeText, GridPane genresPane) {
     	MyData searchBook = new MyData ("searchBook");
     	searchBook.add("bookName", bookName);
     	searchBook.add("authorsName", authorsName);
-    	// searchBook.add("freeText",FreeText);
+    	searchBook.add("freeText",FreeText);
     	// TODO: add that ^
     	ArrayList<String> genres= new ArrayList<>();
     	for (Node p : genresPane.getChildren())
@@ -189,6 +189,9 @@ public class ReaderController {
     			} catch (NullPointerException e) {
     				controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new MemberManagement(((MemberManagement)controllers.get("memberManagement")).getMember())));
     			}
+    			break;
+    		case "exceptionalEvent":
+    			controllers.put(fxml,((MemberManagement)controllers.get("memberManagement")).new ExceptionalEvent());
     			break;
     		case "viewRequests":
     			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new ViewRequests());
@@ -385,7 +388,8 @@ public class ReaderController {
 		    	tableBooks.getItems().clear();
     	    	orderBookButton.setVisible(false);
     	    	indexBookButton.setVisible(false);
-	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTextField.getText(),GenrePane));
+    	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
+	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
 	    	    	orderBookButton.setVisible(true);
 	    	    	indexBookButton.setVisible(true);
 		    }

@@ -105,8 +105,24 @@ public class MemberController {
 
 	    @FXML
 	    void replacePage(MouseEvent event) {
-	    	rc.setBottom(event);
+	    	if(checkPossibility(event)==0)
+	    		return;
+	    	else
+	    		rc.setBottom(event);
 	    }
+	    private int checkPossibility(MouseEvent event) {
+			// TODO Auto-generated method stub
+	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("orderBook"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Your user is freeze. you can't order books");
+	    		return 0;
+	    	}
+	    	if(member.getStatus().equals(Member.Status.FREEZE) &&(((ImageView)event.getSource()).getId().equals("extensionRequest"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Your user is freeze. you can't extend any borrow");
+	    		return 0;
+	    	}
+	    	return 1;
+
+		}
 	    @FXML
 	    void saveInfo(MouseEvent event) {
 	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
@@ -141,24 +157,24 @@ public class MemberController {
 			ArrayList<History> arrOb = (ArrayList<History>)rc.getCC().getFromServer().getData("list");
 			BorrowTable.getItems().addAll(arrOb);
 			System.out.println(arrOb);
-			colname.setCellValueFactory(new PropertyValueFactory<History, String>("bookName"));
-			colborrowdate.setCellValueFactory(new PropertyValueFactory<History,Date>("borrowDate"));
-			colreturndate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualReturnDate"));
+			colType.setCellValueFactory(new PropertyValueFactory<History,String>("type"));
+			colName.setCellValueFactory(new PropertyValueFactory<History,String>("name"));
+			colDate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualDate"));
 		}
         @FXML
     	private AnchorPane pane;
         @FXML
         private ImageView r;
+
+        @FXML
+        private TableColumn<History, String> colType;
+
+        @FXML
+        private TableColumn<History, String> colName;
+
+        @FXML
+        private TableColumn<History, Date> colDate;
         
-		@FXML
-		private TableColumn<History, String> colname;
-
-		@FXML
-		private TableColumn<History, Date> colborrowdate;
-
-		@FXML
-		private TableColumn<History, Date> colreturndate;
-		    
 		@FXML
 		private TableView<History> BorrowTable;
 			
