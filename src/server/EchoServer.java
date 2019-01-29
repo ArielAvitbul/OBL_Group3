@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.sun.corba.se.spi.copyobject.CopierManager;
+
 import common.Borrow;
+import common.CopyInBorrow;
 import common.MyData;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
@@ -88,9 +91,7 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.history((Integer)data.getData("id")));
 	  		    	break;
 	  		  case "BorrowToExtend":
-	  		    	MyData extensionResult = serverCont.updateExtension((Borrow)data.getData("TheBorrow"));
-	  		    	extensionResult.add("UpdatedBorrow", data.getData("TheBorrow"));
-	  		    	client.sendToClient(extensionResult);
+	  		    	client.sendToClient(serverCont.updateExtension((CopyInBorrow)data.getData("TheCopyInBorrow")));
 	  		    	break;
 	  		  case "getCopiesInBorrow":
 	  		    	MyData copiesInBorrow = new MyData("copiesInBorrow");
@@ -136,6 +137,9 @@ public class EchoServer extends AbstractServer
 	  		    	MyData books = new MyData("getBooks");
 	  		    	books.add("books", serverCont.getAllBooks());
 	  		    	client.sendToClient(books); // TODO: returns all the books.. replace this with search result!
+	  		    	break;
+	  		    case "getMessages":
+	  		    	client.sendToClient(serverCont.getMessages((int)data.getData("librerian")));
 	  		    	break;
 	  		    case "client_stopped":
 	  		    case "logout":

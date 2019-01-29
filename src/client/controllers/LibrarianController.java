@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
+
 import client.ClientConsole;
 import common.Book;
 import common.Borrow;
@@ -16,13 +18,16 @@ import common.MemberCard;
 import common.Message;
 import common.MyData;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -35,6 +40,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 public class LibrarianController {
@@ -332,7 +339,7 @@ public class LibrarianController {
 				if(returnDatePicker.getValue() == null)
 					return "NoReturnDate";
 				long diff = daysBetween(new java.util.Date(),Date.from(returnDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-				if(toCheck.isPopular())
+				if(toCheck.isPopular()&& diff>2)
 					return "MoreThenThreeDaysAndPopular";
 				return "OK";
 			}		
@@ -770,6 +777,7 @@ public class LibrarianController {
 	    }
 	}
 	protected class ShowInbox {
+    	private ArrayList<Message> myMessagse;
 	    @FXML
 	    private AnchorPane ChooseBookPane;
 
@@ -791,21 +799,15 @@ public class LibrarianController {
 	    	rc.getCC().send(data);
 	    	switch(rc.getCC().getFromServer().getAction()) {
 	    	case "messages":
-	    		messagesTV.getItems().addAll((ArrayList <Message>)rc.getCC().getFromServer().getData("messages"));
+	    		myMessagse = (ArrayList<Message>)rc.getCC().getFromServer().getData("messages");
+	    		messagesTV.getItems().addAll(myMessagse);
 	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
 	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
 	    		break;
 	    	case "noMessages":
-	    		messagesTV.setVisible(false);
-	    		contentTF.setVisible(false);
-	    		ClientConsole.newAlert(AlertType.INFORMATION,null ,"No New Messages!", "No new messagse at the moment!");
+	    		messagesTV.setPlaceholder(new Label("No New Messages!"));
 	    		break;
 	    	}
-
-	    }
-
-	    @FXML
-	    void keyBoard(KeyEvent event) {
 
 	    }
 	    @FXML
@@ -817,6 +819,16 @@ public class LibrarianController {
 	    void exited(MouseEvent event) {
 	    	rc.mouseExited(event);
 	    }
-	    
-	  }
+	    @FXML
+	    void showMessage(MouseEvent event) {
+	    	System.out.println(messagesTV.getSelectionModel().getSelectedIndex());
+	    		contentTF.getChildren().clear();
+	    		Text header = new Text("Message Content:\n\n");
+	    		header.setFont(new Font("Calibri", 20));
+	    		Text msg = new Text((myMessagse.get(messagesTV.getSelectionModel().getSelectedIndex()).getContent()));
+	    		msg.setFont(new Font("Calibri", 16));
+	    		contentTF.getChildren().add(header);
+	    		contentTF.getChildren().add(msg);
+	    	}
+	    }
 }

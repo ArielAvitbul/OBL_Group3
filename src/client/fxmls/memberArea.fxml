@@ -34,11 +34,6 @@
                   <Image url="@../images/buttons/askForExtend.jpg" />
                </image>
             </ImageView>
-            <ImageView fx:id="showInbox" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/buttons/inbox.jpeg" />
-               </image>
-            </ImageView>
          </children>
       </HBox>
       <GridPane hgap="15.0" layoutX="333.0" layoutY="131.0" vgap="5.0">

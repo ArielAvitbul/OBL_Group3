@@ -278,18 +278,78 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return toReturn;
 	}
 	
-	public MyData updateExtension(Borrow toUpdate) throws SQLException {
+	public MyData updateExtension(CopyInBorrow copyInBorrow) throws SQLException {
+		MyData toReturn;
+		if(checkReservations(copyInBorrow)) {
+			toReturn = new MyData("ExtensionFailed");
+			toReturn.add("updatedBorrow", copyInBorrow);
+			toReturn.add("reason", "This book has been reserved!");
+		}
+		else {
+		toReturn = updateBorrows(copyInBorrow);
+		if(updateExtensions((CopyInBorrow)toReturn.getData("updatedBorrow"))==0) {
+			toReturn = new MyData("ExtensionFailed");
+			toReturn.add("updatedBorrow", copyInBorrow);
+			toReturn.add("reason", "Can't update borrow!");
+		}
+		else {
+		writeMsgToLibrerians(copyInBorrow);
+			}
+		}
+		return toReturn;	
+	}
+	private boolean checkReservations(CopyInBorrow copyInBorrow) throws SQLException {
+		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE bookID="+copyInBorrow.getBorroBook().getBookID());
+		return db.hasResults(rs);
+	}
+	private int updateExtensions(CopyInBorrow copyInBorrow) throws SQLException {
+		String insertQ = "INSERT INTO extensions(memberID,borrowID,newReturnDate) "
+				+ "VALUES(?,?,?)";
+		PreparedStatement ps = db.update(insertQ);
+		ps.setInt(1, copyInBorrow.getNewBorrow().getMemberID());
+		ps.setInt(2, copyInBorrow.getNewBorrow().getBorrowID());
+		ps.setDate(3, new Date(copyInBorrow.getNewBorrow().getReturnDate().getTime()));
+		return ps.executeUpdate();
+		
+	}
+	private MyData updateBorrows(CopyInBorrow copyInBorrow) throws SQLException {
+		MyData toReturn;
 		Calendar c = Calendar.getInstance();
-		c.setTime(toUpdate.getReturnDate());
+		c.setTime(copyInBorrow.getNewBorrow().getReturnDate());
 		c.add(Calendar.DAY_OF_MONTH, 7);
-		toUpdate.setReturnDate((Date) c.getTime());
-		String query = "UPDATE borrows SET returnDate="+toUpdate.getReturnDate()+" WHERE borrowID="+toUpdate.getBorrowID();
-		db.updateWithExecute(query);
-		MyData toReturn = new MyData("ExtensionSucceed");
-		toReturn.add("updaedBorrow", toUpdate);
+		copyInBorrow.getNewBorrow().setReturnDate(new java.sql.Date(c.getTimeInMillis()));
+		System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
+		System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
+		String query = "UPDATE borrows SET returnDate=? WHERE borrowID=?";
+		PreparedStatement ps = db.update(query);
+		ps.setDate(1,copyInBorrow.getNewBorrow().getReturnDate());
+		ps.setInt(2,copyInBorrow.getNewBorrow().getBorrowID());
+		if(ps.executeUpdate()==1) {
+			toReturn = new MyData("ExtensionSucceed");
+			toReturn.add("updatedBorrow", copyInBorrow);
+		}
+		else {
+			toReturn = new MyData("ExtensionFailed");
+			toReturn.add("updatedBorrow", copyInBorrow);
+		}
 		return toReturn;
 	}
 	
+	private void writeMsgToLibrerians(CopyInBorrow toUpdate) throws SQLException {
+		ArrayList<Integer> librerians = new ArrayList<Integer>();
+		MemberCard borrower = getMemberCard(toUpdate.getNewBorrow().getMemberID());
+		String insertQ = "INSERT INTO messages(sender,reciever,content) "
+				+ "VALUES(?,?,?)";
+		String query = "SELECT id FROM librarians";
+		ResultSet rs = db.select(query);
+		while(rs.next()) {
+			PreparedStatement ps = db.update(insertQ);
+			ps.setInt(1, toUpdate.getNewBorrow().getMemberID());
+			ps.setInt(2, rs.getInt("id"));
+			ps.setString(3, "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+toUpdate.getBorroBookName()+"\nHas been extended in a week!");
+			ps.executeUpdate();
+		}
+	}
 	public MyData history(int id) throws SQLException{
 		MyData ret = new MyData("result");
 		ArrayList<History> myHistory = new ArrayList<>();
@@ -358,6 +418,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return bookToUpdate;
 	}
 	
+
 	public MyData report(MyData data) throws SQLException {
 		ResultSet rs;
 		switch (data.getAction()) {

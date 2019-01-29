@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import client.ClientConsole;
 import client.MyImage;
@@ -70,6 +71,10 @@ public class ReaderController {
     }
 	protected ClientConsole getCC() {
 		return cc;
+	}
+	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
+	    long diff = d2.getTime() - d1.getTime();
+	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 	@FXML
 	void initialize() {
@@ -217,6 +222,9 @@ public class ReaderController {
     			break;
     		case "orderBook":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
+    			break;
+    		case "showInbox":
+    			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new ShowInbox());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
