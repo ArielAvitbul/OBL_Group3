@@ -13,6 +13,7 @@ import common.CopyInBorrow;
 import common.Librarian;
 import common.Member;
 import common.MemberCard;
+import common.Message;
 import common.MyData;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
@@ -34,6 +35,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 
 public class LibrarianController {
 	private ReaderController rc;
@@ -767,4 +769,54 @@ public class LibrarianController {
 	        }
 	    }
 	}
+	protected class ShowInbox {
+	    @FXML
+	    private AnchorPane ChooseBookPane;
+
+	    @FXML
+	    private TableView<Message> messagesTV;
+
+	    @FXML
+	    private TableColumn<Message, String> fromColumn;
+
+	    @FXML
+	    private TableColumn<Message, Date> dateColumn;
+
+	    @FXML
+	    private TextFlow contentTF;
+	    @FXML
+	    void initialize() {
+	    	MyData data = new MyData("getMessages");
+	    	data.add("librerian", librarian.getID());
+	    	rc.getCC().send(data);
+	    	switch(rc.getCC().getFromServer().getAction()) {
+	    	case "messages":
+	    		messagesTV.getItems().addAll((ArrayList <Message>)rc.getCC().getFromServer().getData("messages"));
+	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
+	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
+	    		break;
+	    	case "noMessages":
+	    		messagesTV.setVisible(false);
+	    		contentTF.setVisible(false);
+	    		ClientConsole.newAlert(AlertType.INFORMATION,null ,"No New Messages!", "No new messagse at the moment!");
+	    		break;
+	    	}
+
+	    }
+
+	    @FXML
+	    void keyBoard(KeyEvent event) {
+
+	    }
+	    @FXML
+	    void entered(MouseEvent event) {
+	    	rc.mouseEntered(event);
+	    }
+
+	    @FXML
+	    void exited(MouseEvent event) {
+	    	rc.mouseExited(event);
+	    }
+	    
+	  }
 }

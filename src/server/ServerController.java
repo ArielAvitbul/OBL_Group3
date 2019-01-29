@@ -23,6 +23,7 @@ import common.Librarian;
 import common.Manager;
 import common.Member;
 import common.MemberCard;
+import common.Message;
 import common.MyData;
 import common.MyFile;
 import common.SendMail;
@@ -512,5 +513,28 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.setAction("succeed");
 			data.add("succeed", "Return book is succeed");
 			return data;
+		}
+		/**
+		 * @author Good Guy
+		 * @param librarianID
+		 * @return MyData instance representing the messages.
+		 * @throws SQLException
+		 */
+		public MyData getMessages(int librarianID) throws SQLException {
+			MyData toReturn;
+			ArrayList<Message> theMessages = new ArrayList<Message>();
+			//String query = "SELECT * FROM messages WHERE to="+librarianID;
+			ResultSet rs = db.select("SELECT * FROM messages WHERE reciever="+librarianID);
+			System.out.println(db.hasResults(rs));
+			if(!db.hasResults(rs))
+				toReturn = new MyData("noMessages");
+			else {
+				do {
+					theMessages.add(new Message(rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content")));
+				}while(rs.next());
+				toReturn = new MyData("messages");
+				toReturn.add("messages", theMessages);
+			}
+			return toReturn;
 		}
 }
