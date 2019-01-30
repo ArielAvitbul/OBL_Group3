@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.sun.corba.se.spi.copyobject.CopierManager;
 
+import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
 import common.MyData;
@@ -242,6 +243,9 @@ public class EchoServer extends AbstractServer
   		    	MyData save=serverCont.updateBook(data);
   		    	client.sendToClient(save);
   		    	break;
+  			case "getActivityReports":
+	  			client.sendToClient(serverCont.getActivityReports());
+	  			break;
 	  		    case "Activity Report":
 	  		    case "Borrow Report":
 	  		    case "Late Return Report":
@@ -293,7 +297,7 @@ public class EchoServer extends AbstractServer
 	  		    		client.sendToClient(normalSave);
 	  		    	break;
 	  		    case "orderBook":
-	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Integer)data.getData("bookID")));
+	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Book)data.getData("book")));
 	  		    	break;
 	  		    case "getBooks":
 	  		    	MyData books = new MyData("getBooks");

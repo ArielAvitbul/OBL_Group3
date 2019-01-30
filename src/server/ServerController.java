@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
@@ -201,14 +202,13 @@ public class ServerController {
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
-	public MyData orderBook(int userid, int bookID) throws SQLException {
-		Book book = getBook(bookID);
+	public MyData orderBook(int userid, Book book) throws SQLException {
 		if (book==null)
 			return new MyData("fail","message","The book doesn't exists.");
 			if (book.getCurrentNumberOfCopies()==0) { // can order
 				Timestamp today = new Timestamp(System.currentTimeMillis());
-				db.insertWithExecute("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+today+"', '"+bookID+"')");
-				return new MyData("success","reservation",new BookReservation(userid, today ,bookID));
+				db.insertWithExecute("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+today+"', '"+book.getBookID()+"')");
+				return new MyData("success","reservation",new BookReservation(userid, today ,book.getBookID()));
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
@@ -441,7 +441,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		MyData ret=new MyData("fail");
 		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
 		try {
-			PreparedStatement ps = db.insert("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
+			PreparedStatement ps = db.update("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
 					+ " , `shellLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`,`deleted`) "
 					+ "VALUES ('"+data.getData("bookName")+"' , '"+data.getData("authorsNames")+
 					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
@@ -514,40 +514,96 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	}
 	
 
+	public MyData getActivityReports() throws SQLException {
+		MyData data = new MyData("result");
+		ResultSet rs = db.select("SELECT time from activity_reports");
+		while (rs.next())
+			data.add(String.valueOf(rs.getRow()), rs.getTimestamp("time"));
+		return data;
+	}
+
 	public MyData report(MyData data) throws SQLException {
 		ResultSet rs;
+		float avg=0;
+		ArrayList<Float> sum = new ArrayList<>();
 		switch (data.getAction()) {
 		case "Activity Report":
-			rs = db.select("SELECT COUNT(id) as active, (SELECT count(id) from members where `status`='LOCK') as inactive, (SELECT count(id) from members where `status`='FREEZE') as frozen, (SELECT count(*) from copy_in_borrow) as totalCopiesInBorrow, (SELECT distinct count(memberID) from borrows where actualReturnDate > returnDate) as lateMembers from members where `status`='ACTIVE'");
+			if (data.getData().containsKey("ts")) {
+				PreparedStatement ps = db.update("SELECT * from activity_reports where time=?");
+				ps.setTimestamp(1, Timestamp.valueOf((String)data.getData("ts")));
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					data.add("active", rs.getInt("active"));
+					data.add("locked", rs.getInt("locked"));
+					data.add("frozen", rs.getInt("frozen"));
+					data.add("totalBorrowedCopies", rs.getInt("totalBorrowedCopies"));
+					data.add("lateReturners", rs.getInt("lateReturners"));
+					data.add("ts",  data.getData("ts"));
+				}
+			} else {
+			rs = db.select("SELECT COUNT(id) as active, (SELECT count(id) from members where `status`='LOCK') as locked, (SELECT count(id) from members where `status`='FREEZE') as frozen, (SELECT count(*) from copy_in_borrow) as totalBorrowedCopies, (SELECT distinct count(memberID) from borrows where actualReturnDate > returnDate) as lateReturners from members where `status`='ACTIVE'");
+			PreparedStatement ps = db.update("INSERT INTO `activity_reports` (`active`, `locked`, `frozen`, `totalBorrowedCopies`, `lateReturners`, `time`) VALUES (?, ?, ?, ?, ?, ?)");
 			if (rs.next()) {
 			data.add("active", rs.getInt("active"));
-			data.add("inactive", rs.getInt("inactive"));
+			ps.setInt(1, rs.getInt("active"));
+			data.add("locked", rs.getInt("locked"));
+			ps.setInt(2, rs.getInt("locked"));
 			data.add("frozen", rs.getInt("frozen"));
-			data.add("totalCopiesInBorrow", rs.getInt("totalCopiesInBorrow"));
-			data.add("lateMembers", rs.getInt("lateMembers"));
+			ps.setInt(3, rs.getInt("frozen"));
+			data.add("totalBorrowedCopies", rs.getInt("totalBorrowedCopies"));
+			ps.setInt(4, rs.getInt("totalBorrowedCopies"));
+			data.add("lateReturners", rs.getInt("lateReturners"));
+			ps.setInt(5, rs.getInt("lateReturners"));
+			Timestamp time = new Timestamp(System.currentTimeMillis());
+			time.setNanos(0);
+			ps.setTimestamp(6, time);
+			data.add("ts", time.toString());
+			ps.executeUpdate();
+			}
 			}
 			break;
-		 case "Borrow Report": // TODO: maybe get only 1 view, by not using getBook
-			 HashMap<Book,ArrayList<Integer>> books = new HashMap<>();
-			 rs = db.select("select books.bookID, ifnull(returnDate-borrowDate,0) as borrowDuration from borrows right join books on books.bookID = borrows.bookID order by bookID");
+		 case "Borrow Report":
+			 HashMap<Boolean,ArrayList<Float>> borrows = new HashMap<>(); // key: isPopular, value: borrows
+			 rs = db.select("select isPopular, cast(ifnull((day(returnDate)-day(borrowDate))+((hour(returnDate)-hour(borrowDate)))/24+((minute(returnDate)-minute(borrowDate)))/(24*60),0) as decimal(10,2)) as borrowDuration from borrows right join books on books.bookID = borrows.bookID order by borrowDuration");
+			 borrows.put(false,new ArrayList<>());
+			 borrows.put(true,new ArrayList<>());
 			 while (rs.next()) {
-				 Book book = getBook(rs.getInt("bookID"));
-				 if (!books.containsKey(book))
-				 books.put(book, new ArrayList<>());
-				 books.get(book).add(rs.getInt("borrowDuration"));
+				 float borrowDuration = rs.getFloat("borrowDuration");
+				 borrows.get(rs.getBoolean("isPopular")).add(borrowDuration);
+				 sum.add(borrowDuration);
 			 }
-			 data.add("books", books);
+			 Collections.sort(sum);
+			 data.add("maxVal", sum.get(sum.size()-1));
+			 data.add("median", sum.get(sum.size()/2));
+			 for (Float f : sum)
+				 avg+=f;
+			 data.add("average", avg/sum.size());
+			 data.add("borrows", borrows);
 			 break;
 		 case "Late Return Report":
-				HashMap<String,Integer> result = new HashMap<>();
-				rs= db.select("select books.bookName,count(books.bookName) as amount from books join copy_in_borrow WHERE deleted = '0' AND books.bookID=copy_in_borrow.BookID  group by books.bookName union select bookName,0 from books WHERE deleted = '0' AND bookID not in (select bookID from copy_in_borrow)");
-				while (rs.next())
-					result.put(rs.getString("bookName"), rs.getInt("amount"));
+				HashMap<Integer,MyData> result = new HashMap<>();
+				rs = db.select("select books.bookID,bookName, cast(if(actualReturnDate is null, (day(CURRENT_TIMESTAMP)-day(returnDate))+((hour(CURRENT_TIMESTAMP)-hour(returnDate)))/24+((minute(CURRENT_TIMESTAMP)-minute(returnDate)))/(24*60), (day(actualReturnDate)-day(returnDate))+((hour(actualReturnDate)-hour(returnDate)))/24+((minute(actualReturnDate)-minute(returnDate)))/(24*60)) as decimal(10,2)) as duration from borrows join books where if(actualReturnDate is null,current_timestamp>returnDate,actualReturnDate>returnDate) and books.bookID=borrows.bookID");
+				while (rs.next()) {
+					if (!result.containsKey(rs.getInt("bookID"))) { // init
+						result.put(rs.getInt("bookID"), new MyData(rs.getString("bookName")));
+						result.get(rs.getInt("bookID")).add("durations", new ArrayList<Float>());
+					}
+					float duration = rs.getFloat("duration");
+					((ArrayList<Float>)result.get(rs.getInt("bookID")).getData("durations")).add(duration);
+					sum.add(duration);
+				 }
+				Collections.sort(sum);
+				data.add("maxVal", sum.get(sum.size()-1));
+				data.add("median", sum.get(sum.size()/2));
+				 for (Float f : sum)
+					 avg+=f;
+				data.add("average", avg/sum.size());
 				data.add("result", result);
 				break;
 		}
 		return data;
 	}
+	
 	
 	public MyData writeNewBorrow(MyData bookAndBorrow) throws SQLException {
 		MyData toReturn;
