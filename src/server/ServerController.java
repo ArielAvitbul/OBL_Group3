@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,9 +107,9 @@ public class ServerController {
 	public MyData createUser(MyData data) {
 		MyData ret = new MyData("fail");
 		try {
-		 db.insert("INSERT INTO members (`id`, `username`, `password`) "
+		 db.insertWithExecute("INSERT INTO members (`id`, `username`, `password`) "
 				 + "VALUES ('"+data.getData("id")+"', '"+data.getData("username")+"', '"+data.getData("password")+"')");
-		 db.insert("INSERT INTO member_cards (`userID`, `firstName`, `lastName`, `phoneNumber`, `emailAddress`) "
+		 db.insertWithExecute("INSERT INTO member_cards (`userID`, `firstName`, `lastName`, `phoneNumber`, `emailAddress`) "
 		 		+ "VALUES ('"+data.getData("id")+"', '"+data.getData("firstname")+"', '"+data.getData("lastname")+"', '"+data.getData("phone")+"', '"+data.getData("email")+"')");
 		} catch (SQLException e) {
 			if (e instanceof MySQLIntegrityConstraintViolationException)
@@ -152,7 +153,7 @@ public class ServerController {
 		ArrayList<Borrow> memberBorrows = new ArrayList<Borrow>();
 		ResultSet rs = db.select("SELECT * FROM borrows WHERE memberID ="+memberID);
 		while(rs.next())
-			memberBorrows.add(new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"), rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate")));
+			memberBorrows.add(new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"), rs.getInt("memberID"), rs.getTimestamp("borrowDate"), rs.getTimestamp("returnDate"), rs.getTimestamp("actualReturnDate")));
 		return memberBorrows;
 	}
 	/* function to get all of the specified member violations
@@ -176,7 +177,7 @@ public class ServerController {
 		ArrayList<BookReservation> memberReservations = new ArrayList<BookReservation>();
 		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE memberID ="+memberID);
 		while(rs.next()) {
-			memberReservations.add(new BookReservation(memberID, rs.getDate("orderDate"),rs.getInt("bookID")));
+			memberReservations.add(new BookReservation(memberID, rs.getTimestamp("orderDate"),rs.getInt("bookID")));
 		}
 		return memberReservations;
 	}
@@ -205,9 +206,9 @@ public class ServerController {
 		if (book==null)
 			return new MyData("fail","message","The book doesn't exists.");
 			if (book.getCurrentNumberOfCopies()==0) { // can order
-				Date date = new Date(System.currentTimeMillis());
-				db.insert("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+date+"', '"+bookID+"')");
-				return new MyData("success","reservation",new BookReservation(userid, date,bookID));
+				Timestamp today = new Timestamp(System.currentTimeMillis());
+				db.insertWithExecute("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+today+"', '"+bookID+"')");
+				return new MyData("success","reservation",new BookReservation(userid, today ,bookID));
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
@@ -274,7 +275,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
 	if (db.hasResults(rs))
-		return new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"),rs.getInt("memberID"), rs.getDate("borrowDate"), rs.getDate("returnDate"), rs.getDate("actualReturnDate"));
+		return new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"),rs.getInt("memberID"), rs.getTimestamp("borrowDate"), rs.getTimestamp("returnDate"), rs.getTimestamp("actualReturnDate"));
 	return null;
 }
 
@@ -374,12 +375,12 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		Calendar c = Calendar.getInstance();
 		c.setTime(copyInBorrow.getNewBorrow().getReturnDate());
 		c.add(Calendar.DAY_OF_MONTH, 7);
-		copyInBorrow.getNewBorrow().setReturnDate(new java.sql.Date(c.getTimeInMillis()));
+		copyInBorrow.getNewBorrow().setReturnDate(new Timestamp(c.getTimeInMillis()));
 		System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
 		System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
 		String query = "UPDATE borrows SET returnDate=? WHERE borrowID=?";
 		PreparedStatement ps = db.update(query);
-		ps.setDate(1,copyInBorrow.getNewBorrow().getReturnDate());
+		ps.setTimestamp(1,copyInBorrow.getNewBorrow().getReturnDate());
 		ps.setInt(2,copyInBorrow.getNewBorrow().getBorrowID());
 		if(ps.executeUpdate()==1) {
 			toReturn = new MyData("ExtensionSucceed");
@@ -413,20 +414,20 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		try {
 			ResultSet rs= db.select("SELECT violations.description, violations.violationDate FROM violations WHERE violations.memberID="+ id);
 			while (rs.next())
-				myHistory.add(new History( "Violation" ,rs.getString("description"), rs.getDate("violationDate")));
+				myHistory.add(new History( "Violation" ,rs.getString("description"), rs.getTimestamp("violationDate")));
 			ResultSet rs1= db.select("SELECT books.bookName, Borrows.borrowDate FROM books JOIN borrows WHERE borrows.bookID=books.bookID AND borrows.memberID="+ id);
 			while (rs1.next())
-				myHistory.add(new History( "Borrow" ,rs1.getString("bookName"), rs1.getDate("borrowDate")));
+				myHistory.add(new History( "Borrow" ,rs1.getString("bookName"), rs1.getTimestamp("borrowDate")));
 			ResultSet rs2= db.select("SELECT books.bookName, book_reservations.orderDate FROM books JOIN book_reservations WHERE books.bookID=book_reservations.bookID AND book_reservations.memberID="+ id);
 			while (rs2.next())
-				myHistory.add(new History( "order" ,rs2.getString("bookName"), rs2.getDate("orderDate")));
+				myHistory.add(new History( "order" ,rs2.getString("bookName"), rs2.getTimestamp("orderDate")));
 			ResultSet rs3= db.select("SELECT books.bookName, Borrows.actualReturnDate FROM books JOIN borrows WHERE borrows.bookID=books.bookID AND borrows.memberID="+ id);
 			while (rs3.next())
 				if(rs3.getDate("actualReturnDate")!=null)
-					myHistory.add(new History( "Return" ,rs3.getString("bookName"), rs3.getDate("actualReturnDate")));
+					myHistory.add(new History( "Return" ,rs3.getString("bookName"), rs3.getTimestamp("actualReturnDate")));
 			ResultSet rs4= db.select("SELECT books.bookName, extensions.newReturnDate FROM books JOIN borrows JOIN extensions WHERE borrows.bookID=books.bookID AND borrows.borrowID=extensions.borrowID AND borrows.memberID="+ id);
 			while (rs4.next()) {
-				myHistory.add(new History( "Extension" ,rs4.getString("bookName"), rs4.getDate("newReturnDate")));
+				myHistory.add(new History( "Extension" ,rs4.getString("bookName"), rs4.getTimestamp("newReturnDate")));
 			}
 			}
 		catch (SQLException e) {
@@ -556,8 +557,9 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		PreparedStatement ps = db.update(query);
 		ps.setInt(1, ((Borrow)bookAndBorrow.getData("theBorrow")).getMemberID());
 		ps.setInt(2,((Book)bookAndBorrow.getData("theCopy")).getBookID());
-		ps.setDate(3, ((Borrow)bookAndBorrow.getData("theBorrow")).getBorrowDate());
-		ps.setDate(4, ((Borrow)bookAndBorrow.getData("theBorrow")).getReturnDate());
+		Timestamp borrowDate = ((Borrow)bookAndBorrow.getData("theBorrow")).getBorrowDate();
+		ps.setTimestamp(3,((Borrow)bookAndBorrow.getData("theBorrow")).getBorrowDate());
+		ps.setTimestamp(4, ((Borrow)bookAndBorrow.getData("theBorrow")).getReturnDate());
 		if(ps.executeUpdate()==1) {
 			ResultSet rs = db.select("SELECT LAST_INSERT_ID()");
 			rs.next();
@@ -623,7 +625,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		public MyData returnCopy(MyData data) throws SQLException {
 		CopyInBorrow copy =  (CopyInBorrow) data.getData("copy");
 			java.util.Date today = new java.util.Date();
-			java.sql.Date sqlDate = new java.sql.Date(today.getTime());
+			Timestamp sqlDate = new Timestamp(today.getTime());
 			java.util.Date returnDate = new java.util.Date(copy.getNewBorrow().getReturnDate().getTime());
 			if(today.after(returnDate))
 			{
@@ -643,7 +645,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		
 			String query = "UPDATE borrows SET actualReturnDate = ? WHERE borrowID= '"+copy.getNewBorrow().getBorrowID()+"'";
 			PreparedStatement stmt = db.update(query);
-			stmt.setDate(1, sqlDate);
+			stmt.setTimestamp(1, sqlDate);
 			stmt.executeUpdate();
 			String deleteQuery = "DELETE FROM copy_in_borrow WHERE borrowID= ?";
 			PreparedStatement stmt1 = db.update(deleteQuery);
@@ -655,7 +657,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			if(db.hasResults(rs1)) {
 				String query1 = "UPDATE book_reservations SET arrivedDate = ? WHERE bookID= '"+copy.getBorroBook().getBookID()+"' and arrivedDate is null order by orderDate limit 1";
 				PreparedStatement stmt11 = db.update(query1);
-				stmt11.setDate(1, sqlDate);
+				stmt11.setTimestamp(1, sqlDate);
 				stmt11.executeUpdate();
 
 				String memberID = rs1.getString("memberID");
@@ -730,7 +732,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				toReturn = new MyData("noMessages");
 			else {
 				do {
-					theMessages.add(new Message(rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content")));
+					theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content")));
 				}while(rs.next());
 				toReturn = new MyData("messages");
 				toReturn.add("messages", theMessages);
@@ -740,10 +742,9 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		public MyData addViolation(MyData data) {
 			MyData ret=new MyData("fail");
 			try {
-				PreparedStatement ps = db.insert("INSERT INTO violations (`memberID`, `ViolationDate` , `description` , `violationType`) "
+				db.insertWithExecute("INSERT INTO violations (`memberID`, `ViolationDate` , `description` , `violationType`) "
 						+ "VALUES ('"+data.getData("id")+"' , '"+data.getData("violationDate")+
 						"' , '"+data.getData("violation")+"' , '"+data.getData("violationType")+"')");
-				ps.executeUpdate();
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
@@ -751,6 +752,15 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				}
 			ret.setAction("success");
 			return ret;
+		}
+		public MyData removeMsg(MyData data) throws SQLException {
+			Message toDelete = (Message)data.getData("toDelete");
+			String deleteQuery = "DELETE FROM messages WHERE msgID=?";
+			PreparedStatement ps = db.update(deleteQuery);
+			ps.setInt(1, toDelete.getMsgID());
+			if (ps.executeUpdate() == 1) 
+				return new MyData("removed");
+			return new MyData("failed");
 		}
 
 }

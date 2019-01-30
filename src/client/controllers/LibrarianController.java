@@ -3,16 +3,21 @@ package client.controllers;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.Date;
+import java.util.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
+import javax.print.attribute.standard.DateTimeAtCompleted;
+
 import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 
 import client.ClientConsole;
+import client.MyImage;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
@@ -33,6 +38,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -107,6 +113,7 @@ public class LibrarianController {
     	protected Member getMember() {
     		return member;
     	}
+
     	@FXML
 	    void replacePage(MouseEvent event) {
     		if(checkPossibility( event)==0)
@@ -214,9 +221,7 @@ public class LibrarianController {
     	    	MyData data=new MyData("addViolation");
     	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna add this violation?", "Press ok to add this violation.").get() == ButtonType.OK) {
     	    		data.add("id", member.getID());
-    	    		Calendar calendar = Calendar.getInstance();
-    	    		java.sql.Date ourJavaDateObject = new java.sql.Date(calendar.getTime().getTime());
-    		    	data.add("violationDate", ourJavaDateObject);
+    		    	data.add("violationDate", new Timestamp(System.currentTimeMillis()));
     	    		data.add("violation",exceptionEventList.getSelectionModel().getSelectedItem().toString() );
     	    		switch(exceptionEventList.getSelectionModel().getSelectedItem().toString()) {
     				case "LATE_RETURN":
@@ -335,10 +340,18 @@ public class LibrarianController {
 
     	    @FXML
     	    private TableColumn<Book, String> AvalCopiesCol;
-
+    	    
     	    
     	    @FXML
     	    void initialize() {
+    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
+    	    	        public void updateItem(LocalDate date, boolean empty) {
+    	    	            super.updateItem(date, empty);
+    	    	            LocalDate today = LocalDate.now();
+
+    	    	            setDisable(empty || date.compareTo(today) < 0 );
+    	    	        }
+    	    	    });
     	    	SearchResultTable.setVisible(false);
     	    	dateSelector.setVisible(false);
     	    	submitBorrow.setVisible(false);
@@ -445,8 +458,17 @@ public class LibrarianController {
 				return Math.abs(difference);
 			}
 			private void updateNewBorrow(Book newCopyToBorrow) {
-				Date fromPicker = Date.valueOf(returnDatePicker.getValue());
-				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Date(System.currentTimeMillis()) , fromPicker);
+				//Date fromPicker = Date.valueOf(returnDatePicker.getValue());
+				Date fromPicker = new Date();
+				fromPicker.setDate(returnDatePicker.getValue().getDayOfMonth());
+				int fix = returnDatePicker.getValue().getMonthValue() == 1 ? 12 : returnDatePicker.getValue().getMonthValue()-1;
+				fromPicker.setMonth(fix);
+				System.out.println(returnDatePicker.getValue().getYear());
+				fromPicker.setYear(returnDatePicker.getValue().getYear()-1900);
+				System.out.println(fromPicker);
+				Timestamp toServer = new Timestamp(fromPicker.getTime());
+				System.out.println(toServer);
+				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
 				MyData toSend = new MyData("newBorrowRequest");
 				toSend.add("theBorrow", newBorrow);
 				toSend.add("theCopy", newCopyToBorrow);
@@ -540,6 +562,72 @@ public class LibrarianController {
     	    		
 		    		
     	    }
+    	}
+    	protected class ManualExtension {
+
+    	    @FXML
+    	    private ImageView back_memberManagement;
+    	    @FXML
+    	    private DatePicker newReturnDate;
+    	    @FXML
+    	    private TableView<CopyInBorrow> borrowsTV;
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, String> bookNameCol;
+
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, String> bookAuthorCol;
+
+    	    @FXML
+    	    private TableColumn<CopyInBorrow, Date> returnDateCol;
+
+    	    @FXML
+    	    void initialize() {
+
+        	    	
+    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
+    	    			for(Borrow toCheck : member.getMemberCard().getBorrowHistory()) 
+    	    				if(isCurrBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck)))
+    	    					currBorrows.add(toCheck);
+    	    	    	MyData data = new MyData("getCopiesInBorrow");
+    	    	    	data.add("borrows", currBorrows);
+    	    	    	rc.getCC().send(data);
+    	    	    	switch(rc.getCC().getFromServer().getAction()) {
+    	    	    	case "copiesInBorrow":
+    	    	    		if((ArrayList<Book>) rc.getCC().getFromServer().getData("copies")==null) 
+    	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
+    	    	    		else {
+    	    	    			ArrayList<CopyInBorrow> copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
+    	    	    			borrowsTV.getItems().addAll(copies);
+    	    	    			bookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
+    	    	    			bookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
+    	    	    			returnDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Date>("returnDate"));
+    	    	    		}
+    	    	    		break;
+    	    	    		}
+    	    		}
+
+    		@FXML
+    		void entered(MouseEvent e) {
+    			rc.mouseEntered(e);
+    		}
+    		@FXML
+    		void exited(MouseEvent e) {
+    			rc.mouseExited(e);
+    		}
+
+    	    @FXML
+    	    void goBack(MouseEvent event) {
+    	    	rc.setBottom(event, "memberManagement");
+    	    }
+    	    protected boolean isCurrBorrow(int index) {
+    	    	return member.getMemberCard().getBorrowHistory().get(index).getReturnDate().after(new java.util.Date());
+
+    	    }
+    	    @FXML
+    	    void manualyExtend(MouseEvent event) {
+    	    	
+    	    }
+
     	}
     }
     
@@ -1002,6 +1090,9 @@ public class LibrarianController {
 
 	    @FXML
 	    private TableColumn<Message, Date> dateColumn;
+	    
+	    @FXML
+	    private ImageView deleteMsg;
 
 	    @FXML
 	    private TextFlow contentTF;
@@ -1022,6 +1113,28 @@ public class LibrarianController {
 	    		break;
 	    	}
 
+	    }
+
+	    @FXML
+	    void deleteMsg(MouseEvent event) {
+	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
+	    	MyData data = new MyData("deleteMsg");
+	    	data.add("toDelete", toDelete);
+	    	rc.getCC().send(data);
+	    	switch(rc.getCC().getFromServer().getAction()) {
+	    	case "removed":
+	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Message Removed From Inbox!", "Message has been deleted!");
+	    		contentTF.getChildren().clear();
+	    		messagesTV.getItems().clear();
+	    		initialize();
+	    		break;
+	    	case "failed":
+	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Could Not Remove Message!", "Message has not been removed!");
+	    		contentTF.getChildren().clear();
+	    		messagesTV.getItems().clear();
+	    		initialize();
+	    		break;
+	    	}
 	    }
 	    @FXML
 	    void entered(MouseEvent event) {
@@ -1044,4 +1157,5 @@ public class LibrarianController {
 	    		contentTF.getChildren().add(msg);
 	    	}
 	    }
+
 }

@@ -1,15 +1,15 @@
 package common;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class History implements Serializable {
 
 	private String name;
 	private final String type;
-	private Date actualDate;
+	private Timestamp actualDate;
 	
-	public History( String type,String name, Date actualDate) {
+	public History( String type,String name, Timestamp actualDate) {
 		super();
 		this.type = type;
 		this.actualDate = actualDate;
@@ -24,11 +24,11 @@ public class History implements Serializable {
 		this.name = name;
 	}
 
-	public Date getActualDate() {
+	public Timestamp getActualDate() {
 		return actualDate;
 	}
 
-	public void setActualDate(Date actualDate) {
+	public void setActualDate(Timestamp actualDate) {
 		this.actualDate = actualDate;
 	}
 

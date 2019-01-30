@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,7 +36,8 @@ import ocsf.server.ConnectionToClient;
  */
 public class EchoServer extends AbstractServer 
 {
-  //Class variables *************************************************
+  private static final float MILLISECONDS_PER_DAY = 86400000;
+//Class variables *************************************************
   
   /**
    * The default port to listen on.
@@ -98,11 +100,11 @@ public class EchoServer extends AbstractServer
 		{
 
 			java.util.Date today = new java.util.Date();
-			java.sql.Date returnDate = rs.getDate("returnDate");
+			Timestamp returnDate = rs.getTimestamp("returnDate");
 			int memberID = rs.getInt("memberID");
 			java.util.Date returnDateUTIL = new java.util.Date(returnDate.getTime());
 			//int days = (int) daysBetween(returnDateUTIL,borrowDateUTIL);
-			long days = getDifferenceDays(today,returnDateUTIL) ;
+			float days = daysBetween(today, returnDateUTIL) ;
 			if (days>0)
 			{
 				int borrowID = rs.getInt("borrowID");
@@ -117,12 +119,12 @@ public class EchoServer extends AbstractServer
 				ResultSet rs4 = db.select(checkQuery);
 				if(!db.hasResults(rs4)) {
 				 	java.util.Date today1 = new java.util.Date();
-				 	java.sql.Date sqlDate = new java.sql.Date(today1.getTime());
+				 	Timestamp sqlDate = new Timestamp(today1.getTime());
 					String query = "INSERT INTO violations(memberID,ViolationDate,description,violationType,lateOn) "
 							+ "VALUES(?,?,?,?,?)";
 					PreparedStatement ps = db.update(query);
 					ps.setInt(1, memberID);
-					ps.setDate(2,sqlDate);
+					ps.setTimestamp(2,sqlDate);
 					ps.setString(3, "late return");
 					ps.setInt(4, 0);
 					ps.setInt(5, borrowID);
@@ -130,7 +132,7 @@ public class EchoServer extends AbstractServer
 				}
 
 			}
-			else if(days==1)
+			if(getDifferenceDays(today,returnDateUTIL)==1)
 			{
 				String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
 				ResultSet rs2 = db.select(emailQuery);
@@ -151,23 +153,27 @@ public class EchoServer extends AbstractServer
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
+	private float daysBetween(java.util.Date one, java.util.Date date) { 
+		float difference = (one.getTime()-date.getTime())/MILLISECONDS_PER_DAY; 
+		return difference;
+	}
 
 	 private void CancleResevion() throws SQLException
 	 {
 		 	java.util.Date today = new java.util.Date();
-		 	java.sql.Date sqlDate = new java.sql.Date(today.getTime());
+		 	Timestamp sqlDate = new Timestamp(today.getTime());
 			String MyQuery = "SELECT * FROM book_reservations WHERE arrivedDate is not null ";
 			ResultSet rs = db.select(MyQuery);
 			while (rs.next()) 
 			{
 				int memberID = rs.getInt("memberID");
 				int bookID = rs.getInt("bookID");
-				java.sql.Date arrivedDate = rs.getDate("arrivedDate");
+				Timestamp arrivedDate = rs.getTimestamp("arrivedDate");
 				java.util.Date arrivedDateUTIL = new java.util.Date(arrivedDate.getTime());
 				//int days = (int) daysBetween(today,arrivedDateUTIL);
 				//int days = today.compareTo(arrivedDateUTIL);
-				long days = getDifferenceDays(today,arrivedDateUTIL) ;
-				if(days>1)
+				float days = daysBetween(today, arrivedDateUTIL);
+				if(days>2)
 				{
 					String deleteQuery = "DELETE FROM book_reservations WHERE memberID= ? AND bookID = ?";
 					PreparedStatement stmt1 = db.update(deleteQuery);
@@ -177,7 +183,7 @@ public class EchoServer extends AbstractServer
 
 					String query1 = "UPDATE book_reservations SET arrivedDate = ? WHERE bookID= '"+bookID+"' and arrivedDate is null order by orderDate limit 1";
 					PreparedStatement stmt11 = db.update(query1);
-					stmt11.setDate(1, sqlDate);
+					stmt11.setTimestamp(1, sqlDate);
 					stmt11.executeUpdate();
 
 					String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
@@ -214,6 +220,9 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
+	  		    case "deleteMsg":
+	  		    	client.sendToClient(serverCont.removeMsg(data));
+	  		    	break;
 		  		  case "notify_graduation":
 		  		    	client.sendToClient(serverCont.notifyGraduation((Integer)data.getData("id")));
 		  		    		break;

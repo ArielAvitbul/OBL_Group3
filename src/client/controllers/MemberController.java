@@ -1,6 +1,8 @@
 package client.controllers;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import client.ClientConsole;
@@ -196,7 +198,7 @@ public class MemberController {
 	    	    private TableColumn<CopyInBorrow, String> BookNameCol;
 	    	    
 	    	    @FXML
-	    	    private TableColumn<CopyInBorrow, Date> RetDateCol;
+	    	    private TableColumn<CopyInBorrow, Timestamp> RetDateCol;
 	    	    
 	    	    @FXML
 	    	    private TableColumn<CopyInBorrow, String> BookAuthorCol;
@@ -223,7 +225,7 @@ public class MemberController {
 	    	    			ExtensionCurrBooks.getItems().addAll(copies);
 	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
 	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
-	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Date>("returnDate"));
+	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Timestamp>("returnDate"));
 	    	    			
 	    	    		}
 	    				rc.addTo(ExtensionAnPane, new MyImage("askForExtend", "\\client\\images\\buttons\\askForExtend.jpg", 231, 358, e->submitExtensionRequest(e)), true);
@@ -233,7 +235,8 @@ public class MemberController {
 	    	    
 
 				private boolean isExtendableBorrow(int i) {
-					if(rc.getDifferenceDays(member.getMemberCard().getBorrowHistory().get(i).getReturnDate(),(java.util.Date)new Date(System.currentTimeMillis()))>8)
+					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
+					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
 						return false;
 					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
 				}	  

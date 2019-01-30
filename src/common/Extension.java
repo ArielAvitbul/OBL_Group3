@@ -1,14 +1,14 @@
 package common;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Extension {
 
 	private final int memberID;
 	private final int borrowID;
-	private Date newReturnDate;
+	private Timestamp newReturnDate;
 	
-	public Extension(int memberID, Borrow newBorrow,Date newReturnDate) {
+	public Extension(int memberID, Borrow newBorrow,Timestamp newReturnDate) {
 		super();
 		this.memberID = memberID;
 		this.borrowID = newBorrow.getBorrowID();
@@ -24,11 +24,11 @@ public class Extension {
 		return borrowID;
 	}
 
-	public Date getNewReturnDate() {
+	public Timestamp getNewReturnDate() {
 		return newReturnDate;
 	}
 
-	public void setNewReturnDate(Date newReturnDate,Borrow newBorrow) {
+	public void setNewReturnDate(Timestamp newReturnDate,Borrow newBorrow) {
 		this.newReturnDate = newReturnDate;
 		newBorrow.setReturnDate(newReturnDate);
 	}

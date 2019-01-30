@@ -1,7 +1,7 @@
 package common;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -11,11 +11,11 @@ public class Borrow implements Serializable {
 	private int borrowID;
 	private final int bookID;
 	private final int memberID;
-	private final Date borrowDate;
-	private Date returnDate;
-	private Date actualReturnDate;
+	private final Timestamp borrowDate;
+	private Timestamp returnDate;
+	private Timestamp actualReturnDate;
 	
-	public Borrow(int borrowID,int bookID, int memberID, Date borrowDate, Date returnDate, Date actualReturnDate) {
+	public Borrow(int borrowID,int bookID, int memberID, Timestamp borrowDate, Timestamp returnDate, Timestamp actualReturnDate) {
 		super();
 		this.borrowID = borrowID;
 		this.bookID=bookID;
@@ -25,7 +25,7 @@ public class Borrow implements Serializable {
 		this.actualReturnDate = actualReturnDate;
 	}
 
-	public Borrow(int bookID, int memberID, Date date, Date fromPicker) {
+	public Borrow(int bookID, int memberID, Timestamp date, Timestamp fromPicker) {
 		this.bookID=bookID;
 		this.memberID = memberID;
 		this.borrowDate = date;
@@ -46,27 +46,27 @@ public class Borrow implements Serializable {
 		return memberID;
 	}
 
-	public Date getBorrowDate() 
+	public Timestamp getBorrowDate() 
 	{
 		return borrowDate;
 	}
 
-	public Date getReturnDate() 
+	public Timestamp getReturnDate() 
 	{
 		return returnDate;
 	}
 
-	public void setReturnDate(Date returnDate) 
+	public void setReturnDate(Timestamp returnDate) 
 	{
 		this.returnDate = returnDate;
 	}
 
-	public Date getActualReturnDate() 
+	public Timestamp getActualReturnDate() 
 	{
 		return actualReturnDate;
 	}
 
-	public void setActualReturnDate(Date actualReturnDate) 
+	public void setActualReturnDate(Timestamp actualReturnDate) 
 	{
 		this.actualReturnDate = actualReturnDate;
 	}
