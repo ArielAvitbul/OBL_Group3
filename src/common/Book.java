@@ -42,6 +42,12 @@ public class Book implements Serializable{
 		this.bookID = bookID;
 		this.bookName = bookName;
 	}
+	public String getAvlible() 
+	{
+		if(currentNumberOfCopies>0)
+		return "Yes";
+		else return "No";
+	}
 
 	public int getBookID() 
 	{

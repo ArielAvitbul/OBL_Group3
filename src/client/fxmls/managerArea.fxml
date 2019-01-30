@@ -15,17 +15,13 @@
             <Image url="@../images/texts/titles/managerArea.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="managerReport" layoutX="387.0" layoutY="183.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#produceReport" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/produceReport.png" />
-         </image>
-      </ImageView>
-      <ComboBox fx:id="ReportBox" layoutX="376.0" layoutY="148.0" prefWidth="150.0" />
-      <ImageView fx:id="saveInfo1" layoutX="397.0" layoutY="121.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/texts/select_report_type.png" />
-         </image>
-      </ImageView>
-      <HBox layoutX="400.0" layoutY="60.0" prefHeight="32.0" prefWidth="103.0" spacing="15.0" />
+      <HBox layoutX="400.0" layoutY="60.0" prefHeight="32.0" prefWidth="103.0" spacing="15.0">
+         <children>
+            <ImageView fx:id="report" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/produceReport.png" />
+               </image>
+            </ImageView>
+         </children></HBox>
    </children>
 </AnchorPane>

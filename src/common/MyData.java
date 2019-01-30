@@ -10,6 +10,9 @@ public class MyData implements Serializable{
 		this.action=datatype;
 		this.data = new HashMap<>();
 	}
+	public MyData() {
+		this.data = new HashMap<>();
+	}
 	public MyData(String datatype, String what, Object item) {
 		this.action=datatype;
 		this.data = new HashMap<>();

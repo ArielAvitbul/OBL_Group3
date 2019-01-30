@@ -1,8 +1,11 @@
 package server;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -37,7 +40,7 @@ public class ServerController {
 	public ArrayList<Book> getAllBooks() {
 		ArrayList<Book> books = new ArrayList<>();
 		try {
-		ResultSet rs = db.select("SELECT * from books");
+			ResultSet rs = db.select("SELECT * from books WHERE deleted = '0'");
 		while (rs.next()) {//TODO: add table of content PDF.
 			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 			books.add(book);
@@ -48,8 +51,7 @@ public class ServerController {
 		return books;
 	}
 	public Book getBook(int bookID) throws SQLException {
-		ResultSet rs = db.select("SELECT * from books WHERE bookid="+ bookID);
-		if (db.hasResults(rs))
+		ResultSet rs = db.select("SELECT * from books WHERE deleted = '0' AND bookid="+ bookID);		if (db.hasResults(rs))
 			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 		return null;
 	}
@@ -59,7 +61,8 @@ public class ServerController {
 	 * Guy Wrote This
 	 */
 	public MyData login (MyData data) throws SQLException {
-		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ="+ data.getData("id")+" AND password ="+data.getData("password"));
+		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ='"+ data.getData("id")+"' AND password ='"+data.getData("password")+"'");
+
 		MyData ret = new MyData("login_failed");
 		if(!db.hasResults(memberMatch))
 			ret.add("reason", "ID or password incorrect");
@@ -75,7 +78,7 @@ public class ServerController {
 		return ret;
 	}
 	
-	public void setLoggedIn(boolean value, int id) throws SQLException { // TODO change name to id...
+	public void setLoggedIn(boolean value, int id) throws SQLException {
 		PreparedStatement ps = db.update("UPDATE members SET loggedin =? WHERE id =?");
 		ps.setBoolean(1, value);
 		ps.setInt(2, id);
@@ -139,8 +142,8 @@ public class ServerController {
 		ResultSet rs = db.select("SELECT * from member_cards WHERE userID = "+ id);
 		if (db.hasResults(rs))
 		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), getMemberBorrows(id), getMemberViolations(id), getMemberReservations(id),rs.getInt("lateReturns"));
-		return new MemberCard(); // TODO: incase no member card exists in the db, perhaps remove this later
-	}
+		return null;
+		}
 		/* function to get all of the specified member borrows
 		 * input: memberID (unique) , MyDB instance.
 		 * output: array of borrows.
@@ -229,11 +232,44 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 			      return data;
 			    }
 			catch (Exception e) {
-				System.out.println("Error send (Files)msg) to Server");
+				System.out.println("Error send (Files)msg) to Client");
 			}
 		return data;
 		
 	}
+public MyData deleteBook(MyData data) throws SQLException {
+	Book book =  (Book) data.getData("book");
+ResultSet rs1 = db.select("SELECT * FROM copy_in_borrow where BookID ='" + book.getBookID()+"'");
+if(!db.hasResults(rs1)) {
+	String query1 = "UPDATE books SET deleted = '1' WHERE bookID= '"+book.getBookID()+"'";
+	db.updateWithExecute(query1);
+	data.setAction("succeed");
+	data.add("succeed", "Return book is succeed");
+	return data;
+}
+else {
+data.setAction("book_in_borrow");
+data.add("book_in_borrow", "One or more of the copies is still borrow.");
+return data;
+}
+}
+public MyData getClosedReturnBook(MyData data) throws SQLException {
+	Book book =  (Book) data.getData("book");
+	ResultSet rs1 = db.select("SELECT * FROM borrows where bookID ='" + book.getBookID()+"' and actualReturnDate is null order by returnDate limit 1");
+	if(db.hasResults(rs1)) {
+	Date returnDate = rs1.getDate("returnDate");
+	System.out.println(returnDate);
+	data.setAction("succeed");
+	data.add("returnDate", returnDate);
+	return data;
+
+	}
+else {
+	data.setAction("fail");
+	data.add("fail", "The book is not borrow.");
+	return data;
+	}
+}
 public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
@@ -252,6 +288,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName , ArrayList<String>freeTxt) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<Book> result = new ArrayList<>();
+		String h;
 		for (Book b : getAllBooks()) {
 			if (compareStrings(b.getBookName(),bookName) &&	compareStrings(b.getAuthorsNames(),authorsName)) {
 				boolean flag=true;
@@ -399,17 +436,18 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return ret;
 	}
 	
-	public MyData addNewBook(MyData data) {
+	public MyData addNewBook(MyData data) throws IOException, SQLException {
 		MyData ret=new MyData("fail");
 		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
 		try {
 			PreparedStatement ps = db.insert("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
-					+ " , `shellLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`) "
+					+ " , `shellLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`,`deleted`) "
 					+ "VALUES ('"+data.getData("bookName")+"' , '"+data.getData("authorsNames")+
 					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
 					"' , '"+data.getData("shellLocation")+"' , ? , '"+data.getData("topics")+"' , '"+data.getData("currentNumberOfCopies")+
-					"' , '"+data.getData("purchaseDate")+"')");
+					"' , '"+data.getData("purchaseDate")+"', ?)");
 			ps.setBoolean(1, (Boolean)data.getData("isPopular"));
+			ps.setBoolean(2, false);
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {
@@ -420,33 +458,55 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		e.printStackTrace();
 		return ret;
 		}
+		ResultSet rs = db.select("SELECT LAST_INSERT_ID()");
+		rs.next();
+		int bookid = rs.getInt(1);
+		MyFile mf = (MyFile) data.getData("getFile");
+    	File newFile = new File(mf.getWriteToPath()+"/"+bookid+".pdf");
+		  if (!newFile.exists()) 
+			newFile.createNewFile();
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
+		bos.write(mf.getMybytearray(), 0, mf.getSize());
+		bos.close();
 		ret.setAction("success");
 		return ret;
 	}
 	
-	public MyData updateBook(MyData data) throws SQLException  {
+	public MyData updateBook(MyData data) throws SQLException, IOException  {
 		MyData bookToUpdate;
-		if(((Integer)data.getData("numberOfCopies"))==0) {
-			if (db.updateWithExecute("DELETE FROM books WHERE bookID="+data.getData("bookID"))==1) {
-				bookToUpdate=new MyData("success");
-				bookToUpdate.add("updatedBook", data);
-				return bookToUpdate;
-			}
-		}
-		else {
+
 			String query= "UPDATE books SET shellLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=?, topics='"+data.getData("genres")+"' WHERE bookID="+data.getData("bookID");
 			PreparedStatement ps=db.update(query);
 			ps.setString(1, (String) data.getData("shellLocation"));
+			Integer num = (Integer)data.getData("numberOfCopies");
+			if(num.intValue()>=0)
 			ps.setInt(2, (Integer)data.getData("numberOfCopies"));
+			else {
+				bookToUpdate=new MyData("number_of_copies_less_than_zero");
+				bookToUpdate.add("copies_faild", data);
+				return bookToUpdate;
+			}
 			ps.setInt(3, (Integer)data.getData("currentNumberOfCopies"));
 			ps.setFloat(4, (Float)data.getData("editionNumber"));
 			ps.setBoolean(5, (Boolean)data.getData("isPopular"));
+			//guyguy
+
+			if((Boolean) data.getData("FileChose"))
+			{
+			MyFile mf = (MyFile) data.getData("getFile");
+	    	File newFile = new File(mf.getWriteToPath()+"/"+data.getData("bookID")+".pdf");
+			  if (!newFile.exists()) 
+				newFile.createNewFile();
+	        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
+			bos.write(mf.getMybytearray(), 0, mf.getSize());
+			bos.close();
+			}
+		//guyguy
 			if(ps.executeUpdate()==1) {
 				bookToUpdate=new MyData("success");
 				bookToUpdate.add("updatedBook", data);
 				return bookToUpdate;
 			}
-		}
 		bookToUpdate=new MyData("failed");
 		bookToUpdate.add("reason", new String("there was an error"));
 		return bookToUpdate;
@@ -466,16 +526,20 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("lateMembers", rs.getInt("lateMembers"));
 			}
 			break;
-		 case "Borrow Report":
-			 rs = db.select("select sum(returnDate-borrowDate) as regular, (select sum(returnDate-borrowDate) from books join borrows where isPopular=1 and borrows.bookID=books.bookID) as popular from books join borrows where isPopular=0 and borrows.bookID=books.bookID");
-			 if (rs.next()) {
-				 data.add("regular", rs.getInt("regular"));
-				 data.add("popular", rs.getInt("popular"));
+		 case "Borrow Report": // TODO: maybe get only 1 view, by not using getBook
+			 HashMap<Book,ArrayList<Integer>> books = new HashMap<>();
+			 rs = db.select("select books.bookID, ifnull(returnDate-borrowDate,0) as borrowDuration from borrows right join books on books.bookID = borrows.bookID order by bookID");
+			 while (rs.next()) {
+				 Book book = getBook(rs.getInt("bookID"));
+				 if (!books.containsKey(book))
+				 books.put(book, new ArrayList<>());
+				 books.get(book).add(rs.getInt("borrowDuration"));
 			 }
+			 data.add("books", books);
 			 break;
 		 case "Late Return Report":
 				HashMap<String,Integer> result = new HashMap<>();
-				rs= db.select("select books.bookName,count(books.bookName) as amount from books join copy_in_borrow where books.bookID=copy_in_borrow.BookID  group by books.bookName union select bookName,0 from books where bookID not in (select bookID from copy_in_borrow)");
+				rs= db.select("select books.bookName,count(books.bookName) as amount from books join copy_in_borrow WHERE deleted = '0' AND books.bookID=copy_in_borrow.BookID  group by books.bookName union select bookName,0 from books WHERE deleted = '0' AND bookID not in (select bookID from copy_in_borrow)");
 				while (rs.next())
 					result.put(rs.getString("bookName"), rs.getInt("amount"));
 				data.add("result", result);
@@ -586,9 +650,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			stmt1.setInt(1, copy.getNewBorrow().getBorrowID());
 			stmt1.executeUpdate();
 			
-			String reservationQuery = "SELECT * FROM book_reservations WHERE bookID='"+copy.getBorroBook().getBookID()+"'";
+			String reservationQuery = "SELECT * FROM book_reservations WHERE bookID='"+copy.getBorroBook().getBookID()+"' and arrivedDate is null order by orderDate limit 1";
 			ResultSet rs1 = db.select(reservationQuery);
 			if(db.hasResults(rs1)) {
+				String query1 = "UPDATE book_reservations SET arrivedDate = ? WHERE bookID= '"+copy.getBorroBook().getBookID()+"' and arrivedDate is null order by orderDate limit 1";
+				PreparedStatement stmt11 = db.update(query1);
+				stmt11.setDate(1, sqlDate);
+				stmt11.executeUpdate();
+
 				String memberID = rs1.getString("memberID");
 				String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
 				ResultSet rs2 = db.select(emailQuery);
@@ -609,6 +678,42 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("succeed", "Return book is succeed");
 			return data;
 		}
+		/**
+		 * @author Ariel
+		 * @param studentid - Student's ID
+		 * @return the MyData's data key "message" will contain the message received from server.
+		 * @return the action will be Success/Fail
+		 * @throws SQLException
+		 */
+		protected MyData notifyGraduation(int studentid) throws SQLException {
+			MyData data = new MyData();
+			int status;
+			ResultSet rs = db.select("SELECT * FROM members WHERE id ="+ studentid);
+			if (!db.hasResults(rs)) { // no such student in DB
+				data.setAction("Fail");
+				 data.add("message", "Student was not found");
+				 return data;
+			}
+			if (rs.getBoolean("graduated")) { // if true : student already known as graduated.
+				data.setAction("Fail");
+				 data.add("message", "OBL is was already updated regarding this student's graduation.");
+				 return data;
+			}
+			 // check is student has copies in borrow
+			status = db.select("SELECT * FROM borrows join copy_in_borrow WHERE borrows.borrowID=copy_in_borrow.BookID AND memberID="+studentid).next() ? 1 : 2;
+			 PreparedStatement ps = db.update("UPDATE members SET graduated=?,status=? where id=?");
+			 ps.setBoolean(1, true);
+			 ps.setString(2, Member.Status.values()[status].toString());
+			 ps.setInt(3, studentid);
+			 if (ps.executeUpdate()==1) {
+				 data.setAction("Success");
+				 data.add("message", "Successfuly updated the system.");
+			 } else {
+				 data.setAction("Fail");
+				 data.add("message", "Failed to update the system");
+			 }
+			 return data;
+		  }
 		/**
 		 * @author Good Guy
 		 * @param librarianID

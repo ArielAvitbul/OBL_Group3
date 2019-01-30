@@ -19,7 +19,11 @@ public class CopyInBorrow implements Serializable {
 		returnDate = newBorrow.getReturnDate();
 		this.copyNumber = copyNumber;
 	}
-	
+	public Date getBorrowDate() 
+	{
+		return newBorrow.getBorrowDate();
+	}
+
 	public SimpleStringProperty borroBook() {
 		return new SimpleStringProperty(borroBook.getBookName());
 	}

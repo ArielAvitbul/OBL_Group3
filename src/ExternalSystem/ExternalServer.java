@@ -1,12 +1,10 @@
-package client;
+package ExternalSystem;
 
 import java.io.IOException;
 import java.util.Optional;
 
-import client.controllers.ReaderController;
 import common.ChatClient;
 import common.CommonIF;
-import common.Member;
 import common.MyData;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -33,56 +32,38 @@ import javafx.stage.WindowEvent;
  * @author Dr Robert Lagani&egrave;re
  * @version July 2000
  */
-public class ClientConsole extends Application implements CommonIF 
+public class ExternalServer extends Application implements CommonIF 
 {
   //Class variables *************************************************
-	@FXML
-    private TextField ipField;
-    @FXML
-    private TextField portField;
-    protected class GraduationForm {
-  	  @FXML
-  	    private TextField idField;
-  	  @FXML
-  	    void notify(MouseEvent event) {
-  		  MyData data = new MyData("notify_graduation");
-  		  data.add("id", Integer.parseInt(idField.getText()));
-  		  send(data);
-  		  newAlert(AlertType.INFORMATION, null, fromServer.getAction(), (String)fromServer.getData("message"));
-  	    }
+  protected class GraduationForm {
+	  @FXML
+	    private TextField idField;
+	  @FXML
+	    void notify(MouseEvent event) {
+		  MyData data = new MyData("notify_graduation");
+		  data.add("id", Integer.parseInt(idField.getText()));
+		  send(data);
+		  newAlert(AlertType.INFORMATION, null, fromServer.getAction(), (String)fromServer.getData("message"));
+	    }
 
-    }
+  }
   /**
    * The instance of the client that created this ConsoleChat.
    */
   protected ChatClient client;
   protected MyData fromServer;
-  private int userid=-1;
+  @FXML
+  private TextField ipField;
+  @FXML
+  private TextField portField;
   @FXML
   void connect(MouseEvent event) {
       try {
 		client= new ChatClient(ipField.getText(), Integer.parseInt(portField.getText()), this);
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/gui.fxml"));
-		loader.setController(new ReaderController(this));
-		((Stage)ipField.getScene().getWindow()).close();
-		Stage stage = new Stage();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("graduationForm.fxml"));
+		loader.setController(this.new GraduationForm());
+		Stage stage = (Stage)ipField.getScene().getWindow();
 		stage.setScene(new Scene(loader.load()));
-		stage.show();
-		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				if (userid!=-1) {
-					MyData data = new MyData("client_stopped");
-					data.add("id", userid);
-					send(data);
-					}
-					try {
-						client.closeConnection();
-					} catch (IOException e) {e.printStackTrace();}
-					Platform.exit();
-			        System.exit(0);
-			}
-		});
       }
 	    catch (IOException e) 
 	    {
@@ -93,7 +74,6 @@ public class ClientConsole extends Application implements CommonIF
   		portField.clear();
   	}
   }
-  
   //Instance methods ************************************************
   
   /**
@@ -115,11 +95,6 @@ public class ClientConsole extends Application implements CommonIF
   public void handle(Object message)
   {
 	  fromServer = (MyData) message;
-	  System.out.println("Client received: "+ fromServer.getAction() +": "+ fromServer.getData());
-	  if (fromServer.getAction().equals("login_approved"))
-			  this.userid = ((Member)fromServer.getData("MemberLoggedIn")).getID();
-	  else if (fromServer.getAction().equals("successful_logout"))
-		  this.userid = 0; // back to default, forget the user.
   }
   public MyData getFromServer() {
 	  return fromServer;
@@ -129,21 +104,29 @@ public class ClientConsole extends Application implements CommonIF
   
   /**
    * This method is responsible for the creation of the Client GUI.
-   * @throws IOException
    */
 	@Override
-	public void start(Stage primaryStage) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/connectToServerGUI.fxml"));
-		Scene scene = new Scene(loader.load());
+	public void start(Stage primaryStage) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("externalSystem.fxml"));
+			AnchorPane root = loader.load();
+			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			primaryStage.show();
-	primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-		@Override
-		public void handle(WindowEvent event) {
-				Platform.exit();
-		        System.exit(0);
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+				@Override
+				public void handle(WindowEvent event) {
+						Platform.exit();
+				        System.exit(0);
+				}
+			});
 		}
-	});
+		catch(IOException exception) 
+	    {
+	      System.out.println("Error: Can't setup connection! Terminating client.");
+	      exception.printStackTrace();
+	      System.exit(1);
+	    }
 	}
 	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
@@ -156,6 +139,5 @@ public class ClientConsole extends Application implements CommonIF
 	{
 		launch(args);
 	}
-
 }
 //End of ConsoleChat class

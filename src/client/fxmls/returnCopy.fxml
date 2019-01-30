@@ -10,11 +10,10 @@
    <children>
       <TableView fx:id="returnsTable" layoutX="226.0" layoutY="121.0" prefHeight="249.0" prefWidth="483.0">
          <columns>
-            <TableColumn fx:id="bookNameCol" prefWidth="116.00003051757812" text="Book Name" />
-            <TableColumn fx:id="borrowIDCol" minWidth="0.0" prefWidth="84.79998779296875" text="Borrow ID" />
-            <TableColumn fx:id="borrowDateCol" prefWidth="95.199951171875" text="Borrow Date" />
-            <TableColumn fx:id="returnDateCol" prefWidth="91.19998168945312" text="Return Date" />
-            <TableColumn fx:id="copyNumberCol" prefWidth="95.199951171875" text="Copy Number" />
+            <TableColumn fx:id="bookNameCol" prefWidth="132.0" text="Book Name" />
+            <TableColumn fx:id="borrowDateCol" prefWidth="119.199951171875" text="Borrow Date" />
+            <TableColumn fx:id="returnDateCol" prefWidth="116.80007934570312" text="Return Date" />
+            <TableColumn fx:id="copyNumberCol" prefWidth="112.79998779296875" text="Copy Number" />
          </columns></TableView>
       <ImageView fx:id="back_memberManagement" layoutX="416.0" layoutY="69.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>

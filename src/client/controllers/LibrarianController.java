@@ -1,5 +1,8 @@
 package client.controllers;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.Date;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -14,14 +17,18 @@ import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
 import common.Librarian;
+import common.Manager;
 import common.Member;
 import common.MemberCard;
 import common.Message;
 import common.MyData;
+import common.MyFile;
 import common.Violation;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Orientation;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -45,6 +52,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 
 public class LibrarianController {
 	private ReaderController rc;
@@ -121,7 +129,10 @@ public class LibrarianController {
 		}
     	@FXML
     	void initialize() {
+    		if (librarian instanceof Manager) 
     			statusBox.getItems().addAll(Member.Status.values());
+    		else
+    			statusBox.getItems().add(member.getStatus());
     			statusBox.getSelectionModel().select(member.getStatus());
     			usernameField.setText(member.getUserName());
     			idField.setText(String.valueOf(member.getID()));
@@ -457,7 +468,6 @@ public class LibrarianController {
     		@FXML
 			void initialize() {
     			bookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, String>("borroBook"));
-    			borrowIDCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Integer>("BorrowID"));
     			borrowDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Object>("BorrowDate"));
     			returnDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Object>("returnDate"));
     			copyNumberCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow, Integer>("CopyNumber"));
@@ -472,15 +482,13 @@ public class LibrarianController {
 	    			}
 	    			else if (result.equals("unfind_borrows_Book")) {
 		    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No books found", (String)rc.getCC().getFromServer().getData("reason"));
+		    			isEmpty = 1;
 		    			}
 	    		}
-    		
+    		int isEmpty = 0;
 		    @FXML
     	    private TableColumn<CopyInBorrow, String> bookNameCol;
-
-    	    @FXML
-    	    private TableColumn<CopyInBorrow, Integer> borrowIDCol;
-    	    
+    
     	    @FXML
     	    private TableColumn<CopyInBorrow, Object> borrowDateCol;
     	    
@@ -515,7 +523,8 @@ public class LibrarianController {
     	    @FXML
     	    void returnCopyIsSelected(MouseEvent event) {
     	    	CopyInBorrow copy = returnsTable.getSelectionModel().getSelectedItem();
-    	    	
+    	    	if(copy !=null)
+    	    	{
     	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+copy.getBorroBook().getBookName()+" to return.\nPress OK to continue!").get()==ButtonType.OK) {
 		    		MyData returnCopy = new MyData("copyToReturn");
 		    		returnCopy.add("copy", copy);
@@ -526,6 +535,8 @@ public class LibrarianController {
 		    			}
 	    			goBack(null);
 	    			}
+    	    	}
+    	    	else if(copy==null&&isEmpty==0) ClientConsole.newAlert(AlertType.INFORMATION, null, "Book is not choose","Plese Choose Book" );
     	    		
 		    		
     	    }
@@ -604,14 +615,44 @@ public class LibrarianController {
 			colTopicInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			colAuthorsInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
 		}
-		@FXML
+		/*@FXML
 		 void handle(MouseEvent event) {
 		       if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && 
 		            ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna update this book?", "Once changed, the old information would be lost.").get() == ButtonType.OK)
 		            	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
-		        }
+		        }*/
+	    @FXML
+	    void goToUpdate(MouseEvent event) {
+	    	if(inventoryTable.getSelectionModel().getSelectedItem() !=null)
+	    	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
+	    	else ClientConsole.newAlert(AlertType.INFORMATION, null, "Book Not Choose", "Plese chose book from the list.");
+	    }
+	    @FXML
+	    void deleteChosen(MouseEvent event) {
+	    	Book book = inventoryTable.getSelectionModel().getSelectedItem();
+
+	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+book.getBookName()+" to delete.\nPress OK to continue!").get()==ButtonType.OK) {
+	    		MyData deleteBook = new MyData("deleteBook");
+	    		deleteBook.add("book", book);
+	    		rc.getCC().send(deleteBook);
+	    		String result = (String)rc.getCC().getFromServer().getAction();
+	    		if (result.equals("succeed")) {
+	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "The book is delete", (String)rc.getCC().getFromServer().getData("succeed"));
+	    			}
+	    		else if (result.equals("book_in_borrow")) {
+	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Cant delete book", (String)rc.getCC().getFromServer().getData("book_in_borrow"));
+	    			}
+	    	}
+	    }
 		@FXML
 		private TableView<Book> inventoryTable;
+		
+	    @FXML
+	    private ImageView delButton;
+
+	    @FXML
+	    private ImageView upButton;
+
 	    @FXML
 	    private TableColumn<Book, String> colNameInventory;
 
@@ -643,13 +684,15 @@ public class LibrarianController {
 	    	}
 	    	@FXML
 	    	void initialize() {
+	    		choicePopular.getItems().addAll("Yes","No");
 	    		bookName.setText(book.getBookName());
 	    		authors.setText(book.getAuthorsNames());
 	    		editionNumber.setText(String.format("%s", book.getEditionNumber()));
 	    		shortDescription.setText(book.getShortDescription());
 	    		numberOfCopies.setText(String.format("%s", book.getNumberOfCopies()));
 	    		if(book.isPopular()==true)
-	    			Popular.setSelected(true);
+	    			choicePopular.getSelectionModel().select("Yes");
+	    		else choicePopular.getSelectionModel().select("No");
 	    		shellLocation.setText(book.getShellLocation());
 	    		if(book.getTopics().contains("Kids"))
 	    			Kids.setSelected(true);
@@ -664,6 +707,9 @@ public class LibrarianController {
 	    		if(book.getTopics().contains("TextBook"))
 	    			TextBook.setSelected(true);
 	    	}
+    		File newFile;
+    	    @FXML
+    	    private ChoiceBox<String> choicePopular;
 	    	 @FXML
 	    	    private TextField bookName;
 
@@ -717,6 +763,21 @@ public class LibrarianController {
 	    	    void exited(MouseEvent event) {
 	    	    	rc.mouseExited(event);
 	    	    }
+	    	    @FXML
+	    	    void chooseTOCtoUpdate(ActionEvent event) {
+	    	    	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+	    	    	FileChooser fileChooser = new FileChooser();
+	    	    	fileChooser.getExtensionFilters().add(extFilter);
+		    		newFile = fileChooser.showOpenDialog(null);
+
+		    		if (newFile != null) {
+
+		    			System.out.println("File selected: " + newFile.getName());
+		    		}
+		    		else {
+		    			System.out.println("File selection cancelled.");
+		    		}
+	    	    }
 
 	    	    @FXML
 	    	    void updateBook(MouseEvent event) {
@@ -732,12 +793,40 @@ public class LibrarianController {
 	    	    		data.add("numberOfCopies", Integer.parseInt(numberOfCopies.getText()));
 	    	    		data.add("shellLocation", shellLocation.getText());
 	    	    		data.add("currentNumberOfCopies", selected.getCurrentNumberOfCopies()+Integer.parseInt(numberOfCopies.getText())-selected.getNumberOfCopies());
-	    	    		data.add("isPopular", Popular.isSelected());
+	    	    		if(choicePopular.getSelectionModel().getSelectedItem().equals("Yes"))
+	    		    		data.add("isPopular", true);
+	    		    	else if (choicePopular.getSelectionModel().getSelectedItem().equals("No"))
+	    		    		data.add("isPopular", false);
 	    	    		data.add("genres", genres);
+		    	    	if (newFile !=null)
+		    	    	{
+		    	    		data.add("bookID", book.getBookID());
+		  				  MyFile msg= new MyFile(newFile.getName());
+						  msg.setWriteToPath("./src/server/TableOfContents");
+						  try{		      
+							      byte [] mybytearray  = new byte [(int)newFile.length()];
+							      FileInputStream fis = new FileInputStream(newFile);
+							      BufferedInputStream bis = new BufferedInputStream(fis);			  
+
+							      msg.initArray(mybytearray.length);
+							      bis.read(msg.getMybytearray(),0,mybytearray.length);
+							      data.add("getFile", msg);
+								  bis.close();
+								  Boolean k = true;
+								  data.add("FileChose", k);
+							    }
+							catch (Exception e) {
+								System.out.println("Error send (Files)msg) to Server");
+							}
+		    	    	}
+
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
 	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
+	    	    			break;
+	    	    		case "number_of_copies_less_than_zero":
+	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Update faild", "Enter positive and integer number.");
 	    	    			break;
 	    	    		case "fail":
 	    	    		default:
@@ -751,6 +840,12 @@ public class LibrarianController {
 	    }
 		
 	    protected class AddBook {
+	    	@FXML
+	    	void initialize() {
+	    		popularChoice.getItems().addAll("Yes", "No");
+
+	    	}
+	    	File newFile;
 	    	@FXML
 	        private AnchorPane myPane;
 
@@ -779,6 +874,12 @@ public class LibrarianController {
 	        private CheckBox Popular;
 
 	        @FXML
+	        private Button chooseFileButton;
+
+	        @FXML
+	        private ChoiceBox<String> popularChoice;
+
+	        @FXML
 	        private TextField shellLocation;
 
 	        @FXML
@@ -804,6 +905,22 @@ public class LibrarianController {
 	        @FXML
 	        private GridPane genresPane;
 	        @FXML
+	        void chooseFile(ActionEvent event) {
+    	    	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
+    	    	FileChooser fileChooser = new FileChooser();
+    	    	fileChooser.getExtensionFilters().add(extFilter);
+	    		newFile = fileChooser.showOpenDialog(null);
+
+	    		if (newFile != null) {
+
+	    			System.out.println("File selected: " + newFile.getName());
+	    		}
+	    		else {
+	    			System.out.println("File selection cancelled.");
+	    		}
+	        }
+
+	        @FXML
 		    void addBook(MouseEvent event) {
 		    	try {
 		    	MyData data= new MyData("addNewBook");
@@ -819,14 +936,31 @@ public class LibrarianController {
 		    	data.add("numberOfCopies", numberOfCopies.getText());
 		    	data.add("purchaseDate", new Date(System.currentTimeMillis()));
 		    	data.add("shellLocation", shellLocation.getText());
-		    	if(Popular.isSelected())
-		    		data.add("isPopular", Popular.isSelected());
+		    	if(popularChoice.getSelectionModel().getSelectedItem().equals("Yes"))
+		    		data.add("isPopular", true);
+		    	else if (popularChoice.getSelectionModel().getSelectedItem().equals("No"))
+		    		data.add("isPopular", false);
 		    	data.add("currentNumberOfCopies",numberOfCopies.getText());
 		    	data.add("topics",genres);
 		    	data.add("tableOfContent",bookName.getText());
 		    	Calendar calendar = Calendar.getInstance();
 		    	java.sql.Date ourJavaDateObject = new java.sql.Date(calendar.getTime().getTime());
 		    	data.add("purchaseDate", ourJavaDateObject);
+				  MyFile msg= new MyFile(newFile.getName());
+				  msg.setWriteToPath("./src/server/TableOfContents");
+				  try{		      
+					      byte [] mybytearray  = new byte [(int)newFile.length()];
+					      FileInputStream fis = new FileInputStream(newFile);
+					      BufferedInputStream bis = new BufferedInputStream(fis);			  
+
+					      msg.initArray(mybytearray.length);
+					      bis.read(msg.getMybytearray(),0,mybytearray.length);
+					      data.add("getFile", msg);
+						  bis.close();
+					    }
+					catch (Exception e) {
+						System.out.println("Error send (Files)msg) to Server");
+					}
 		    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this book ("+ bookName.getText() +")").get()==ButtonType.OK) {
 		    		rc.getCC().send(data);
 		    		MyData rcv = rc.getCC().getFromServer();

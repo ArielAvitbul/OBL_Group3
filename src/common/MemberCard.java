@@ -45,11 +45,6 @@ public class MemberCard implements Serializable{
 		this.reservationHistory = reservationHistory;
 	}
 
-	public MemberCard() {
-		this.borrowHistory = new ArrayList<>();
-		this.violationHistory = new ArrayList<>();
-		this.reservationHistory = new ArrayList<>();
-	}
 	
 	public String getFirstName() 
 	{

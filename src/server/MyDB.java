@@ -11,10 +11,8 @@ public class MyDB {
 	private final String IP= "localhost";
 	private final String port="3306";
 	private final String schema="oblg3";
-	private final String user="root";
-	private final String pass="123321";
 	private Connection conn;
-	public MyDB() {
+	public MyDB(String user, String pass) {
 		try {
 			   Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://"+IP+":"+port+"/"+schema,user,pass);
@@ -49,4 +47,10 @@ public class MyDB {
 	public boolean hasResults(ResultSet rs) throws SQLException {
 		return rs.first();
 	}
+	@Override
+	protected void finalize() throws Throwable {
+	conn.close();
+	System.out.println("Database finalized.");
+	super.finalize();
+	}	
 }
