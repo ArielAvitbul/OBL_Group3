@@ -5,12 +5,14 @@ package server;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import common.Book;
 import common.Borrow;
 import common.MyData;
 import ocsf.server.AbstractServer;
@@ -90,19 +92,22 @@ public class EchoServer extends AbstractServer
 		{
 	  		MyData data = (MyData) o;
 	  		    switch (data.getAction()) {
-	  		  case "notify_graduation":
+	  		    case "notify_graduation":
 	  		    	client.sendToClient(serverCont.notifyGraduation((Integer)data.getData("id")));
 	  		    	break;
-	  		case "newBorrowRequest":
+	  		  	case "newBorrowRequest":
   		    	client.sendToClient(serverCont.writeNewBorrow(data));
   		    	break;
-	  		  case "addNewBook":
+	  		  	case "addNewBook":
 	  		    	client.sendToClient(serverCont.addNewBook(data));
 	  		    	break;
-	  		case "updateBook":
+	  		  	case "updateBook":
   		    	MyData save=serverCont.updateBook(data);
   		    	client.sendToClient(save);
-  		    	break;
+	  			break;
+	  			case "getActivityReports":
+		  			client.sendToClient(serverCont.getActivityReports());
+		  			break;
 	  		    case "Activity Report":
 	  		    case "Borrow Report":
 	  		    case "Late Return Report":
@@ -154,7 +159,7 @@ public class EchoServer extends AbstractServer
 	  		    		client.sendToClient(normalSave);
 	  		    	break;
 	  		    case "orderBook":
-	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Integer)data.getData("bookID")));
+	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Book)data.getData("book")));
 	  		    	break;
 	  		    case "getBooks":
 	  		    	MyData books = new MyData("getBooks");

@@ -276,7 +276,7 @@ public class MemberController {
 				if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
     	    	MyData data = new MyData("orderBook");
     	    	data.add("id", getMember().getID());
-    	    	data.add("bookID", book.getBookID());
+    	    	data.add("book", book);
     	    	rc.getCC().send(data);
 				switch (rc.getCC().getFromServer().getAction()) {
 				case "success":
