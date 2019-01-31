@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView layoutX="363.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/orderBook.png" />
          </image>
       </ImageView>
-      <ImageView layoutX="386.0" layoutY="341.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#orderBook" pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="386.0" layoutY="341.0" onMouseEntered="#enetered" onMouseExited="#exited" onMouseReleased="#orderBook" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/orderBook.jpg" />
          </image>
@@ -28,11 +30,6 @@
       <ImageView layoutX="398.0" layoutY="90.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/serch_results.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="back_memberArea" layoutX="773.0" layoutY="20.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/back.jpg" />
          </image>
       </ImageView>
    </children>

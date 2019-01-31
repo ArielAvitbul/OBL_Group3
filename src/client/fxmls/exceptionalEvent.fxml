@@ -9,7 +9,6 @@
 
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Text layoutX="22.0" layoutY="120.0" strokeType="OUTSIDE" strokeWidth="0.0" text="please choose the violation to add the user:" wrappingWidth="375.73675537109375">
          <font>
@@ -25,11 +24,6 @@
       <ImageView fitHeight="41.0" fitWidth="242.0" layoutX="33.0" layoutY="33.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/addViolation.png" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="back_memberManagement" layoutX="765.0" layoutY="37.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/back.jpg" />
          </image>
       </ImageView>
    </children>

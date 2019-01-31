@@ -63,10 +63,5 @@
             </Label>
          </children>
       </VBox>
-      <ImageView fx:id="back_librarianArea" layoutX="774.0" layoutY="28.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/back.jpg" />
-         </image>
-      </ImageView>
    </children>
 </AnchorPane>
