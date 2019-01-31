@@ -25,18 +25,17 @@ import common.MyData;
 import common.MyFile;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
@@ -49,24 +48,40 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-
+/**
+ * Handles all reader's functionality
+ * @author Ariel
+ *
+ */
 public class ReaderController {
 	private ClientConsole cc;
 	private HashMap<String,Object> controllers;
 	public Label welcomeMsg;
+	/**
+	 * Builder for reader controller
+	 * @param cc - a link to the client console, mostly for using send & fromServer
+	 */
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
+	/**
+	 * Gets search results from server
+	 * @param bookName name of the book
+	 * @param authorsName names of the authors of the book
+	 * @param FreeText array of free text
+	 * @param genresPane the GridPane that holds the genres
+	 * @return an ArrayList of all the books returned from the server related to the search
+	 */
 	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, ArrayList<String> FreeText, GridPane genresPane) {
     	MyData searchBook = new MyData ("searchBook");
     	searchBook.add("bookName", bookName);
     	searchBook.add("authorsName", authorsName);
     	searchBook.add("freeText",FreeText);
-    	// TODO: add that ^
     	ArrayList<String> genres= new ArrayList<>();
     	for (Node p : genresPane.getChildren())
     		if (((CheckBox)p).isSelected())
@@ -75,6 +90,10 @@ public class ReaderController {
 			cc.send(searchBook);
 	    	return (ArrayList<Book>) cc.getFromServer().getData("search_results");
     }
+	/**
+	 * 
+	 * @return ClientConsole instance
+	 */
 	protected ClientConsole getCC() {
 		return cc;
 	}
@@ -86,6 +105,8 @@ public class ReaderController {
 	void initialize() {
 		controllers = new HashMap<>();
 	}
+    @FXML
+    private VBox loginBox;
 	@FXML
     private AnchorPane page;
 	@FXML
@@ -106,8 +127,13 @@ public class ReaderController {
     private ImageView loginPicture;
     @FXML
     private ImageView loginButton;
-    /* This method removes objects from a pane */
-	private void removeFrom(Pane pane, ArrayList<String> names) {
+    /**
+     * This method removes objects from a pane
+     * @param pane pane to remove from
+     * @param names list of node IDs to remove from pane
+     * @return true if this list changed as a result of the call
+     */
+	private boolean removeFrom(Pane pane, ArrayList<String> names) {
 		ArrayList<Node> list = new ArrayList<>();
 		for (Node n : pane.getChildren())
 			if (names.contains(n.getId())) {
@@ -115,32 +141,69 @@ public class ReaderController {
 				if (pane.equals(MenuBox))
 					list.add(MenuBox.getChildren().get(MenuBox.getChildren().indexOf(n)+1));
 			}
-		pane.getChildren().removeAll(list);
+		return pane.getChildren().removeAll(list);
 	}
-
-    /* This method removes an object from a pane */
+	/**
+	 * clear everything inside a pane except 'exception'
+	 * @param pane Pane to remove from
+	 * @param exception The exception (what we're not goin to remove from pane)
+	 */
+	private boolean emptyPane(Pane pane, String exception) {
+		ArrayList<Node> list = new ArrayList<>();
+		for (Node n : pane.getChildren())
+			if (!n.getId().equals(exception))
+				list.add(n);
+		return pane.getChildren().removeAll(list);
+	}
+	/**
+	 * clear everything inside a pane except 'exceptions'
+	 * @param pane Pane to remove from
+	 * @param exceptions The exceptions (what we're not goin to remove from pane)
+	 */
+	private boolean emptyPane(Pane pane, ArrayList<String> exceptions) {
+		ArrayList<Node> list = new ArrayList<>();
+		for (Node n : pane.getChildren())
+			if (!exceptions.contains(n.getId()))
+				list.add(n);
+		return pane.getChildren().removeAll(list);
+	}
+    /**
+     * This method removes an object from a pane
+     * @param pane pane to remove from
+     * @param name node ID to remove from pane
+     * @return true if this list changed as a result of the call
+     */
 	private boolean removeFrom(Pane pane, String name) {
 		for (Node n : pane.getChildren()) {
 			if (name.equals(n.getId())) {
 				if (pane.equals(MenuBox))
 					MenuBox.getChildren().remove(MenuBox.getChildren().indexOf(n)+1); // delete his separator
-				pane.getChildren().remove(n);
-				return true;
+				return pane.getChildren().remove(n);
 			}
 		}
 		return false;
 	}
-    void addTo(Pane pane, Node button, boolean enteredexited) {
-    	pane.getChildren().add(button);
+	/**
+	 * Add a node to a pane
+	 * @param pane Pane to add to
+	 * @param node Node to add to the pane
+	 * @param enteredexited if true: will set the entered & exited functionality
+	 */
+    void addTo(Pane pane, Node node, boolean enteredexited) {
+    	pane.getChildren().add(node);
     	if (pane.equals(MenuBox)) {
     		pane.getChildren().add(new ImageView(new Image("client/images/buttons/separator.png")));
-    		button.setPickOnBounds(true); // since the image has a transparent background, we want the mouse to be able to click on it's bounds instead of it's visible graphics.
+    		node.setPickOnBounds(true); // since the image has a transparent background, we want the mouse to be able to click on it's bounds instead of it's visible graphics.
     	}
     	if (enteredexited) {
-    	button.setOnMouseEntered(e-> mouseEntered(e));
-    	button.setOnMouseExited(e->mouseExited(e));
+    	node.setOnMouseEntered(e-> mouseEntered(e));
+    	node.setOnMouseExited(e->mouseExited(e));
     	}
     }
+    /**
+     * This function will change the effect of the Node entered by mouse
+     * @param ev - MouseEvent
+     */
     @FXML
     protected void mouseEntered(MouseEvent ev) {
     	//ImageView button = ((ImageView)ev.getSource());
@@ -154,27 +217,43 @@ public class ReaderController {
     	effect.setBrightness(-num);
      image.setEffect(effect);
     }
+    /**
+     * This function will disable of the node exited from by mouse
+     * @param ev - MouseEvent
+     */
     @FXML
     protected void mouseExited(MouseEvent ev) {
     	((ImageView)ev.getSource()).setEffect(null);
     }
+    /**
+     * Removes the bottom page
+     */
     private void resetBottom() {
-    	mainPane.getChildren().remove(page); // removes the previous page.
+    	mainPane.getChildren().remove(page);
     }
+    /**
+     * Sets bottom page to event's fxml ID
+     * @param event - MouseEvent
+     */
     @FXML
-    protected void setBottom(MouseEvent ev) {
-    	setBottom(ev,((ImageView)ev.getSource()).getId());
+    protected void setBottom(MouseEvent event) {
+    	setBottom(((ImageView)event.getSource()).getId(),null);
     }
-    protected void setBottom(MouseEvent ev,String fxml) {
-    	setBottom(ev,fxml,null);
+    /**
+     * Sets bottom page to fxml's fxml ID
+     * @param event - MouseEvent
+     * @param fxml - fxml file name to open at bottom
+     */
+    protected void setBottom(String fxml) {
+    	setBottom(fxml,null);
     }
-    /** Sets the bottom GUI
-     * values:
-     * 	ev: MouseEvent (button that summoned the function by mouse release)
-     * 	fxml : the id of the case
-     * objects : used for controllers's builders.		
-     * */
-    protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
+    /**
+     * Sets the bottom GUI
+     * @param ev MouseEvent (button that summoned the function by mouse release)
+     * @param fxml the id of the case
+     * @param objects used for controllers's builders.
+     */
+    protected void setBottom(String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     		switch (fxml) {
     		case "viewRequests":
@@ -232,8 +311,8 @@ public class ReaderController {
     		case "orderBook":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
     			break;
-    		case "showInbox":
-    			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new ShowInbox());
+    		case "inbox":
+    			controllers.put(fxml, ((MemberController)controllers.get("member")).new Inbox());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
@@ -259,6 +338,23 @@ public class ReaderController {
 		if (!passField.getText().isEmpty() && !passField.getText().isEmpty() && event.getCode().equals(KeyCode.ENTER) && !controllers.containsKey("member"))
 			submitLogin(null);
     }
+	/**
+	 * create a logout VBox!
+	 * @return the logout VBox
+	 */
+	private VBox getLoggedinBox(String name) {
+    	VBox loggedinBox = new VBox(90); // 90 until we add profile picture!
+    	loggedinBox.setAlignment(Pos.TOP_CENTER);
+    	loggedinBox.setId("logoutBox");
+    	addTo(loggedinBox,new Label("Welcome, "+name),false);
+    	loggedinBox.setLayoutX(650);
+    	loggedinBox.setLayoutY(30);
+    	HBox buttonBox = new HBox(5);
+    	addTo(buttonBox,new MyImage("inbox","client/images/buttons/inbox.jpeg", e->setBottom("inbox")),true); // add Logout button
+    	addTo(buttonBox,new MyImage("logout","client/images/buttons/logout.jpg", e->submitLogout(e)),true); // add Logout button
+    	loggedinBox.getChildren().add(buttonBox);
+    	return loggedinBox;
+    }
 	/* This method handles a user logout
 	 * input: none
 	 * output: none
@@ -279,12 +375,9 @@ public class ReaderController {
     				cc.send(login);
     		String result = cc.getFromServer().getAction();
     		if (result.equals("login_approved")) {
-    			addTo(mainPane,new MyImage("logout","client/images/buttons/logout.jpg", loginButton.getLayoutX(),loginButton.getLayoutY(), e->submitLogout(e)),true);
-    			addTo(mainPane,welcomeMsg = new Label("Welcome, "+cc.getFromServer().getData("MemberLoggedIn")),false);
-    			welcomeMsg.setId("welcomeMsg");
-    			welcomeMsg.setLayoutX(loginPicture.getLayoutX());
-    			welcomeMsg.setLayoutY(loginPicture.getLayoutY());
-    			removeFrom(mainPane,new ArrayList<>(Arrays.asList("loginButton","loginIdField","passField","loginPicture")));
+    			resetBottom();
+    			mainPane.getChildren().remove(loginBox);
+    			mainPane.getChildren().add(getLoggedinBox(cc.getFromServer().getData("MemberLoggedIn").toString()));
     			if (cc.getFromServer().getData("MemberLoggedIn") instanceof Member) {
     				addTo(MenuBox, new MyImage("memberArea","client/images/buttons/memberArea.png",e1->setBottom(e1)),true);
         			controllers.put("member", new MemberController(this,(Member) cc.getFromServer().getData("MemberLoggedIn")));
@@ -305,15 +398,11 @@ public class ReaderController {
     	else
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
     }
-    
 		private void submitLogout(MouseEvent event) {
-			removeFrom(mainPane, new ArrayList<>(Arrays.asList("welcomeMsg","logout")));
-			addTo(mainPane,passField,false);
+			removeFrom(mainPane, "logoutBox");
+			addTo(mainPane,loginBox,false);
 			passField.clear();
-			addTo(mainPane,loginIdField,false);
 			loginIdField.clear();
-			addTo(mainPane,loginPicture,false);
-			addTo(mainPane,loginButton,false); // no need for boolean value to be true; it remembers.
 			removeFrom(MenuBox,new ArrayList<>(Arrays.asList("memberArea","librarianArea","managerArea")));
 				MyData data = new MyData("logout");
 				Member member = ((MemberController)controllers.get("member")).getMember();

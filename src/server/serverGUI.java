@@ -85,6 +85,7 @@ public class serverGUI extends Application
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			primaryStage.setTitle("OBL G3 - Server");
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {

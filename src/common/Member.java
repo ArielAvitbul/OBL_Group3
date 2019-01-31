@@ -56,6 +56,10 @@ public class Member extends Reader implements Serializable
 	{
 		return status;
 	}
+	
+	public void setUserStatus(Status status) {
+		this.status=status;
+	}
 /**
  * 
  * @param enumNumericValue

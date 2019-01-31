@@ -3,7 +3,11 @@ package client;
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-
+/**
+ * 
+ * @author Ariel
+ *
+ */
 public class MyImage extends ImageView {
 	public MyImage(String name, String imageURL, double layoutX, double layoutY, EventHandler<MouseEvent> mouseRelease) {
 		super(imageURL);

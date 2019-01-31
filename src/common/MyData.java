@@ -26,7 +26,7 @@ public class MyData implements Serializable{
 		getData().put(datatype, data);
 	}
 	public Object getData(String datatype) {
-		return getData().get(datatype);
+		return getData().containsKey(datatype) ? getData().get(datatype) : 0;
 	}
 	public void setAction(String action) {
 		this.action = action;

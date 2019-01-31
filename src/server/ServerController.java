@@ -515,8 +515,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	public MyData getActivityReports() throws SQLException {
 		MyData data = new MyData("result");
 		ResultSet rs = db.select("SELECT time from activity_reports");
+		if (db.hasResults(rs)) {
 		while (rs.next())
 			data.add(String.valueOf(rs.getRow()), rs.getTimestamp("time"));
+		} else data.setAction("Failure");
 		return data;
 	}
 	public MyData report(MyData data) throws SQLException {
@@ -536,7 +538,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					data.add("totalBorrowedCopies", rs.getInt("totalBorrowedCopies"));
 					data.add("lateReturners", rs.getInt("lateReturners"));
 					data.add("ts",  data.getData("ts"));
-				}
+				} else data.setAction("Failure");
 			} else {
 			rs = db.select("SELECT COUNT(id) as active, (SELECT count(id) from members where `status`='LOCK') as locked, (SELECT count(id) from members where `status`='FREEZE') as frozen, (SELECT count(*) from copy_in_borrow) as totalBorrowedCopies, (SELECT distinct count(memberID) from borrows where actualReturnDate > returnDate) as lateReturners from members where `status`='ACTIVE'");
 			PreparedStatement ps = db.update("INSERT INTO `activity_reports` (`active`, `locked`, `frozen`, `totalBorrowedCopies`, `lateReturners`, `time`) VALUES (?, ?, ?, ?, ?, ?)");
@@ -556,7 +558,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ps.setTimestamp(6, time);
 			data.add("ts", time.toString());
 			ps.executeUpdate();
-			}
+			} else data.setAction("Failure");
 			}
 			break;
 		 case "Borrow Report":
@@ -564,6 +566,8 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			 rs = db.select("select isPopular, cast(ifnull((day(returnDate)-day(borrowDate))+((hour(returnDate)-hour(borrowDate)))/24+((minute(returnDate)-minute(borrowDate)))/(24*60),0) as decimal(10,2)) as borrowDuration from borrows right join books on books.bookID = borrows.bookID order by borrowDuration");
 			 borrows.put(false,new ArrayList<>());
 			 borrows.put(true,new ArrayList<>());
+			 if (db.hasResults(rs)) {
+					rs.beforeFirst();
 			 while (rs.next()) {
 				 float borrowDuration = rs.getFloat("borrowDuration");
 				 borrows.get(rs.getBoolean("isPopular")).add(borrowDuration);
@@ -576,10 +580,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				 avg+=f;
 			 data.add("average", avg/sum.size());
 			 data.add("borrows", borrows);
+			 } else data.setAction("Failure");
 			 break;
 		 case "Late Return Report":
 				HashMap<Integer,MyData> result = new HashMap<>();
 				rs = db.select("select books.bookID,bookName, cast(if(actualReturnDate is null, (day(CURRENT_TIMESTAMP)-day(returnDate))+((hour(CURRENT_TIMESTAMP)-hour(returnDate)))/24+((minute(CURRENT_TIMESTAMP)-minute(returnDate)))/(24*60), (day(actualReturnDate)-day(returnDate))+((hour(actualReturnDate)-hour(returnDate)))/24+((minute(actualReturnDate)-minute(returnDate)))/(24*60)) as decimal(10,2)) as duration from borrows join books where if(actualReturnDate is null,current_timestamp>returnDate,actualReturnDate>returnDate) and books.bookID=borrows.bookID");
+				if (db.hasResults(rs)) {
+					rs.beforeFirst();
 				while (rs.next()) {
 					if (!result.containsKey(rs.getInt("bookID"))) { // init
 						result.put(rs.getInt("bookID"), new MyData(rs.getString("bookName")));
@@ -590,12 +597,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					sum.add(duration);
 				 }
 				Collections.sort(sum);
-				data.add("maxVal", sum.get(sum.size()-1));
+				data.add("maxVal", sum.get(sum.size()-1));//
 				data.add("median", sum.get(sum.size()/2));
 				 for (Float f : sum)
 					 avg+=f;
 				data.add("average", avg/sum.size());
 				data.add("result", result);
+				} else data.setAction("Failure");
 				break;
 		}
 		return data;
@@ -779,13 +787,15 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			MyData toReturn;
 			ArrayList<Message> theMessages = new ArrayList<Message>();
 			//String query = "SELECT * FROM messages WHERE to="+librarianID;
-			ResultSet rs = db.select("SELECT * FROM messages WHERE reciever="+librarianID);
-			System.out.println(db.hasResults(rs));
+			ResultSet rs = db.select("SELECT * FROM messages WHERE reciever="+librarianID+" order by wasRead");
 			if(!db.hasResults(rs))
 				toReturn = new MyData("noMessages");
 			else {
 				do {
-					theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content")));
+					if (rs.getString("action").equals("None")) // check if message has action
+						theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content"),rs.getBoolean("wasRead")));
+					else
+						theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
 				}while(rs.next());
 				toReturn = new MyData("messages");
 				toReturn.add("messages", theMessages);
@@ -814,5 +824,33 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			if (ps.executeUpdate() == 1) 
 				return new MyData("removed");
 			return new MyData("failed");
+		}
+		public MyData msgRead(boolean value, int msgID) throws SQLException {
+			MyData data = new MyData("Success");
+			PreparedStatement ps = db.update("UPDATE messages SET wasRead =? WHERE msgID=?");
+			ps.setBoolean(1, value);
+			ps.setInt(2, msgID);
+			if (ps.executeUpdate()!=1)
+				data.setAction("Failure");
+			return data;
+		}
+		public MyData msgAction(MyData dfs) throws SQLException {
+			MyData data = new MyData("Success");
+			switch (dfs.getAction()) {
+				case "3Late":
+					PreparedStatement ps = db.update("UPDATE members SET status =? WHERE id =?");
+					ps.setString(1, ((Member.Status)dfs.getData("newStatus")).toString());
+					ps.setInt(2, (Integer)dfs.getData("memberID"));
+					if (ps.executeUpdate()!=1)
+						data.setAction("Failure");
+					break;
+			}
+			if (!data.getAction().equals("Failure")) {
+				PreparedStatement ps = db.update("UPDATE messages SET handled =1 WHERE msgID =?");
+				ps.setInt(1, (Integer)dfs.getData("msgID"));
+				if (ps.executeUpdate()!=1)
+					data.setAction("Failure");
+			}
+			return data;
 		}
 }

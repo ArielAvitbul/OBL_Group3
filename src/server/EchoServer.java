@@ -92,7 +92,6 @@ public class EchoServer extends AbstractServer
   
   //Instance methods ************************************************
   private void checkLateReturns() throws SQLException {
-	// TODO Auto-generated method stub
 		String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID "
 				+ "FROM oblg3.copy_in_borrow "
 				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
@@ -304,8 +303,14 @@ public class EchoServer extends AbstractServer
 	  		    	books.add("books", serverCont.getAllBooks());
 	  		    	client.sendToClient(books); // TODO: returns all the books.. replace this with search result!
 	  		    	break;
+	  		    case "msgRead":
+	  		    	client.sendToClient(serverCont.msgRead(true,(Integer)data.getData("msgID")));
+	  		    	break;
+	  		    case "3Late":
+	  		    	client.sendToClient(serverCont.msgAction(data));
+	  		    	break;
 	  		    case "getMessages":
-	  		    	client.sendToClient(serverCont.getMessages((int)data.getData("librerian")));
+	  		    	client.sendToClient(serverCont.getMessages((int)data.getData("member")));
 	  		    	break;
 	  		    case "client_stopped":
 	  		    case "logout":

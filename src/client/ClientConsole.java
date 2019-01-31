@@ -1,7 +1,6 @@
 package client;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import client.controllers.ReaderController;
 import common.ChatClient;
@@ -19,7 +18,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -30,7 +28,8 @@ import javafx.stage.WindowEvent;
  *
  * @author Fran&ccedil;ois B&eacute;langer
  * @author Dr Timothy C. Lethbridge  
- * @author Dr Robert Lagani&egrave;re
+ * @author Dr Robert Lagani&egrave;
+ * @author OBL Group 3
  * @version July 2000
  */
 public class ClientConsole extends Application implements CommonIF 
@@ -50,7 +49,6 @@ public class ClientConsole extends Application implements CommonIF
   		  send(data);
   		  newAlert(AlertType.INFORMATION, null, fromServer.getAction(), (String)fromServer.getData("message"));
   	    }
-
     }
   /**
    * The instance of the client that created this ConsoleChat.
@@ -67,6 +65,7 @@ public class ClientConsole extends Application implements CommonIF
 		((Stage)ipField.getScene().getWindow()).close();
 		Stage stage = new Stage();
 		stage.setScene(new Scene(loader.load()));
+		stage.setTitle("OBL G3");
 		stage.show();
 		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
@@ -137,6 +136,7 @@ public class ClientConsole extends Application implements CommonIF
 		Scene scene = new Scene(loader.load());
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			primaryStage.setTitle("OBL G3");
 	primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 		@Override
 		public void handle(WindowEvent event) {
@@ -145,12 +145,20 @@ public class ClientConsole extends Application implements CommonIF
 		}
 	});
 	}
-	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
+	/**
+	 * This method will create a new pop-up alert in javafx gui
+	 * @param type - Alert Type
+	 * @param title Alert title
+	 * @param header Alert Header
+	 * @param content Alert Content
+	 * @return 
+	 */
+	public static ButtonType newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
 		alert.setTitle(title == null ? "OBL - Group 3" : title);
 		alert.setHeaderText(header);
 		alert.setContentText(content);
-			return alert.showAndWait();
+			return alert.showAndWait().get();
 	}
 	public static void main(String[] args)
 	{

@@ -2,7 +2,6 @@ package client.controllers;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.sql.Time;
 import java.util.ArrayList;
 
 import client.ClientConsole;
@@ -14,26 +13,48 @@ import common.CopyInBorrow;
 import common.History;
 import common.Member;
 import common.MemberCard;
+import common.Message;
 import common.MyData;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.util.Callback;
+/**
+ * a controller for all member's actions
+ * @author Ariel
+ *
+ */
 public class MemberController {
 	private Member member;
 	protected ReaderController rc;
+	/**
+	 * Builder for MemberController
+	 * @param rc - ReaderController link
+	 * @param member - the member's instance after login
+	 */
 	public MemberController(ReaderController rc, Member member) {
 		this.rc=rc;
 		this.member = member;
 	}
+	/**
+	 * Returns the instance of the member
+	 * @return member instance
+	 */
 	public Member getMember() {
 		return member;
 	}
@@ -113,7 +134,6 @@ public class MemberController {
 	    		rc.setBottom(event);
 	    }
 	    private int checkPossibility(MouseEvent event) {
-			// TODO Auto-generated method stub
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("orderBook"))) {
 	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Your user is freeze. you can't order books");
 	    		return 0;
@@ -125,9 +145,13 @@ public class MemberController {
 	    	return 1;
 
 		}
+	    /**
+	     * This function handles the action after clicking 'Save' button
+	     * @param event - MouseEvent
+	     */
 	    @FXML
 	    void saveInfo(MouseEvent event) {
-	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		if(checkFields()==1) {
 	    			MyData data = new MyData("saveInfo");
 	    			data.add("id", Integer.parseInt(idField.getText()));
@@ -150,6 +174,7 @@ public class MemberController {
 	    		}
 	    	}
 	    }
+
 	    protected class HistoryController {
     		@FXML
     		void initialize() {
@@ -216,20 +241,14 @@ public class MemberController {
 	    	    	MyData data = new MyData("getCopiesInBorrow");
 	    	    	data.add("borrows", currBorrows);
 	    	    		rc.getCC().send(data);
-	    	    	switch(rc.getCC().getFromServer().getAction()) {
-	    	    	case "copiesInBorrow":
-	    	    		if((ArrayList<Book>) rc.getCC().getFromServer().getData("copies")==null) 
+	    	    		copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
+	    	    		if(copies==null) 
 	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
 	    	    		else {
-	    	    			copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
 	    	    			ExtensionCurrBooks.getItems().addAll(copies);
 	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
 	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
 	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Timestamp>("returnDate"));
-	    	    			
-	    	    		}
-	    				rc.addTo(ExtensionAnPane, new MyImage("askForExtend", "\\client\\images\\buttons\\askForExtend.jpg", 231, 358, e->submitExtensionRequest(e)), true);
-	    	    		break;
 	    	    		}
 	    	    	}
 	    	    
@@ -268,11 +287,14 @@ public class MemberController {
 	    				}
 	    			}
 				}
+	    /**
+	     * a controller for Order Book page
+	     * @author Ariel
+	     *
+	     */
     	protected class OrderBookController {
     		@FXML
     		void initialize() {
-    			//TODO: replace this with actual search results
-    	//		resultTable.getItems().addAll(Arrays.asList("Harry Potter and the Chamber of Secrets","lolz","The Ugev","The Ugev 2"));
 					rc.getCC().send(new MyData("getBooks"));
     			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
     			resultTable.getItems().addAll(books);
@@ -305,7 +327,10 @@ public class MemberController {
     	    void exited(MouseEvent event) {
     	    	rc.mouseExited(event);
     	    }
-
+    	    /**
+    	     * This function handles the action after clicking 'Order Book' button
+    	     * @param event - MouseEvent
+    	     */
     	    @FXML
     	    void orderBook(MouseEvent event) {
     	    	Book book = resultTable.getSelectionModel().getSelectedItem();
@@ -328,6 +353,135 @@ public class MemberController {
     	    	} else
     	    		ClientConsole.newAlert(AlertType.WARNING, null, "Reserved already", "You have already reserved that book.");
     	    }
-    	    
     	}
+    	
+    	protected class Inbox {
+        	private ArrayList<Message> myMessages;
+    	    @FXML
+    	    private AnchorPane ChooseBookPane;
+
+    	    @FXML
+    	    private TableView<Message> messagesTV;
+
+    	    @FXML
+    	    private TableColumn<Message, String> fromColumn;
+
+    	    @FXML
+    	    private TableColumn<Message, Date> dateColumn;
+    	    
+    	    @FXML
+    	    private ImageView deleteMsg;
+
+    	    @FXML
+    	    private TextFlow contentTF;
+    	    @FXML
+    	    void initialize() {
+    	    	messagesTV.setRowFactory(new Callback<TableView<Message>, TableRow<Message>>() {
+    	            @Override
+    	            public TableRow<Message> call(TableView<Message> param) {
+    	                return new TableRow<Message>() {
+    	                    @Override
+    	                    protected void updateItem(Message msg, boolean empty) {
+    	                    	super.updateItem(msg, empty);
+    	                    	if (msg==null || msg.wasRead())
+    	                            setStyle("");
+    	                    	else 
+    	                    	   setStyle("-fx-font-weight: bold");
+    	                    }
+    	                };
+    	            }
+    	        });
+    	    	MyData data = new MyData("getMessages");
+    	    	data.add("member", member.getID());
+    	    	rc.getCC().send(data);
+    	    	switch(rc.getCC().getFromServer().getAction()) {
+    	    	case "messages":
+    	    		myMessages = (ArrayList<Message>)rc.getCC().getFromServer().getData("messages");
+    	    		messagesTV.getItems().addAll(myMessages);
+    	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
+    	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
+    	    		break;
+    	    	case "noMessages":
+    	    		messagesTV.setPlaceholder(new Label("No New Messages!"));
+    	    		break;
+    	    	}
+    	    }
+
+    	    @FXML
+    	    void deleteMsg(MouseEvent event) {
+    	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
+    	    	MyData data = new MyData("deleteMsg");
+    	    	data.add("toDelete", toDelete);
+    	    	rc.getCC().send(data);
+    	    	switch(rc.getCC().getFromServer().getAction()) {
+    	    	case "removed":
+    	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Message Removed From Inbox!", "Message has been deleted!");
+    	    		contentTF.getChildren().clear();
+    	    		messagesTV.getItems().clear();
+    	    		initialize();
+    	    		break;
+    	    	case "failed":
+    	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Could Not Remove Message!", "Message has not been removed!");
+    	    		contentTF.getChildren().clear();
+    	    		messagesTV.getItems().clear();
+    	    		initialize();
+    	    		break;
+    	    	}
+    	    }
+    	    @FXML
+    	    void entered(MouseEvent event) {
+    	    	rc.mouseEntered(event);
+    	    }
+
+    	    @FXML
+    	    void exited(MouseEvent event) {
+    	    	rc.mouseExited(event);
+    	    }
+    	    @FXML
+    	    void showMessage(MouseEvent event) {
+    	    		contentTF.getChildren().clear();
+    	    		messagesTV.refresh();
+    	    		Text header = new Text("Message Content:\n\n");
+    	    		header.setFont(new Font("Calibri", 20));
+    	    		Message selectedMsg = myMessages.get(messagesTV.getSelectionModel().getSelectedIndex());
+    	    		selectedMsg.setRead(true);
+    	    		MyData data = new MyData("msgRead");
+    	    		data.add("msgID", selectedMsg.getMsgID());
+    	    		rc.getCC().send(data);
+    	    		Text msg = new Text((selectedMsg.getContent()));
+    	    		msg.setFont(new Font("Calibri", 16));
+    	    		contentTF.getChildren().add(header);
+    	    		contentTF.getChildren().add(msg);
+    	    		if (!selectedMsg.wasHandled()) {
+    	    		switch (selectedMsg.getAction()) {
+    	    		case "3Late":
+    	    			VBox actionBox = new VBox(5);
+    	    			actionBox.getChildren().add(new Text("\n\nThe user is currently frozen\nand is waiting on a manager's action.\nWould you like to take action?\n\n"));
+    	    			actionBox.getChildren().add(new Label("Change "+ selectedMsg.getRegarding().getMemberCard().getFirstName()+"'s status: "));
+    	    			ChoiceBox<Member.Status> statusBox = new ChoiceBox<>();
+    	        		statusBox.getItems().addAll(Member.Status.values());
+    	        		statusBox.getSelectionModel().select(selectedMsg.getRegarding().getStatus());
+    	    			actionBox.getChildren().add(statusBox);
+    	    			actionBox.getChildren().add(new MyImage("save", "client/images/buttons/save.jpg", e->{
+    	    				if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Confirmation", "Are you sure?")==ButtonType.OK) {
+    	    				selectedMsg.getRegarding().setUserStatus(statusBox.getSelectionModel().getSelectedItem());
+    	    				data.setAction(selectedMsg.getAction()); // 3Late
+    	    				data.add("memberID", selectedMsg.getRegarding().getID());
+    	    				data.add("newStatus", selectedMsg.getRegarding().getStatus());
+    	    				rc.getCC().send(data);
+    	    				if (rc.getCC().getFromServer().getAction().equals("Success")) {
+    	    				ClientConsole.newAlert(AlertType.INFORMATION, null, "Success", "Thank you for taking action. Case is now closed.");
+    	    				selectedMsg.setHandled(true);
+    	    				contentTF.getChildren().remove(actionBox);
+    	    				contentTF.getChildren().add(new Text("\nThank you for taking action."));
+    	    				} else
+    	    					ClientConsole.newAlert(AlertType.ERROR, null, "Something went wrong", "Update didn't go through properly...");
+    	    				}
+    	    			}));
+    	    			contentTF.getChildren().add(actionBox);
+    	    			break;
+    	    		} }else
+    	    			contentTF.getChildren().add(new Text("\n\nAction was already taken."));
+    	    	}
+    	    }
 }

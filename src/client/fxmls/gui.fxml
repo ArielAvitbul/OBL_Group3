@@ -19,23 +19,6 @@
             <Image url="@../images/logo.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="loginPicture" layoutX="726.0" layoutY="45.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/login.png" />
-         </image>
-      </ImageView>
-      <TextField fx:id="loginIdField" alignment="CENTER" layoutX="683.0" layoutY="80.0" promptText="User Name" text="203969316" />
-      <PasswordField fx:id="passField" alignment="CENTER" layoutX="683.0" layoutY="114.0" promptText="Password" text="123123" />
-      <ImageView fx:id="loginButton" layoutX="705.0" layoutY="148.0" onMouseEntered="#mouseEntered" onMouseExited="#mouseExited" onMouseReleased="#submitLogin">
-         <image>
-            <Image url="@../images/buttons/login.jpg" />
-         </image>
-      </ImageView>
-      <ImageView layoutX="695.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
-         <image>
-            <Image url="@../images/buttons/person.png" />
-         </image>
-      </ImageView>
       <HBox fx:id="MenuBox" alignment="CENTER" layoutY="193.0" prefHeight="47.0" prefWidth="900.0" style="-fx-background-color: #f6f6f6;">
          <children>
             <ImageView pickOnBounds="true" preserveRatio="true">
@@ -69,5 +52,26 @@
             </ImageView>
          </children>
       </AnchorPane>
+      <VBox fx:id="loginBox" alignment="TOP_CENTER" layoutX="650.0" layoutY="30.0" prefHeight="114.0" prefWidth="169.0" spacing="15.0">
+         <children>
+            <ImageView fx:id="loginPicture" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/login.png" />
+               </image>
+            </ImageView>
+            <TextField fx:id="loginIdField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="User Name" text="203969316" />
+            <PasswordField fx:id="passField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" promptText="Password" text="123123" />
+            <ImageView fx:id="loginButton" onMouseEntered="#mouseEntered" onMouseExited="#mouseExited" onMouseReleased="#submitLogin">
+               <image>
+                  <Image url="@../images/buttons/login.jpg" />
+               </image>
+            </ImageView>
+         </children>
+      </VBox>
+      <ImageView layoutX="683.0" layoutY="31.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/person.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

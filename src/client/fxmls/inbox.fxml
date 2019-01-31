@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
@@ -20,7 +14,7 @@
 
 <AnchorPane fx:id="ChooseBookPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TextFlow fx:id="contentTF" layoutX="550.0" layoutY="130.0" />
+      <TextFlow fx:id="contentTF" layoutX="568.0" layoutY="130.0" prefHeight="200.0" prefWidth="302.0" />
       <VBox layoutX="60.0" layoutY="18.0" pickOnBounds="false" prefHeight="424.0" prefWidth="416.0" spacing="20.0">
          <children>
             <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">

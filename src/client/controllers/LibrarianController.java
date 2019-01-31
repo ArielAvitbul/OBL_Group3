@@ -52,10 +52,19 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 
-
+/**
+ * a controller for all librarian's actions
+ * @author Ariel
+ *
+ */
 public class LibrarianController {
 	private ReaderController rc;
 	private Librarian librarian;
+	/**
+	 * Builder for LibrarianController
+	 * @param rc - ReaderController link
+	 * @param librarian - the librarian's instance after login
+	 */
 	public LibrarianController(ReaderController rc, Librarian librarian) {
 		this.rc=rc;
 		this.librarian=librarian;		
@@ -78,6 +87,10 @@ public class LibrarianController {
     void replacePage(MouseEvent e) {
     	rc.setBottom(e);
     }
+    /**
+     * This function handles the action after clicking 'Search Member' button
+     * @param event - MouseEvent
+     */
     @FXML
     void searchMember(MouseEvent event) {
     	try {
@@ -89,8 +102,8 @@ public class LibrarianController {
     	if (result.getData().containsKey("member")) {
     		Member member = (Member)result.getData("member");
     		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Is this the member you were looking for?", 
-    				member.getMemberCard().getFirstName() +" "+member.getMemberCard().getLastName()+" ("+member.getID()+") was found! Click OK to work on member.").get()==ButtonType.OK) {
-    			rc.setBottom(event,"memberManagement",member);
+    				member.getMemberCard().getFirstName() +" "+member.getMemberCard().getLastName()+" ("+member.getID()+") was found! Click OK to work on member.")==ButtonType.OK) {
+    			rc.setBottom("memberManagement",member);
     		}
     	} else
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "No results.", "The Database doesn't contain such member with that ID.");
@@ -98,11 +111,24 @@ public class LibrarianController {
     		ClientConsole.newAlert(AlertType.ERROR, null, "ID Field", "9 digits only in ID field!");
     	}
     }
+    /**
+     * This class handles Member Management page
+     * @author Ariel
+     *
+     */
     protected class MemberManagement {
     	private Member member;
+    	/**
+    	 * 
+    	 * @param member - Searched member instance
+    	 */
     	public MemberManagement(Member member) {
     		this.member=member;
     	}
+    	/**
+    	 * 
+    	 * @return member instance searched
+    	 */
     	protected Member getMember() {
     		return member;
     	}
@@ -170,10 +196,13 @@ public class LibrarianController {
         void exited(MouseEvent event) {
         	rc.mouseExited(event);
         }
-
+        /**
+         * Handles the functionality of clicking 'Save' at member management page
+         * @param event - MouseEvent
+         */
         @FXML
         void saveMemberInfo(MouseEvent event) {
-        	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+        	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		MyData data = new MyData("saveInfo");
 	    		data.add("admin", librarian.getID()); // TODO: write in logs
 	    		data.add("id", Integer.parseInt(idField.getText()));
@@ -212,7 +241,7 @@ public class LibrarianController {
     	    @FXML
     	    void addException(MouseEvent event) {
     	    	MyData data=new MyData("addViolation");
-    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna add this violation?", "Press ok to add this violation.").get() == ButtonType.OK) {
+    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna add this violation?", "Press ok to add this violation.") == ButtonType.OK) {
     	    		data.add("id", member.getID());
     		    	data.add("violationDate", new Timestamp(System.currentTimeMillis()));
     	    		data.add("violation",exceptionEventList.getSelectionModel().getSelectedItem().toString() );
@@ -266,7 +295,7 @@ public class LibrarianController {
     		}
     		@FXML
     		void goBack(MouseEvent event) {
-    			rc.setBottom(event, "memberManagement");
+    			rc.setBottom("memberManagement");
     		}
     	}
         protected class BorrowCopy {
@@ -363,7 +392,7 @@ public class LibrarianController {
     		}
     		@FXML
     		void goBack(MouseEvent event) {
-    			rc.setBottom(event, "memberManagement");
+    			rc.setBottom("memberManagement");
     		}
     		@FXML
     	    void keyBoard(KeyEvent event) {
@@ -419,7 +448,7 @@ public class LibrarianController {
 		    			ClientConsole.newAlert(AlertType.ERROR, null , "Popular Book!", "The book you choosed is popular\ntherfore you cannot borrow it\nfor more the three days.\nplease change the return date!");
 		    			break;
 		    		default:
-		    			if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+selected.getBookName()+" to borrow.\nPress OK to continue!").get()==ButtonType.OK) {
+		    			if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+selected.getBookName()+" to borrow.\nPress OK to continue!")==ButtonType.OK) {
 		    			updateNewBorrow(selected);
 		    			goBack(null);
 		    			}
@@ -532,7 +561,7 @@ public class LibrarianController {
     		}
     		@FXML
     		void goBack(MouseEvent event) {
-    			rc.setBottom(event, "memberManagement");
+    			rc.setBottom("memberManagement");
     		}
     		
     	    @FXML
@@ -540,7 +569,7 @@ public class LibrarianController {
     	    	CopyInBorrow copy = returnsTable.getSelectionModel().getSelectedItem();
     	    	if(copy !=null)
     	    	{
-    	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+copy.getBorroBook().getBookName()+" to return.\nPress OK to continue!").get()==ButtonType.OK) {
+    	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+copy.getBorroBook().getBookName()+" to return.\nPress OK to continue!")==ButtonType.OK) {
 		    		MyData returnCopy = new MyData("copyToReturn");
 		    		returnCopy.add("copy", copy);
 		    		rc.getCC().send(returnCopy);
@@ -610,7 +639,7 @@ public class LibrarianController {
 
     	    @FXML
     	    void goBack(MouseEvent event) {
-    	    	rc.setBottom(event, "memberManagement");
+    	    	rc.setBottom("memberManagement");
     	    }
     	    protected boolean isCurrBorrow(int index) {
     	    	return member.getMemberCard().getBorrowHistory().get(index).getReturnDate().after(new java.util.Date());
@@ -623,7 +652,11 @@ public class LibrarianController {
 
     	}
     }
-    
+    /**
+     * This class handles the Create User page management
+     * @author Ariel
+     *
+     */
 	protected class CreateUser {
 		@FXML
 	    private PasswordField passwordField;
@@ -651,7 +684,10 @@ public class LibrarianController {
 	    void exited(MouseEvent e) {
 	    	rc.mouseExited(e);
 	    }
-
+	    /**
+	     * Handles functionality of 'Submit' button
+	     * @param event - MouseEvent
+	     */
 	    @FXML
 	    void submit(MouseEvent event) {
 	    	//TODO: verify all fields are legit
@@ -664,7 +700,7 @@ public class LibrarianController {
 	    	data.add("lastname", lastnameField.getText());
 	    	data.add("email", emailField.getText());
 	    	data.add("phone", phoneField.getText());
-	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")").get()==ButtonType.OK) {
+	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")")==ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		MyData rcv = rc.getCC().getFromServer();
 		    	switch (rcv.getAction()) {
@@ -699,20 +735,20 @@ public class LibrarianController {
 		/*@FXML
 		 void handle(MouseEvent event) {
 		       if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && 
-		            ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna update this book?", "Once changed, the old information would be lost.").get() == ButtonType.OK)
+		            ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna update this book?", "Once changed, the old information would be lost.") == ButtonType.OK)
 		            	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
 		        }*/
 	    @FXML
 	    void goToUpdate(MouseEvent event) {
 	    	if(inventoryTable.getSelectionModel().getSelectedItem() !=null)
-	    	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
+	    	rc.setBottom("bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
 	    	else ClientConsole.newAlert(AlertType.INFORMATION, null, "Book Not Choose", "Plese chose book from the list.");
 	    }
 	    @FXML
 	    void deleteChosen(MouseEvent event) {
 	    	Book book = inventoryTable.getSelectionModel().getSelectedItem();
 
-	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+book.getBookName()+" to delete.\nPress OK to continue!").get()==ButtonType.OK) {
+	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+book.getBookName()+" to delete.\nPress OK to continue!")==ButtonType.OK) {
 	    		MyData deleteBook = new MyData("deleteBook");
 	    		deleteBook.add("book", book);
 	    		rc.getCC().send(deleteBook);
@@ -867,7 +903,7 @@ public class LibrarianController {
 	    	    	for (Node p : genrePane.getChildren())
 	    	    		if (((CheckBox)p).isSelected())
 	    	    			genres.add(p.getId());
-	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
 	    	    		data.add("editionNumber", Float.parseFloat(editionNumber.getText()));
@@ -1042,7 +1078,7 @@ public class LibrarianController {
 					catch (Exception e) {
 						System.out.println("Error send (Files)msg) to Server");
 					}
-		    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this book ("+ bookName.getText() +")").get()==ButtonType.OK) {
+		    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this book ("+ bookName.getText() +")")==ButtonType.OK) {
 		    		rc.getCC().send(data);
 		    		MyData rcv = rc.getCC().getFromServer();
 			    	switch (rcv.getAction()) {
@@ -1070,85 +1106,4 @@ public class LibrarianController {
 	        }
 	    }
 	}
-	protected class ShowInbox {
-    	private ArrayList<Message> myMessagse;
-	    @FXML
-	    private AnchorPane ChooseBookPane;
-
-	    @FXML
-	    private TableView<Message> messagesTV;
-
-	    @FXML
-	    private TableColumn<Message, String> fromColumn;
-
-	    @FXML
-	    private TableColumn<Message, Date> dateColumn;
-	    
-	    @FXML
-	    private ImageView deleteMsg;
-
-	    @FXML
-	    private TextFlow contentTF;
-	    @FXML
-	    void initialize() {
-	    	MyData data = new MyData("getMessages");
-	    	data.add("librerian", librarian.getID());
-	    	rc.getCC().send(data);
-	    	switch(rc.getCC().getFromServer().getAction()) {
-	    	case "messages":
-	    		myMessagse = (ArrayList<Message>)rc.getCC().getFromServer().getData("messages");
-	    		messagesTV.getItems().addAll(myMessagse);
-	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
-	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
-	    		break;
-	    	case "noMessages":
-	    		messagesTV.setPlaceholder(new Label("No New Messages!"));
-	    		break;
-	    	}
-
-	    }
-
-	    @FXML
-	    void deleteMsg(MouseEvent event) {
-	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
-	    	MyData data = new MyData("deleteMsg");
-	    	data.add("toDelete", toDelete);
-	    	rc.getCC().send(data);
-	    	switch(rc.getCC().getFromServer().getAction()) {
-	    	case "removed":
-	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Message Removed From Inbox!", "Message has been deleted!");
-	    		contentTF.getChildren().clear();
-	    		messagesTV.getItems().clear();
-	    		initialize();
-	    		break;
-	    	case "failed":
-	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Could Not Remove Message!", "Message has not been removed!");
-	    		contentTF.getChildren().clear();
-	    		messagesTV.getItems().clear();
-	    		initialize();
-	    		break;
-	    	}
-	    }
-	    @FXML
-	    void entered(MouseEvent event) {
-	    	rc.mouseEntered(event);
-	    }
-
-	    @FXML
-	    void exited(MouseEvent event) {
-	    	rc.mouseExited(event);
-	    }
-	    @FXML
-	    void showMessage(MouseEvent event) {
-	    	System.out.println(messagesTV.getSelectionModel().getSelectedIndex());
-	    		contentTF.getChildren().clear();
-	    		Text header = new Text("Message Content:\n\n");
-	    		header.setFont(new Font("Calibri", 20));
-	    		Text msg = new Text((myMessagse.get(messagesTV.getSelectionModel().getSelectedIndex()).getContent()));
-	    		msg.setFont(new Font("Calibri", 16));
-	    		contentTF.getChildren().add(header);
-	    		contentTF.getChildren().add(msg);
-	    	}
-	    }
-
 }

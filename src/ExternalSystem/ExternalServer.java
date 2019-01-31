@@ -113,6 +113,7 @@ public class ExternalServer extends Application implements CommonIF
 			Scene scene = new Scene(root);
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			primaryStage.setTitle("Graduation System");
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 				@Override
 				public void handle(WindowEvent event) {

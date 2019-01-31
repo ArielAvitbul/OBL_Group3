@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import client.ClientConsole;
 import common.Manager;
 import common.MyData;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -20,6 +20,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -85,18 +86,15 @@ public class ManagerController {
 			rc.getCC().send(new MyData("getActivityReports"));
 			for (Entry<String, Object> d : (((HashMap<String,Object>)rc.getCC().getFromServer().getData()).entrySet()))
 				activityBox.getItems().add(((Timestamp)d.getValue()).toString());
-			ReportBox.valueProperty().addListener(new ChangeListener<String>() {
-		        @Override
-		        public void changed(ObservableValue ov, String t, String t1) {
-		            if (ov.getValue().equals("Activity Report")) {
-		    			activityBox.getSelectionModel().select("New Report");
-		            	Label label = new Label("Test");
-		            	label.setId("test");
-		            	sideBox.getChildren().add(2, activityBox);
-		            } else
-		            	sideBox.getChildren().remove(activityBox);
-		          }    
-		      });
+			ReportBox.valueProperty().addListener((ChangeListener<String>) (ov, oldValue, newValue) -> {
+			    if (ov.getValue().equals("Activity Report")) {
+					activityBox.getSelectionModel().select("New Report");
+			    	Label label = new Label("Test");
+			    	label.setId("test");
+			    	sideBox.getChildren().add(2, activityBox);
+			    } else
+			    	sideBox.getChildren().remove(activityBox);
+			  });
 		}
 		@FXML
 		void produceReport(MouseEvent event) {
@@ -108,8 +106,7 @@ public class ManagerController {
 		        calculationBox.getChildren().clear();
 		        chartContainer.getChildren().clear();
 				switch (dfs.getAction()) {
-				case "Activity Report"://active,inactive,frozen,totalBorrowedCopies,lateReturners
-					
+				case "Activity Report":
 						String time = (String)dfs.getData("ts");
 						if (activityBox.getSelectionModel().getSelectedItem().equals("New Report"))
 						activityBox.getItems().add(time);
@@ -118,12 +115,15 @@ public class ManagerController {
 						calculationBox.getChildren().add(date);
 				    	chartContainer.getChildren().add(createActivityReport((Integer)dfs.getData("active"),(Integer)dfs.getData("locked"),(Integer)dfs.getData("frozen"),(Integer)dfs.getData("totalBorrowedCopies"),(Integer)dfs.getData("lateReturners")));
 					break;
-				 case "Borrow Report"://regular,popular
+				 case "Borrow Report":
 					 chartContainer.getChildren().add(createBorrowReport((HashMap<Boolean, ArrayList<Float>>) dfs.getData("borrows"),(Float)dfs.getData("maxVal"),(Float)dfs.getData("median"),(Float)dfs.getData("average")));
 					break;
-				 case "Late Return Report"://(HashMap<String,Integer>)dfs.getData("result")
+				 case "Late Return Report":
 					 chartContainer.getChildren().add(createLateReturnReport((HashMap<Integer,MyData>)dfs.getData("result"),(Float)dfs.getData("maxVal"),(Float)dfs.getData("median"),(Float)dfs.getData("average")));
 					break;
+				 case "Failure":
+					 ClientConsole.newAlert(AlertType.INFORMATION, null, "No results", "Database returned no results");
+					 break;
 				}
 		}
 
