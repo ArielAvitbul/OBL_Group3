@@ -185,9 +185,6 @@ public class ServerController {
 		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), getMemberBorrows(id), getMemberViolations(id), getMemberReservations(id),rs.getInt("lateReturns"));
 		return null;
 	}
-		/* function to get all of the specified member borrows
-		 * input: memberID (unique) , MyDB instance.
-		 * output: array of borrows.
 		/** function to get all of the specified member borrows
 		 * @param memberID -  member's id (unique)
 		 * @return array of borrows.
@@ -310,6 +307,7 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 		return data;
 		
 	}
+
 public MyData deleteBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 ResultSet rs1 = db.select("SELECT * FROM copy_in_borrow where BookID ='" + book.getBookID()+"'");
@@ -326,6 +324,7 @@ data.add("book_in_borrow", "One or more of the copies is still borrow.");
 return data;
 }
 }
+
 public MyData getClosedReturnBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 	ResultSet rs1 = db.select("SELECT * FROM borrows where bookID ='" + book.getBookID()+"' and actualReturnDate is null order by returnDate limit 1");
@@ -343,6 +342,7 @@ else {
 	return data;
 	}
 }
+
 public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
@@ -365,6 +365,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return true; // if one of the strings is empty, then there's nothing to check and it will get here, so just return true.
 		}
 	}
+	
 	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName , ArrayList<String>freeTxt) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<Book> result = new ArrayList<>();
@@ -913,7 +914,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("succeed", "Return book is succeed");
 			return data;
 		}
-		/**
 		/** 
 		 * @author Ariel
 		 * @param studentid - Student's ID
@@ -989,6 +989,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ret.setAction("success");
 			return ret;
 		}
+		
 		/**
 		 * This method removes a given message from the data base
 		 * @param data - MyData instance contains the message to delete

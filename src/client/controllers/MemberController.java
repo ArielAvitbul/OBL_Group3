@@ -2,8 +2,6 @@ package client.controllers;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.sql.Time;
 import java.util.ArrayList;
 
 import client.ClientConsole;

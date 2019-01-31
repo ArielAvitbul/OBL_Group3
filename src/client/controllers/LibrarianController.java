@@ -141,6 +141,7 @@ public class LibrarianController {
     			rc.setBottom(event);
 	    }
   	  private int checkPossibility(MouseEvent event) {
+	
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
 	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is freeze. He can't borrow any book");
 	    		return 0;
@@ -704,7 +705,7 @@ public class LibrarianController {
 					ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
 					break;
 				case "hasReservations":
-					if((ClientConsole.newAlert(AlertType.CONFIRMATION, null , "Reserved Book!", (String)rc.getCC().getFromServer().getData("msgToPrint")).get()==ButtonType.OK)) {
+					if((ClientConsole.newAlert(AlertType.CONFIRMATION, null , "Reserved Book!", (String)rc.getCC().getFromServer().getData("msgToPrint"))==ButtonType.OK)) {
 						toSend.add("requester", "employeeAfterConfirmation");
 						rc.getCC().send(toSend);
 						switch(rc.getCC().getFromServer().getAction()) {
