@@ -186,7 +186,7 @@ public class MemberController {
 	    			else
 	    				data.add("phone", phoneField.getText());
 	    			if(checkFields()==1) {
-	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    			rc.getCC().send(data);
 	    			switch (rc.getCC().getFromServer().getAction()) {
 	    			case "success":
@@ -201,7 +201,8 @@ public class MemberController {
 	    		}
 	    	}
 	    }
-
+	    	}
+	    }
 	    /**
 	     *
 	     * @author sapir carmi
@@ -249,7 +250,7 @@ public class MemberController {
 
 	    @FXML
 	    void goBack(MouseEvent event) {
-	    	rc.setBottom(event, "memberArea");
+	    	rc.setBottom("memberArea");
 	    }
     	}
 	  /**
@@ -289,7 +290,7 @@ public class MemberController {
 	    	    }
 	    	    @FXML
 	    	    void goBack(MouseEvent event) {
-	    	    	rc.setBottom(event, "memberArea");
+	    	    	rc.setBottom("memberArea");
 	    	    }
 	    	    @FXML
 	    	    void initialize() {
@@ -410,7 +411,7 @@ public class MemberController {
     	     */
     	    @FXML
     	    void goBack(MouseEvent event) {
-    	    	rc.setBottom(event, "memberArea");
+    	    	rc.setBottom("memberArea");
     	    }
     	    @FXML
     	    void orderBook(MouseEvent event) {

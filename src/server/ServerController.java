@@ -569,16 +569,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ps.executeUpdate();
 		}
 	}
-<<<<<<< HEAD
-	
-=======
+
 	/**
 	 * 
 	 * @param id - the id of the member
 	 * @return MyData- the parameters at the table or message that failed to load.
 	 * @throws SQLException 
 	 */
->>>>>>> Sapir
+
 	public MyData history(int id) throws SQLException{
 		MyData ret = new MyData("result");
 		ArrayList<History> myHistory = new ArrayList<>();

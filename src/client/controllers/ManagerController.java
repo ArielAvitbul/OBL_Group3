@@ -79,7 +79,7 @@ public class ManagerController {
 
 	    @FXML
 	    void goBack(MouseEvent event) {
-	    	rc.setBottom(event, "managerArea");
+	    	rc.setBottom("managerArea");
 	    }
 		@FXML void initialize() {
 			ReportBox.getItems().add("Borrow Report");

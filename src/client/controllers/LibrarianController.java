@@ -142,7 +142,7 @@ public class LibrarianController {
 	    }
         @FXML
         void goBack(MouseEvent event) {
-        	rc.setBottom(event, "librarianArea");
+        	rc.setBottom("librarianArea");
         }
   	  private int checkPossibility(MouseEvent event) {
 	
@@ -247,7 +247,7 @@ public class LibrarianController {
 	    		data.add("phone", phoneField.getText());
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
 	    		if(checkFields()==1) {
-	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
@@ -261,6 +261,7 @@ public class LibrarianController {
 	    		}
 	    		}
 	    	}
+        }
         }
         private int checkFields() {
         	if(!emailField.getText().contains("@")) {
@@ -313,7 +314,7 @@ public class LibrarianController {
     	   
     	    @FXML
     	    void goBack(MouseEvent event) {
-    	    	rc.setBottom(event, "memberManagement");
+    	    	rc.setBottom("memberManagement");
     	    }
     	    /**
     	     * This function update the data to send to the server, and send.
@@ -522,9 +523,10 @@ public class LibrarianController {
 		    	            if(date.isAfter(LocalDate.now().plusDays(3)))
 		    	            	setDisable(true);
 		    	        }
-		    	    });
+	    	    	});
 		    	}
 		    }
+        
 		    @FXML
 		    void submitBorrowRequest(MouseEvent event) {
 		    	switch (isValidBorrow(selected)) {
@@ -862,7 +864,7 @@ public class LibrarianController {
 	     */
 	    @FXML
 	    void goBack(MouseEvent event) {
-	    	rc.setBottom(event, "librarianArea");
+	    	rc.setBottom("librarianArea");
 	    }
 	    @FXML
 	    void submit(MouseEvent event) {
@@ -919,7 +921,7 @@ public class LibrarianController {
 	    	else
 	    		data.add("phone", phoneField.getText());
 	    	if(checkFields()==1) {
-	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")").get()==ButtonType.OK) {
+	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")")==ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		MyData rcv = rc.getCC().getFromServer();
 		    	switch (rcv.getAction()) {
@@ -932,11 +934,13 @@ public class LibrarianController {
 		    	}
 	    	}
 	    	}
-	    	} catch (NumberFormatException e) {
+	    	}
+	    	}catch (NumberFormatException e) {
 	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "ID must be written in numbers");
 	    		idField.clear();
 	    	}
 	    }
+	    
 		private int checkFields() {
 			if(!emailField.getText().contains("@")) {
 				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
@@ -970,7 +974,7 @@ public class LibrarianController {
 		}
 
 	}
-	
+
 	/**
 	 * 
 	 * @author sapir carmi and guy feldman
@@ -991,7 +995,7 @@ public class LibrarianController {
 		}
 	    @FXML
 	    void goBack(MouseEvent event) {
-	    	rc.setBottom(event, "librarianArea");
+	    	rc.setBottom("librarianArea");
 	    }
 		/*@FXML
 		 void handle(MouseEvent event) {
@@ -1155,7 +1159,7 @@ public class LibrarianController {
 	    	    }
 	    	    @FXML
 	    	    void goBack(MouseEvent event) {
-	    	    	rc.setBottom(event, "inventoryManagement");
+	    	    	rc.setBottom("inventoryManagement");
 	    	    }
 	    	    /**
 	    	     * This function check if the file is pdf file.
@@ -1193,7 +1197,7 @@ public class LibrarianController {
 	    	    			genres.add(p.getId());
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    	    	
-	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
+	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
 	    	    		if(!editionNumber.getText().equals(""))
@@ -1269,6 +1273,7 @@ public class LibrarianController {
 
 
 	    }
+		}
 		/**
 		 * class that responsible on adding a new book to the system
 		 * @author sapir carmi and guy feldman
@@ -1349,7 +1354,7 @@ public class LibrarianController {
 	        
 	        @FXML
 	        void goBack(MouseEvent event) {
-	        	rc.setBottom(event, "inventoryManagement");
+	        	rc.setBottom("inventoryManagement");
 	        }
 	        /**
 	         * function that responsible of checking if the file is a pdf file.
@@ -1513,7 +1518,7 @@ public class LibrarianController {
 
 	    @FXML
 	    void goBack(MouseEvent event) {
-	    	rc.setBottom(event, "librarianArea");
+	    	rc.setBottom("librarianArea");
 	    }
 	    @FXML
 	    void initialize() {
@@ -1577,4 +1582,6 @@ public class LibrarianController {
 	    	}
 	    }
 
-}
+
+	}
+
