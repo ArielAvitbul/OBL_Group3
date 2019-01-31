@@ -218,10 +218,7 @@ public class LibrarianController {
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			MyData updatedMember = ((MyData)rc.getCC().getFromServer().getData("updatedMember"));
-	    			member = ((Member)updatedMember.getData("member"));
-	    			//member = ((Member)((MyData)rc.getCC().getFromServer().getData("updatedMember")).getData("member"));
-	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
+	    			member = ((Member)(((MyData)rc.getCC().getFromServer().getData("updatedMember"))).getData("member"));
 	    			break;
 	    		case "fail":
 	    		default:

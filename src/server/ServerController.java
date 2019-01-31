@@ -259,8 +259,7 @@ public class ServerController {
 		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
 			result.setAction("success");
 			result.add("updatedMember", searchMember(userid));
-			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
-		}else // member was not found, keep the fail action, add a message
+		}else
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
