@@ -122,7 +122,7 @@ public class LibrarianController {
     			rc.setBottom(event);
 	    }
   	  private int checkPossibility(MouseEvent event) {
-			// TODO Auto-generated method stub
+	
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
 	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is freeze. He can't borrow any book");
 	    		return 0;
@@ -182,7 +182,7 @@ public class LibrarianController {
         void saveMemberInfo(MouseEvent event) {
         	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    		MyData data = new MyData("saveInfo");
-	    		data.add("admin", librarian.getID()); // TODO: write in logs
+	    		data.add("admin", librarian.getID()); 
 	    		data.add("id", Integer.parseInt(idField.getText()));
 	    		data.add("username", usernameField.getText());
 	    		data.add("password", passwordField.getText());
@@ -262,20 +262,11 @@ public class LibrarianController {
     	    }
 
     	}
-        protected class ViewRequests {
-    		@FXML
-    		void entered(MouseEvent e) {
-    			rc.mouseEntered(e);
-    		}
-    		@FXML
-    		void exited(MouseEvent e) {
-    			rc.mouseExited(e);
-    		}
-    		@FXML
-    		void goBack(MouseEvent event) {
-    			rc.setBottom(event, "memberManagement");
-    		}
-    	}
+        /**
+         * The BorrowCopy class is the controller that handles the borrow process's GUI
+         * @author Good Guy
+         *
+         */
         protected class BorrowCopy {
     		private static final long MILLISECONDS_PER_DAY = 86400000;
 
@@ -344,15 +335,7 @@ public class LibrarianController {
     	    
     	    @FXML
     	    void initialize() {
-    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
-	    	        public void updateItem(LocalDate date, boolean empty) {
-	    	            super.updateItem(date, empty);
-	    	            LocalDate today = LocalDate.now();
-	    	            setDisable(empty || date.compareTo(today) < 0 );
-	    	            if(date.isAfter(LocalDate.now().plusDays(14)))
-	    	            	setDisable(true);
-	    	        }
-	    	    });
+
 
     	    	SearchResultTable.setVisible(false);
     	    	dateSelector.setVisible(false);
@@ -376,23 +359,15 @@ public class LibrarianController {
     		}
     		@FXML
     	    void keyBoard(KeyEvent event) {
-    			if (event.getCode().equals(KeyCode.ENTER))
+    			if (event.getCode().equals(KeyCode.ENTER)) 
     				submitSearch(null);
     	    }
 		    @FXML
-		    //guyguyguy
 		    void submitSearch(MouseEvent  event) {
 		    	selected = null;
 		    	SearchResultTable.getItems().clear();
 		    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
     				ArrayList<Book> result = rc.getSearchResults(nameField.getText(), authorsField.getText(), freeTxt, GenrePane);
-    				/* TODO: // Add condition here, incase all field are empty
-    					SearchResultTable.setVisible(false);
-    	    	    	dateSelector.setVisible(false);
-    	    	    	submitBorrow.setVisible(false);
-    	    			SearchResultTable.setVisible(false);
-    		    		ClientConsole.newAlert(AlertType.INFORMATION, null, "Enter at least one search parameter", (String)rc.getCC().getFromServer().getData("reason"));
-    				*/
 		    	if (!result.isEmpty()) {
 	    	    	SearchResultTable.getItems().addAll(result);
 	    	    	SearchResultTable.setVisible(true);
@@ -411,7 +386,28 @@ public class LibrarianController {
 		    @FXML
 		    void selectBook(MouseEvent event) {
 		    	selected = SearchResultTable.getSelectionModel().getSelectedItem();
-
+		    	if(!selected.isPopular()) {
+    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
+	    	        public void updateItem(LocalDate date, boolean empty) {
+	    	            super.updateItem(date, empty);
+	    	            LocalDate today = LocalDate.now();
+	    	            setDisable(empty || date.compareTo(today) < 0 );
+	    	            if(date.isAfter(LocalDate.now().plusDays(14)))
+	    	            	setDisable(true);
+	    	        }
+	    	    });
+		    	}
+		    	else {
+	    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
+		    	        public void updateItem(LocalDate date, boolean empty) {
+		    	            super.updateItem(date, empty);
+		    	            LocalDate today = LocalDate.now();
+		    	            setDisable(empty || date.compareTo(today) < 0 );
+		    	            if(date.isAfter(LocalDate.now().plusDays(3)))
+		    	            	setDisable(true);
+		    	        }
+		    	    });
+		    	}
 		    }
 		    @FXML
 		    void submitBorrowRequest(MouseEvent event) {
@@ -431,7 +427,6 @@ public class LibrarianController {
 		    		default:
 		    			if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+selected.getBookName()+" to borrow.\nPress OK to continue!").get()==ButtonType.OK) {
 		    			updateNewBorrow(selected);
-		    			goBack(null);
 		    			}
 		    			break;
 		    		}
@@ -475,10 +470,18 @@ public class LibrarianController {
 				MyData toSend = new MyData("newBorrowRequest");
 				toSend.add("theBorrow", newBorrow);
 				toSend.add("theCopy", newCopyToBorrow);
+				toSend.add("id" , getMember().getID());
 				rc.getCC().send(toSend);
 				switch(rc.getCC().getFromServer().getAction()) {
 					case "borrowSuccess":
+						int index = SearchResultTable.getItems().indexOf(newCopyToBorrow);
+						SearchResultTable.getItems().remove(newCopyToBorrow);
+						SearchResultTable.getItems().add(index,(Book)((MyData)rc.getCC().getFromServer().getData("UpdatedBookAndBorrow")).getData("theCopy"));
 						ClientConsole.newAlert(AlertType.INFORMATION,null, "Borrow has been registered!" , "Borrow has been registered in the system!");
+						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
+						System.out.println(getMember());
+						System.out.println(getMember().getMemberCard());
+						
 					break;
 					case "borrowFailed":
 						ClientConsole.newAlert(AlertType.ERROR, null , "Something went wrong!", (String)rc.getCC().getFromServer().getData("reason"));
@@ -557,8 +560,9 @@ public class LibrarianController {
 		    		String result = (String)rc.getCC().getFromServer().getAction();
 		    		if (result.equals("succeed")) {
 		    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Return Book is succeed", (String)rc.getCC().getFromServer().getData("succeed"));
+		    			returnsTable.getItems().clear();
+		    			initialize();
 		    			}
-	    			goBack(null);
 	    			}
     	    	}
     	    	else if(copy==null&&isEmpty==0) ClientConsole.newAlert(AlertType.INFORMATION, null, "Book is not choose","Plese Choose Book" );
@@ -566,6 +570,12 @@ public class LibrarianController {
 		    		
     	    }
     	}
+        /**
+         * 
+         * @author Good Guy
+         * The ManualExtension class is the controller of the manual extension GUI part.
+         *
+         */
     	protected class ManualExtension {
     	    @FXML
     	    private VBox returnDateVbox;
@@ -621,10 +631,21 @@ public class LibrarianController {
     	    void goBack(MouseEvent event) {
     	    	rc.setBottom(event, "memberManagement");
     	    }
+    	    /**
+    	     * @author Good Guy
+    	     * @param index -  index of a borrow in the member's member card
+    	     * @return True - if this borrow is still active (the member has the copy)
+    	     * 	 , False - otherwise
+    	     */
     	    protected boolean isCurrBorrow(int index) {
     	    	return member.getMemberCard().getBorrowHistory().get(index).getReturnDate().after(new java.util.Date());
 
     	    }
+    	    /**
+    	     * The manualyExtend method is responsible for handling the manual extension request, performed by the librarian
+    	     * @author Good Guy
+    	     * @param event - the event that caused this method call
+    	     */
     	    @FXML
     	    void manualyExtend(MouseEvent event) {
     	    	MyData toSend = new MyData("BorrowToExtend");
@@ -664,6 +685,12 @@ public class LibrarianController {
 				}
     	    	
     	    	}
+    	    /**
+    	     * The selectCopy method responsible on selecting a copy from TableView and setting date picker accordingly
+    	     * @author Good Guy
+    	     * @param event - the event on which this method was called
+    	     * 
+    	     */
     	    @FXML
     	    void selectCopy(MouseEvent event) {
     	    	returnDateVbox.setVisible(true);
@@ -712,7 +739,6 @@ public class LibrarianController {
 
 	    @FXML
 	    void submit(MouseEvent event) {
-	    	//TODO: verify all fields are legit
 	    	try {
 	    	MyData data = new MyData("createUser");
 	    	data.add("username", usernameField.getText());

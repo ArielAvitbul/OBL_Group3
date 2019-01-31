@@ -66,10 +66,15 @@ public class ServerController {
 			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 		return null;
 	}
-	/*method for confirming login request from client
-	 * input: MyDB instance and MyData instance
-	 * output: MyData (Member instance) that has been logged in or empty MyData
-	 * Guy Wrote This
+	/**
+	 * This method handles the login process.
+	 * checks in data base if details are valid.
+	 * @author Good Guy
+	 * @author Ariel
+	 * @return MyData instance with the result.
+	 * @param data - MyData instance with login details.
+	 * @see MyData
+	 * 
 	 */
 	public MyData login (MyData data) throws SQLException {
 		ResultSet memberMatch = db.select("SELECT * FROM members WHERE id ='"+ data.getData("id")+"' AND password ='"+data.getData("password")+"'");
@@ -88,13 +93,26 @@ public class ServerController {
 			}
 		return ret;
 	}
-	
+	/**
+	 * This method writes "loggedin" status according to the members status.
+	 * @param value - true/false to write to data base
+	 * @param id - id of the member
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	public void setLoggedIn(boolean value, int id) throws SQLException {
 		PreparedStatement ps = db.update("UPDATE members SET loggedin =? WHERE id =?");
 		ps.setBoolean(1, value);
 		ps.setInt(2, id);
 		ps.executeUpdate();
 	}
+	/**
+	 * This method updates the members ip in the data base
+	 * @param ip - ip to update
+	 * @param id - member's id
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	public void updateIP(String ip,int id) throws SQLException {
 		PreparedStatement ps = db.update("UPDATE members SET ip=? WHERE id =?");
 		ps.setString(1, ip);
@@ -102,9 +120,11 @@ public class ServerController {
 		ps.executeUpdate();
 	}
 	/** this method searches for a member in the database, by given ID
-	 * returns: key: member is HashMap incase a result was found!
-	 * 			or an empty HashMap incase a resultw as not found!
-	 * @throws SQLException */
+	 * @return key: member is HashMap in case a result was found!
+	 * 			or an empty HashMap in case a results as not found!
+	 * @throws SQLException 
+	 * @author Ariel
+	 * */
 	public MyData searchMember(int id) throws SQLException {
 		MyData ret = new MyData("result");
 		ResultSet rs = db.select("SELECT * FROM members where id='"+id+"'");
@@ -113,7 +133,11 @@ public class ServerController {
 		return ret;
 	}
 	/** this method inserts a new user to the database
-	 * @throws SQLException */
+	 * @param data - MyData instance with details to write
+	 * @throws SQLException 
+	 * @returns MyData instance with the result
+	 * @author Ariel
+	 * */
 	public MyData createUser(MyData data) {
 		MyData ret = new MyData("fail");
 		try {
@@ -133,8 +157,9 @@ public class ServerController {
 		return ret;
 	}
 	/**this method creates Member instance for the member that has logged in
-	 * input: ResultSet (member details) and MyDB instance
-	 * output: Member instance
+	 * @param rs - ResultSet (member details) and MyDB instance
+	 * @return Member instance
+	 * @author Ariel
 	 */
 	public Member createMember(ResultSet rs) throws SQLException {
 			Member toReturn=null;
@@ -148,16 +173,23 @@ public class ServerController {
 			toReturn.setMemberCard(getMemberCard(rs.getInt("id")));
 			return toReturn;
 	}
-	/* fetch membercard*/
+	/**
+	 * This method creates a MemberCard from the data base by a given member id
+	 * @param id - member's id
+	 * @return MemberCard instance
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	private MemberCard getMemberCard(int id) throws SQLException {
 		ResultSet rs = db.select("SELECT * from member_cards WHERE userID = "+ id);
 		if (db.hasResults(rs))
 		return new MemberCard(rs.getString("firstName"), rs.getString("lastName"), rs.getString("phoneNumber"), rs.getString("emailAddress"), getMemberBorrows(id), getMemberViolations(id), getMemberReservations(id),rs.getInt("lateReturns"));
 		return null;
 		}
-		/* function to get all of the specified member borrows
-		 * input: memberID (unique) , MyDB instance.
-		 * output: array of borrows.
+		/** function to get all of the specified member borrows
+		 * @param memberID -  member's id (unique)
+		 * @return array of borrows.
+		 * @author Good Guy
 		 */
 	public ArrayList<Borrow> getMemberBorrows(int memberID) throws SQLException {
 		ArrayList<Borrow> memberBorrows = new ArrayList<Borrow>();
@@ -166,9 +198,9 @@ public class ServerController {
 			memberBorrows.add(new Borrow(rs.getInt("borrowID"), rs.getInt("bookID"), rs.getInt("memberID"), rs.getTimestamp("borrowDate"), rs.getTimestamp("returnDate"), rs.getTimestamp("actualReturnDate")));
 		return memberBorrows;
 	}
-	/* function to get all of the specified member violations
-	 * input: memberID (unique) , MyDB instance.
-	 * output: array of violations.
+	/** function to get all of the specified member violations
+	 * @param memberID (unique) , MyDB instance.
+	 * @return array of violations.
 	 */
 	public ArrayList<Violation> getMemberViolations(int memberID) throws SQLException {
 		ArrayList<Violation> memberViolations = new ArrayList<Violation>();
@@ -179,9 +211,10 @@ public class ServerController {
 		}
 		return memberViolations;
 	}
-	/* function to get all of the specified member reservations
-	 * input: memberID (unique) , MyDB instance.
-	 * output: array of violations.
+	/** function to get all of the specified member violations
+	 * @param memberID - member's id (unique) , MyDB instance.
+	 * @return array of reservations
+	 * @author Good Guy.
 	 */
 	public ArrayList<BookReservation> getMemberReservations(int memberID) throws SQLException {
 		ArrayList<BookReservation> memberReservations = new ArrayList<BookReservation>();
@@ -191,7 +224,18 @@ public class ServerController {
 		}
 		return memberReservations;
 	}
-	
+	/**
+	 * This method saves the member's info in the data base
+	 * @param userid -  member's id
+	 * @param firstName
+	 * @param lastName
+	 * @param password
+	 * @param email
+	 * @param phone
+	 * @return MyData Instance with the result
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	public MyData saveInfo(int userid, String firstName,String lastName, String password, String email, String phone) throws SQLException {
 		MyData result = new MyData("fail");
 		if (db.updateWithExecute("UPDATE member_cards set firstName='"+firstName+"',lastName='"+lastName+"',emailAddress='"+ email +"', phoneNumber='"+phone+"' WHERE userID='"+userid+"'")==1
@@ -202,6 +246,15 @@ public class ServerController {
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
+	/**
+	 * This method saves info including status update (Admins only!)
+	 * @param userid
+	 * @param username
+	 * @param status
+	 * @return MyData instance with the results
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	public MyData saveInfoAdmin(int userid, String username, String status) throws SQLException {
 		MyData result = new MyData("fail");
 		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
@@ -211,6 +264,14 @@ public class ServerController {
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
+	/**
+	 * This method handles order of a book (writes order to data base);
+	 * @param userid - member's id
+	 * @param book - book to order
+	 * @return MyData instance with the results
+	 * @throws SQLException
+	 * @author Ariel
+	 */
 	public MyData orderBook(int userid, Book book) throws SQLException {
 		if (book==null)
 			return new MyData("fail","message","The book doesn't exists.");
@@ -247,6 +308,7 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 		return data;
 		
 	}
+
 public MyData deleteBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 ResultSet rs1 = db.select("SELECT * FROM copy_in_borrow where BookID ='" + book.getBookID()+"'");
@@ -263,6 +325,7 @@ data.add("book_in_borrow", "One or more of the copies is still borrow.");
 return data;
 }
 }
+
 public MyData getClosedReturnBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 	ResultSet rs1 = db.select("SELECT * FROM borrows where bookID ='" + book.getBookID()+"' and actualReturnDate is null order by returnDate limit 1");
@@ -280,6 +343,7 @@ else {
 	return data;
 	}
 }
+
 public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
@@ -288,6 +352,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	return null;
 }
 
+	/**
+	 * This method compares between to strings not minding cases.
+	 * @param str1 - string to compare
+	 * @param str2 - string to compare
+	 * @return True - strings match , False - Otherwise
+	 * @author Ariel
+	 */
 	public boolean compareStrings(String str1, String str2) {
 		try {
 			return str1.toLowerCase().matches(".*"+str2.toLowerCase()+".*");
@@ -295,6 +366,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return true; // if one of the strings is empty, then there's nothing to check and it will get here, so just return true.
 		}
 	}
+	
 	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName , ArrayList<String>freeTxt) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<Book> result = new ArrayList<>();
@@ -333,6 +405,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return result;
 	}
 	
+	/**
+	 * This method retrieves all copies in borrow by borrow id
+	 * @param myBorrows - ArrayList of borrows.
+	 * @return ArrayList of copies in borrow.
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	public ArrayList<CopyInBorrow> getCopiesInBorrow(ArrayList<Borrow> myBorrows) throws SQLException
 	{
 		ArrayList<CopyInBorrow> toReturn = new ArrayList<CopyInBorrow>();
@@ -345,6 +424,15 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return toReturn;
 	}
 	
+	/**
+	 * This method handles the extension update of a certain copy.
+	 * @param copyInBorrow - copy to extend
+	 * @param requester - requester of the service (user/librarian)
+	 * @param fromPicker - new return date picked
+	 * @return  MyData instance with the results.
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	public MyData updateExtension(CopyInBorrow copyInBorrow , String requester , Timestamp fromPicker) throws SQLException {
 		MyData toReturn = null;
 		switch (requester) {
@@ -392,10 +480,26 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		}
 		return toReturn;
 	}
+	
+	/**
+	 * This method checks if there are active orders regarding a certain copy
+	 * @param copyInBorrow - copy to check
+	 * @return True - order/s exists , False - otherwise
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	private boolean checkReservations(CopyInBorrow copyInBorrow) throws SQLException {
 		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE bookID="+copyInBorrow.getBorroBook().getBookID()+" AND arrivedDate is null");
 		return db.hasResults(rs);
 	}
+	
+	/**
+	 * This method extends a certain copy in borrow
+	 * @param copyInBorrow - copy to extend
+	 * @return result of the update execute
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	private int updateExtensions(CopyInBorrow copyInBorrow) throws SQLException {
 		String insertQ = "INSERT INTO extensions(memberID,borrowID,newReturnDate) "
 				+ "VALUES(?,?,?)";
@@ -406,6 +510,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return ps.executeUpdate();
 		
 	}
+	
+	 /**
+	  * 
+	  * @param copyInBorrow - copy in borrow to update
+	  * @param requester - service requester (user / librarian)
+	  * @param fromPicker - new copy in borrow return date
+	  * @return MyData instance with the results
+	  * @throws SQLException
+	  * @author Good Guy
+	  */
 	private MyData updateBorrows(CopyInBorrow copyInBorrow , String requester , Timestamp fromPicker) throws SQLException {
 		MyData toReturn;
 		int daysToExtend;
@@ -434,6 +548,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		}
 		return toReturn;
 	}
+	
+	/**
+	 * This method writes message to librarians regarding a certain extension of a borrow
+	 * @param toUpdate - Extended copy in borrow 
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	private void writeMsgToLibrerians(CopyInBorrow toUpdate) throws SQLException {
 		ArrayList<Integer> librerians = new ArrayList<Integer>();
 		MemberCard borrower = getMemberCard(toUpdate.getNewBorrow().getMemberID());
@@ -449,6 +570,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ps.executeUpdate();
 		}
 	}
+	
 	public MyData history(int id) throws SQLException{
 		MyData ret = new MyData("result");
 		ArrayList<History> myHistory = new ArrayList<>();
@@ -645,7 +767,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return data;
 	}
 	
-	
+	/**
+	 * This method writes a new tuple that represents a borrow to the data base
+	 * @param bookAndBorrow - MyData instance holding the borrow and the book
+	 * @return MyData instance with the results.
+	 * @throws SQLException
+	 * @author Good Guy
+	 */
 	public MyData writeNewBorrow(MyData bookAndBorrow) throws SQLException {
 		MyData toReturn;
 		int toUpdate;
@@ -677,6 +805,8 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 						toReturn = new MyData("borrowSuccess");
 						((Book)bookAndBorrow.getData("theCopy")).setCurrentNumberOfCopies(toUpdate);
 						toReturn.add("UpdatedBookAndBorrow", bookAndBorrow);
+						System.out.println(getMemberCard((int)bookAndBorrow.getData("id")));
+						toReturn.add("updatedMemberCard", getMemberCard((int)bookAndBorrow.getData("id")));
 						return toReturn;
 				 }
 			}
@@ -685,6 +815,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			toReturn.add("reason", "Cannot write borrow in the system!");
 			return toReturn;
 	}
+	
 	public MyData getReturnBooks(MyData data) throws SQLException {
 		ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
 		int flag =0;
@@ -719,6 +850,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			}
 		}
 
+		
 		public MyData returnCopy(MyData data) throws SQLException {
 		CopyInBorrow copy =  (CopyInBorrow) data.getData("copy");
 			java.util.Date today = new java.util.Date();
@@ -777,7 +909,8 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			data.add("succeed", "Return book is succeed");
 			return data;
 		}
-		/**
+		
+		/** 
 		 * @author Ariel
 		 * @param studentid - Student's ID
 		 * @return the MyData's data key "message" will contain the message received from server.
@@ -850,6 +983,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ret.setAction("success");
 			return ret;
 		}
+		
+		/**
+		 * This method removes a given message from the data base
+		 * @param data - MyData instance contains the message to delete
+		 * @return - MyData instance with the results
+		 * @throws SQLException
+		 * @author Good Guy
+		 */
 		public MyData removeMsg(MyData data) throws SQLException {
 			Message toDelete = (Message)data.getData("toDelete");
 			String deleteQuery = "DELETE FROM messages WHERE msgID=?";

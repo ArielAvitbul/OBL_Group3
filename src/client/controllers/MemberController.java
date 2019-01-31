@@ -182,6 +182,11 @@ public class MemberController {
 		private TableView<History> BorrowTable;
 			
     	}
+	  /**
+	   * The ExtensionRequestController class is the controller of the auto extension process's GUI
+	   * @author Good Guy
+	   *
+	   */
 	    protected class ExtensionRequestController {
 	    	    @FXML
 	    	    private AnchorPane ExtensionAnPane;
@@ -234,13 +239,26 @@ public class MemberController {
 	    	    		}
 	    	    	}
 	    	    
-
+	    	    /**
+	    	     * @author Good Guy
+	    	     * @param i - index of a Borrow in ArrayList of borrows in the member's MemberCard.
+	    	     * @return True - if this Borrow can be extended
+	    	     *,False - Otherwise
+	    	     * @see MemberCard
+	    	     * @see Borrow
+	    	     */
 				private boolean isExtendableBorrow(int i) {
 					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
 					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
 						return false;
 					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
 				}	  
+				/**
+				 * This method handles the extension request submitted by the member
+				 * @author Good Guy
+				 * @param e - event which on this method was called
+				 * 
+				 */
 				@FXML
 				private void submitExtensionRequest(MouseEvent e) {
 	    			CopyInBorrow selected = (CopyInBorrow)ExtensionCurrBooks.getSelectionModel().getSelectedItem();
