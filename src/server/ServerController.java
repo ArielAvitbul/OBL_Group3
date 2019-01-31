@@ -258,8 +258,8 @@ public class ServerController {
 		MyData result = new MyData("fail");
 		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
 			result.setAction("success");
-			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
-		}else // member was not found, keep the fail action, add a message
+			result.add("updatedMember", searchMember(userid));
+		}else
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
