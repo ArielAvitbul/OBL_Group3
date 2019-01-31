@@ -1381,7 +1381,7 @@ public class LibrarianController {
 	         * 
 	         */
 	        @FXML
-		    void addBook(MouseEvent event,String a) {
+		    void addBook(MouseEvent event) {
 		    	try {
 		    	MyData data= new MyData("addNewBook");
 		    	if(!bookName.getText().equals(""))
