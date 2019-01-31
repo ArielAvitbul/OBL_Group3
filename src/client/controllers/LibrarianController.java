@@ -252,7 +252,7 @@ public class LibrarianController {
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
+	    			member = ((Member)(((MyData)rc.getCC().getFromServer().getData("updatedMember"))).getData("member"));
 	    			break;
 	    		case "fail":
 	    		default:
@@ -1381,7 +1381,7 @@ public class LibrarianController {
 	         * 
 	         */
 	        @FXML
-		    void addBook(MouseEvent event,String a) {
+		    void addBook(MouseEvent event) {
 		    	try {
 		    	MyData data= new MyData("addNewBook");
 		    	if(!bookName.getText().equals(""))
