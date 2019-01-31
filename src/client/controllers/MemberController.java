@@ -84,7 +84,7 @@ public class MemberController {
 			return 0;
 		}
 		if(lastnameField.getText().matches(".*\\d+.*")) {
-			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a l name with digits");
+			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a last name with digits");
 			return 0;
 		}
 		return 1;
@@ -155,11 +155,38 @@ public class MemberController {
 	    		if(checkFields()==1) {
 	    			MyData data = new MyData("saveInfo");
 	    			data.add("id", Integer.parseInt(idField.getText()));
-	    			data.add("firstName", firstnameField.getText());
-	    			data.add("lastName", lastnameField.getText());
-	    			data.add("password", passwordField.getText());
-	    			data.add("email", emailField.getText());
-	    			data.add("phone", phoneField.getText());
+	    			if(firstnameField.getText().equals("")) {
+		    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the first name. please insert now");
+		    			return;
+		    		}
+	    			else
+	    				data.add("firstName", firstnameField.getText());
+	    			if(lastnameField.getText().equals("")) {
+	    				ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the last name. please insert now");
+		    			return;
+	    			}
+	    			else
+	    				data.add("lastName", lastnameField.getText());
+	    			if(passwordField.getText().equals("")) {
+	    				ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the password. please insert now");
+		    			return;
+	    			}
+	    			else
+	    				data.add("password", passwordField.getText());
+	    			if(emailField.getText().equals("")) {
+	    				ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the email address. please insert now");
+		    			return;
+	    			}
+	    			else
+	    				data.add("email", emailField.getText());
+	    			if(phoneField.getText().equals("")) {
+	    				ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the phone number. please insert now");
+		    			return;
+	    			}
+	    			else
+	    				data.add("phone", phoneField.getText());
+	    			if(checkFields()==1) {
+	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    			rc.getCC().send(data);
 	    			switch (rc.getCC().getFromServer().getAction()) {
 	    			case "success":
@@ -175,6 +202,12 @@ public class MemberController {
 	    	}
 	    }
 
+	    /**
+	     *
+	     * @author sapir carmi
+	     * class that responsible about the history of the user
+	     * include: borrows, violations, returns, extensions.
+	     */
 	    protected class HistoryController {
     		@FXML
     		void initialize() {
@@ -204,7 +237,20 @@ public class MemberController {
         
 		@FXML
 		private TableView<History> BorrowTable;
-			
+	    @FXML
+	    void entered(MouseEvent event) {
+	    	rc.mouseEntered(event);
+	    }
+
+	    @FXML
+	    void exited(MouseEvent event) {
+	    	rc.mouseExited(event);
+	    }
+
+	    @FXML
+	    void goBack(MouseEvent event) {
+	    	rc.setBottom(event, "memberArea");
+	    }
     	}
 	  /**
 	   * The ExtensionRequestController class is the controller of the auto extension process's GUI
@@ -232,7 +278,19 @@ public class MemberController {
 	    	    
 	    	    @FXML
 	    	    private TableColumn<CopyInBorrow, String> BookAuthorCol;
+	    	    @FXML
+	    	    void entered(MouseEvent event) {
+	    	    	rc.mouseEntered(event);
+	    	    }
 
+	    	    @FXML
+	    	    void exited(MouseEvent event) {
+	    	    	rc.mouseExited(event);
+	    	    }
+	    	    @FXML
+	    	    void goBack(MouseEvent event) {
+	    	    	rc.setBottom(event, "memberArea");
+	    	    }
 	    	    @FXML
 	    	    void initialize() {
 	    	    	ArrayList<CopyInBorrow> copies = null;
@@ -337,8 +395,8 @@ public class MemberController {
     		@FXML
     		private AnchorPane pane;
 
-    	    @FXML
-    	    void enetered(MouseEvent event) {
+    		  @FXML
+    		    void entered(MouseEvent event) {
     	    	rc.mouseEntered(event);
     	    }
 
@@ -350,6 +408,10 @@ public class MemberController {
     	     * This function handles the action after clicking 'Order Book' button
     	     * @param event - MouseEvent
     	     */
+    	    @FXML
+    	    void goBack(MouseEvent event) {
+    	    	rc.setBottom(event, "memberArea");
+    	    }
     	    @FXML
     	    void orderBook(MouseEvent event) {
     	    	Book book = resultTable.getSelectionModel().getSelectedItem();

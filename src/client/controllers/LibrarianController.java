@@ -140,6 +140,10 @@ public class LibrarianController {
     		else
     			rc.setBottom(event);
 	    }
+        @FXML
+        void goBack(MouseEvent event) {
+        	rc.setBottom(event, "librarianArea");
+        }
   	  private int checkPossibility(MouseEvent event) {
 	
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
@@ -206,13 +210,44 @@ public class LibrarianController {
 	    		MyData data = new MyData("saveInfo");
 	    		data.add("admin", librarian.getID()); 
 	    		data.add("id", Integer.parseInt(idField.getText()));
-	    		data.add("username", usernameField.getText());
-	    		data.add("password", passwordField.getText());
-	    		data.add("firstName", firstnameField.getText());
-	    		data.add("lastName", lastnameField.getText());
-	    		data.add("email", emailField.getText());
+	    		if(usernameField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the userName. please insert now");
+	    			return;
+	    		}
+	    		else
+	    			data.add("username", usernameField.getText());
+	    		if(passwordField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the password. please insert now");
+	    			return;
+	    		}
+	    		else
+	    			data.add("password", passwordField.getText());
+	    		if(firstnameField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the first name. please insert now");
+	    			return;
+	    		}
+	    		else
+	    			data.add("firstName", firstnameField.getText());
+	    		if(lastnameField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the last name. please insert now");
+	    			return;
+	    		}
+	    		else
+	    			data.add("lastName", lastnameField.getText());
+	    		if(emailField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the email address. please insert now");
+	    			return;
+	    		}
+	    		else
+	    			data.add("email", emailField.getText());
+	    		if(phoneField.getText().equals("")) {
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the phone number. please insert now");
+	    			return;
+	    		}
 	    		data.add("phone", phoneField.getText());
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
+	    		if(checkFields()==1) {
+	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
@@ -224,12 +259,50 @@ public class LibrarianController {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
 	    			break;
 	    		}
+	    		}
 	    	}
         }
+        private int checkFields() {
+        	if(!emailField.getText().contains("@")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+				return 0;
+			}
+			if(!emailField.getText().contains(".")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+				return 0;
+			}
+			if(!phoneField.getText().startsWith("05")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert number that start at 05");
+				return 0;
+			}
+			if((!phoneField.getText().contains("-"))&&(phoneField.getText().length()<10 || phoneField.getText().length()>10)) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+				return 0;
+			}
+			if((phoneField.getText().contains("-"))&&(phoneField.getText().length()<11 || phoneField.getText().length()>11)) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+				return 0;
+			}
+			if(firstnameField.getText().matches(".*\\d+.*")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a first name with digits");
+				return 0;
+			}
+			if(lastnameField.getText().matches(".*\\d+.*")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a last name with digits");
+				return 0;
+			}
+			return 1;
+		}
+		/**
+         * class that responsible of adding new violation to the member.
+         * @author sapir carmi
+         *
+         */
     	protected class ExceptionalEvent{
     		@FXML
     		void initialize() {
     			exceptionEventList.getItems().addAll(Violation.Type.values());
+    			exceptionEventList.setValue(Violation.Type.OTHER);
     		}
 
     	    @FXML
@@ -237,7 +310,15 @@ public class LibrarianController {
 
     	    @FXML
     	    private ImageView addButton;
-
+    	   
+    	    @FXML
+    	    void goBack(MouseEvent event) {
+    	    	rc.setBottom(event, "memberManagement");
+    	    }
+    	    /**
+    	     * This function update the data to send to the server, and send.
+    	     * @param event - click on add button on add violation screen
+    	     */
     	    @FXML
     	    void addException(MouseEvent event) {
     	    	MyData data=new MyData("addViolation");
@@ -275,12 +356,12 @@ public class LibrarianController {
 
     	    @FXML
     	    void entered(MouseEvent event) {
-
+    	    	rc.mouseEntered(event);
     	    }
 
     	    @FXML
     	    void exited(MouseEvent event) {
-
+    	    	rc.mouseExited(event);
     	    }
 
     	}
@@ -367,7 +448,6 @@ public class LibrarianController {
 
     	    @FXML
     	    private TableColumn<Book, String> AvalCopiesCol;
-    	    
     	    
     	    @FXML
     	    void initialize() {
@@ -781,6 +861,10 @@ public class LibrarianController {
 	     * @param event - MouseEvent
 	     */
 	    @FXML
+	    void goBack(MouseEvent event) {
+	    	rc.setBottom(event, "librarianArea");
+	    }
+	    @FXML
 	    void submit(MouseEvent event) {
 	    	try {
 	    	MyData data = new MyData("createUser");
@@ -792,6 +876,50 @@ public class LibrarianController {
 	    	data.add("email", emailField.getText());
 	    	data.add("phone", phoneField.getText());
 	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")")==ButtonType.OK) {
+	    	if(usernameField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a user name. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("username", usernameField.getText());
+	    	if(passwordField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a password. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("password", passwordField.getText());
+	    	if(idField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an ID. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("id", Integer.parseInt(idField.getText()));
+	    	if(firstnameField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a first name. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("firstname", firstnameField.getText());
+	    	if(lastnameField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a last name. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("lastname", lastnameField.getText());
+	    	if(emailField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an email address. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("email", emailField.getText());
+	    	if(phoneField.getText().equals("")) {
+	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a phone number. please insert now");
+    			return;
+	    	}
+	    	else
+	    		data.add("phone", phoneField.getText());
+	    	if(checkFields()==1) {
+	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")").get()==ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		MyData rcv = rc.getCC().getFromServer();
 		    	switch (rcv.getAction()) {
@@ -803,14 +931,52 @@ public class LibrarianController {
 		    		break;
 		    	}
 	    	}
+	    	}
 	    	} catch (NumberFormatException e) {
 	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "ID must be written in numbers");
 	    		idField.clear();
 	    	}
 	    }
+		private int checkFields() {
+			if(!emailField.getText().contains("@")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+				return 0;
+			}
+			if(!emailField.getText().contains(".")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
+				return 0;
+			}
+			if(!phoneField.getText().startsWith("05")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert number that start at 05");
+				return 0;
+			}
+			if((!phoneField.getText().contains("-"))&&(phoneField.getText().length()<10 || phoneField.getText().length()>10)) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+				return 0;
+			}
+			if((phoneField.getText().contains("-"))&&(phoneField.getText().length()<11 || phoneField.getText().length()>11)) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect phone. please insert 10 digits");
+				return 0;
+			}
+			if(firstnameField.getText().matches(".*\\d+.*")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a first name with digits");
+				return 0;
+			}
+			if(lastnameField.getText().matches(".*\\d+.*")) {
+				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred a last name with digits");
+				return 0;
+			}
+			return 1;
+		}
 
 	}
 	
+	/**
+	 * 
+	 * @author sapir carmi and guy feldman
+	 * This class is responsible on the inventory management of the library, like add books, update and delete.
+	 * 
+	 */
 	protected class InventoryManagement {
 		
 		private ArrayList<Book> books;
@@ -823,12 +989,20 @@ public class LibrarianController {
 			colTopicInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			colAuthorsInventory.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
 		}
+	    @FXML
+	    void goBack(MouseEvent event) {
+	    	rc.setBottom(event, "librarianArea");
+	    }
 		/*@FXML
 		 void handle(MouseEvent event) {
 		       if (event.isPrimaryButtonDown() && event.getClickCount() == 2 && 
 		            ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna update this book?", "Once changed, the old information would be lost.") == ButtonType.OK)
 		            	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
 		        }*/
+		/**
+		 * @author guy feldman
+		 * @param event - the event of click on update book.
+		 */
 	    @FXML
 	    void goToUpdate(MouseEvent event) {
 	    	if(inventoryTable.getSelectionModel().getSelectedItem() !=null)
@@ -883,13 +1057,21 @@ public class LibrarianController {
 	    void replacePage(MouseEvent event) {
 	    	rc.setBottom(event);
 	    }
-	    
+	    /**
+	     * 
+	     * @author sapir carmi
+	     * The class that responsible of update book parameters.
+	     */
 		protected class BookManagement {
 			private Book book;
 	    	public BookManagement(Book book) {
 	    		System.out.println("book on management: "+book);
 	    		this.book=book;
 	    	}
+	    	/**
+	    	 * This function responsible of the page of update book. 
+	    	 * It takes the information of the specific book and update the page
+	    	 */
 	    	@FXML
 	    	void initialize() {
 	    		choicePopular.getItems().addAll("Yes","No");
@@ -972,6 +1154,17 @@ public class LibrarianController {
 	    	    	rc.mouseExited(event);
 	    	    }
 	    	    @FXML
+	    	    void goBack(MouseEvent event) {
+	    	    	rc.setBottom(event, "inventoryManagement");
+	    	    }
+	    	    /**
+	    	     * This function check if the file is pdf file.
+	    	     * @author guy feldman
+	    	     * 
+	    	     * @param event - click on upload.
+	    	     * 
+	    	     */
+	    	    @FXML
 	    	    void chooseTOCtoUpdate(ActionEvent event) {
 	    	    	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
 	    	    	FileChooser fileChooser = new FileChooser();
@@ -986,7 +1179,11 @@ public class LibrarianController {
 		    			System.out.println("File selection cancelled.");
 		    		}
 	    	    }
-
+	    	    /**
+	    	     * This function update the book, and check if there is any parameter that is empty. If there is one like this, it's send an error to the user.
+	    	     * @author sapir carmi
+	    	     * @param event - click on update book
+	    	     */
 	    	    @FXML
 	    	    void updateBook(MouseEvent event) {
 	    	    	Book selected = (Book)inventoryTable.getSelectionModel().getSelectedItem();
@@ -995,17 +1192,43 @@ public class LibrarianController {
 	    	    		if (((CheckBox)p).isSelected())
 	    	    			genres.add(p.getId());
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
+	    	    	
+	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
-	    	    		data.add("editionNumber", Float.parseFloat(editionNumber.getText()));
+	    	    		if(!editionNumber.getText().equals(""))
+	    	    			data.add("editionNumber", Float.parseFloat(editionNumber.getText()));
+	    	    		else {
+	    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new edittion number. please insert now");
+	    	    			return;
+	    	    		}
+	    	    		if(!numberOfCopies.getText().equals("")) {
 	    	    		data.add("numberOfCopies", Integer.parseInt(numberOfCopies.getText()));
-	    	    		data.add("shellLocation", shellLocation.getText());
 	    	    		data.add("currentNumberOfCopies", selected.getCurrentNumberOfCopies()+Integer.parseInt(numberOfCopies.getText())-selected.getNumberOfCopies());
+	    	    		}
+	    	    		else {
+	    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new number of copies. please insert now");
+	    	    			return;
+	    	    		}
+	    	    		if(!shellLocation.getText().equals(""))
+	    	    			data.add("shellLocation", shellLocation.getText());
+		    	    		else {
+		    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new shelf location. please insert now");
+		    	    			return;
+		    	    		}
 	    	    		if(choicePopular.getSelectionModel().getSelectedItem().equals("Yes"))
 	    		    		data.add("isPopular", true);
 	    		    	else if (choicePopular.getSelectionModel().getSelectedItem().equals("No"))
 	    		    		data.add("isPopular", false);
-	    	    		data.add("genres", genres);
+	    	    		for (Node p : genrePane.getChildren())
+		    	    		if (((CheckBox)p).isSelected())
+		    	    			genres.add(p.getId());
+	    	    		if(genres.isEmpty()) {
+	    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new shelf location topics. please insert now");
+	    	    			return;
+	    	    		}
+	    	    		else
+	    	    			data.add("genres", genres);
 		    	    	if (newFile !=null)
 		    	    	{
 		    	    		data.add("bookID", book.getBookID());
@@ -1046,14 +1269,25 @@ public class LibrarianController {
 
 
 	    }
-		
+		/**
+		 * class that responsible on adding a new book to the system
+		 * @author sapir carmi and guy feldman
+		 *
+		 */
 	    protected class AddBook {
 	    	@FXML
 	    	void initialize() {
 	    		popularChoice.getItems().addAll("Yes", "No");
-
+	    		popularChoice.setValue("Yes");
+	    		printDate.setDayCellFactory(picker->new DateCell() {
+					public void updateItem(LocalDate date, boolean empty) {
+				super.updateItem(date, empty);
+				 LocalDate today = LocalDate.now();
+				 setDisable(empty || date.compareTo(today) > 0 );
+					}
+			});
 	    	}
-	    	File newFile;
+	    	File newFile = null;
 	    	@FXML
 	        private AnchorPane myPane;
 
@@ -1112,6 +1346,15 @@ public class LibrarianController {
 	        private ImageView finishButton;
 	        @FXML
 	        private GridPane genresPane;
+	        
+	        @FXML
+	        void goBack(MouseEvent event) {
+	        	rc.setBottom(event, "inventoryManagement");
+	        }
+	        /**
+	         * function that responsible of checking if the file is a pdf file.
+	         * @param event - click on choose file
+	         */
 	        @FXML
 	        void chooseFile(ActionEvent event) {
     	    	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PDF files (*.pdf)", "*.pdf");
@@ -1127,34 +1370,84 @@ public class LibrarianController {
 	    			System.out.println("File selection cancelled.");
 	    		}
 	        }
-
+	        /**
+	         * function that adding a new book , and check if there is any empty parameter. If there is, the book is don't add.
+	         * @param event - click on add button on addBook fxml.
+	         * 
+	         */
 	        @FXML
-		    void addBook(MouseEvent event) {
+		    void addBook(MouseEvent event,String a) {
 		    	try {
 		    	MyData data= new MyData("addNewBook");
-		    	data.add("bookName", bookName.getText());
-		    	data.add("authorsNames", authors.getText());
-		    	data.add("editionNumber", editionNumber.getText());
-		    	data.add("printDate", printDate.getValue());
+		    	if(!bookName.getText().equals(""))
+		    		data.add("bookName", bookName.getText());
+		    	else{
+	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a book name. please insert now");
+	    			return;
+	    		}
+		    	if(!authors.getText().equals(""))	
+		    		data.add("authorsNames", authors.getText());
+		    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an authors names. please insert now");
+	    			return;
+		    	}
+		    	if(!editionNumber.getText().equals(""))
+		    		data.add("editionNumber", editionNumber.getText());
+		    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an edition number. please insert now");
+	    			return;
+		    	}
+		    	if(!(printDate.getValue()==null)) {
+		    		System.out.println(printDate.getValue());
+		    		data.add("printDate", printDate.getValue());}
+		    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a print date. please insert now");
+	    			return;
+		    	}
 		    	ArrayList<String> genres = new ArrayList<String>();
     	    	for (Node p : genresPane.getChildren())
     	    		if (((CheckBox)p).isSelected())
     	    			genres.add(p.getId());
-		    	data.add("shortDescription", shortDescription.getText());
-		    	data.add("numberOfCopies", numberOfCopies.getText());
+    	    	if(!genres.isEmpty())
+    	    		data.add("topics",genres);
+    	    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't choose topics. please select now");
+	    			return;
+		    	}
+    	    	if(!shortDescription.getText().equals(""))
+    	    		data.add("shortDescription", shortDescription.getText());
+    	    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a short description. please insert now");
+	    			return;
+		    	}
+    	    	if(!numberOfCopies.getText().equals("")) {
+    	    		data.add("numberOfCopies", numberOfCopies.getText());
+    	    		data.add("currentNumberOfCopies",numberOfCopies.getText());
+    	    	}
+    	    	else {
+    	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a number of copies. please insert now");
+	    			return;
+    	    	}
 		    	data.add("purchaseDate", new Date(System.currentTimeMillis()));
-		    	data.add("shellLocation", shellLocation.getText());
+		    	if(!shellLocation.getText().equals("")) 
+		    		data.add("shellLocation", shellLocation.getText());
+		    	else {
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a shelf location. please insert now");
+	    			return;
+		    	}
 		    	if(popularChoice.getSelectionModel().getSelectedItem().equals("Yes"))
 		    		data.add("isPopular", true);
 		    	else if (popularChoice.getSelectionModel().getSelectedItem().equals("No"))
 		    		data.add("isPopular", false);
 		    	data.add("currentNumberOfCopies",numberOfCopies.getText());
-		    	data.add("topics",genres);
 		    	data.add("tableOfContent",bookName.getText());
 		    	Calendar calendar = Calendar.getInstance();
 		    	java.sql.Date ourJavaDateObject = new java.sql.Date(calendar.getTime().getTime());
 		    	data.add("purchaseDate", ourJavaDateObject);
-				  MyFile msg= new MyFile(newFile.getName());
+		    	if(newFile==null)
+		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert any file to table of contents");
+		    	else {
+		    	MyFile msg= new MyFile(newFile.getName());
 				  msg.setWriteToPath("./src/server/TableOfContents");
 				  try{		      
 					      byte [] mybytearray  = new byte [(int)newFile.length()];
@@ -1181,6 +1474,7 @@ public class LibrarianController {
 			    		break;
 			    	}
 		    	}
+		    	}
 		    	} catch (NumberFormatException e) {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "ID must be written in numbers");
 		    	}
@@ -1188,13 +1482,99 @@ public class LibrarianController {
 
 	        @FXML
 	        void entered(MouseEvent event) {
-
+	        	rc.mouseEntered(event);
 	        }
 
 	        @FXML
 	        void exited(MouseEvent event) {
-
+	        	rc.mouseExited(event);
 	        }
 	    }
 	}
+	protected class ShowInbox {
+    	private ArrayList<Message> myMessagse;
+	    @FXML
+	    private AnchorPane ChooseBookPane;
+
+	    @FXML
+	    private TableView<Message> messagesTV;
+
+	    @FXML
+	    private TableColumn<Message, String> fromColumn;
+
+	    @FXML
+	    private TableColumn<Message, Date> dateColumn;
+	    
+	    @FXML
+	    private ImageView deleteMsg;
+
+	    @FXML
+	    private TextFlow contentTF;
+
+	    @FXML
+	    void goBack(MouseEvent event) {
+	    	rc.setBottom(event, "librarianArea");
+	    }
+	    @FXML
+	    void initialize() {
+	    	MyData data = new MyData("getMessages");
+	    	data.add("librerian", librarian.getID());
+	    	rc.getCC().send(data);
+	    	switch(rc.getCC().getFromServer().getAction()) {
+	    	case "messages":
+	    		myMessagse = (ArrayList<Message>)rc.getCC().getFromServer().getData("messages");
+	    		messagesTV.getItems().addAll(myMessagse);
+	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
+	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
+	    		break;
+	    	case "noMessages":
+	    		messagesTV.setPlaceholder(new Label("No New Messages!"));
+	    		break;
+	    	}
+
+	    }
+
+	    @FXML
+	    void deleteMsg(MouseEvent event) {
+	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
+	    	MyData data = new MyData("deleteMsg");
+	    	data.add("toDelete", toDelete);
+	    	rc.getCC().send(data);
+	    	switch(rc.getCC().getFromServer().getAction()) {
+	    	case "removed":
+	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Message Removed From Inbox!", "Message has been deleted!");
+	    		contentTF.getChildren().clear();
+	    		messagesTV.getItems().clear();
+	    		initialize();
+	    		break;
+	    	case "failed":
+	    		ClientConsole.newAlert(AlertType.INFORMATION, null ,"Could Not Remove Message!", "Message has not been removed!");
+	    		contentTF.getChildren().clear();
+	    		messagesTV.getItems().clear();
+	    		initialize();
+	    		break;
+	    	}
+	    }
+	    @FXML
+	    void entered(MouseEvent event) {
+	    	rc.mouseEntered(event);
+	    }
+
+	    @FXML
+	    void exited(MouseEvent event) {
+	    	rc.mouseExited(event);
+	    }
+	    @FXML
+	    void showMessage(MouseEvent event) {
+	    	System.out.println(messagesTV.getSelectionModel().getSelectedIndex());
+	    		contentTF.getChildren().clear();
+	    		Text header = new Text("Message Content:\n\n");
+	    		header.setFont(new Font("Calibri", 20));
+	    		Text msg = new Text((myMessagse.get(messagesTV.getSelectionModel().getSelectedIndex()).getContent()));
+	    		msg.setFont(new Font("Calibri", 16));
+	    		contentTF.getChildren().add(header);
+	    		contentTF.getChildren().add(msg);
+	    	}
+	    }
+
 }

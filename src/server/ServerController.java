@@ -392,13 +392,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	public boolean resultByFreeText(Book b , ArrayList<String> freeTxt) {
 		boolean result = false;
 		for(String s : freeTxt) {
-			if(b.getAuthorsNames().contains(s))
+			if(b.getAuthorsNames().toLowerCase().contains(s.toLowerCase()))
 				result = true;
-			if(b.getBookName().contains(s))
+			if(b.getBookName().toLowerCase().contains(s.toLowerCase()))
 				result = true;
-			if(b.getTopics().contains(s))
+			if(b.getTopics().toLowerCase().contains(s.toLowerCase()))
 				result = true;
-			if(b.getShortDescription().contains(s))
+			if(b.getShortDescription().toLowerCase().contains(s.toLowerCase()))
 				result=true;
 		}
 		return result;
@@ -569,7 +569,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			ps.executeUpdate();
 		}
 	}
+<<<<<<< HEAD
 	
+=======
+	/**
+	 * 
+	 * @param id - the id of the member
+	 * @return MyData- the parameters at the table or message that failed to load.
+	 * @throws SQLException 
+	 */
+>>>>>>> Sapir
 	public MyData history(int id) throws SQLException{
 		MyData ret = new MyData("result");
 		ArrayList<History> myHistory = new ArrayList<>();
@@ -598,7 +607,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		ret.add("list", myHistory);
 			return ret;
 	}
-	
+	/**
+	 * 
+	 * @param data - the book we want to add
+	 * @return MyData - success / failed
+	 * @throws IOException
+	 * @throws SQLException
+	 */
 	public MyData addNewBook(MyData data) throws IOException, SQLException {
 		MyData ret=new MyData("fail");
 		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
@@ -975,6 +990,11 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			}
 			return toReturn;
 		}
+		/**
+		 * 
+		 * @param data - the violation we want to add to the table
+		 * @return MyData- success / failed
+		 */
 		public MyData addViolation(MyData data) {
 			MyData ret=new MyData("fail");
 			try {

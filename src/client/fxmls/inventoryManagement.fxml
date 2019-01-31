@@ -31,5 +31,15 @@
             <Image url="@../images/buttons/add.png" />
          </image>
       </ImageView>
+      <ImageView fx:id="back_librarianArea" layoutX="773.0" layoutY="26.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="32.0" fitWidth="386.0" layoutX="258.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../src/client/images/texts/titles/inventoryManagement.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

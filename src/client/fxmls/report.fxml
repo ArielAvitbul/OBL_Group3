@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.chart.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView layoutX="332.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -34,5 +31,10 @@
       </VBox>
       <VBox fx:id="calculationBox" alignment="TOP_CENTER" layoutX="649.0" layoutY="35.0" prefHeight="53.0" prefWidth="230.0" spacing="3.0" />
       <HBox fx:id="chartContainer" layoutX="210.0" layoutY="77.0" prefHeight="350.0" prefWidth="650.0" />
+      <ImageView fx:id="back_managerArea" layoutX="22.0" layoutY="19.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
