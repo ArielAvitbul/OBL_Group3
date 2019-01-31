@@ -325,6 +325,7 @@ public class ReaderController {
 		} catch (IOException e) {e.printStackTrace();}
 		page.setLayoutY(240); // sets to the current layout Y value
     }
+    
     /**This function checks if login fields are empty after clicking the login button
      * @author Good Guy
      * @return True - if the login fields are valid , False - otherwise

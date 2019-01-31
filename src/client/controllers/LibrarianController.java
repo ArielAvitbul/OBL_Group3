@@ -371,9 +371,7 @@ public class LibrarianController {
     	    @FXML
     	    void initialize() {
 
-    	    	            setDisable(empty || date.compareTo(today) < 0 );
-    	    	        }
-    	    	    });
+
     	    	SearchResultTable.setVisible(false);
     	    	dateSelector.setVisible(false);
     	    	submitBorrow.setVisible(false);
@@ -518,6 +516,7 @@ public class LibrarianController {
 						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
 						System.out.println(getMember());
 						System.out.println(getMember().getMemberCard());
+						
 					break;
 					case "borrowFailed":
 						ClientConsole.newAlert(AlertType.ERROR, null , "Something went wrong!", (String)rc.getCC().getFromServer().getData("reason"));
