@@ -874,7 +874,7 @@ public class LibrarianController {
 		            	rc.setBottom(event, "bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
 		        }*/
 		/**
-		 * 
+		 * @author guy feldman
 		 * @param event - the event of click on update book.
 		 */
 	    @FXML
@@ -1033,7 +1033,10 @@ public class LibrarianController {
 	    	    }
 	    	    /**
 	    	     * This function check if the file is pdf file.
+	    	     * @author guy feldman
+	    	     * 
 	    	     * @param event - click on upload.
+	    	     * 
 	    	     */
 	    	    @FXML
 	    	    void chooseTOCtoUpdate(ActionEvent event) {
@@ -1052,6 +1055,7 @@ public class LibrarianController {
 	    	    }
 	    	    /**
 	    	     * This function update the book, and check if there is any parameter that is empty. If there is one like this, it's send an error to the user.
+	    	     * @author sapir carmi
 	    	     * @param event - click on update book
 	    	     */
 	    	    @FXML
@@ -1239,9 +1243,10 @@ public class LibrarianController {
 	        /**
 	         * function that adding a new book , and check if there is any empty parameter. If there is, the book is don't add.
 	         * @param event - click on add button on addBook fxml.
+	         * 
 	         */
 	        @FXML
-		    void addBook(MouseEvent event) {
+		    void addBook(MouseEvent event,String a) {
 		    	try {
 		    	MyData data= new MyData("addNewBook");
 		    	if(!bookName.getText().equals(""))
