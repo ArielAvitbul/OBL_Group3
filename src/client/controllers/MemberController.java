@@ -2,6 +2,8 @@ package client.controllers;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import client.ClientConsole;
@@ -206,6 +208,11 @@ public class MemberController {
 		private TableView<History> BorrowTable;
 			
     	}
+	  /**
+	   * The ExtensionRequestController class is the controller of the auto extension process's GUI
+	   * @author Good Guy
+	   *
+	   */
 	    protected class ExtensionRequestController {
 	    	    @FXML
 	    	    private AnchorPane ExtensionAnPane;
@@ -252,32 +259,46 @@ public class MemberController {
 	    	    		}
 	    	    	}
 	    	    
-
+	    	    /**
+	    	     * @author Good Guy
+	    	     * @param i - index of a Borrow in ArrayList of borrows in the member's MemberCard.
+	    	     * @return True - if this Borrow can be extended
+	    	     *,False - Otherwise
+	    	     * @see MemberCard
+	    	     * @see Borrow
+	    	     */
 				private boolean isExtendableBorrow(int i) {
 					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
 					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
 						return false;
 					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
 				}	  
+				/**
+				 * This method handles the extension request submitted by the member
+				 * @author Good Guy
+				 * @param e - event which on this method was called
+				 * 
+				 */
 				@FXML
 				private void submitExtensionRequest(MouseEvent e) {
 	    			CopyInBorrow selected = (CopyInBorrow)ExtensionCurrBooks.getSelectionModel().getSelectedItem();
 	    			if(selected==null) {
-	    				ClientConsole.newAlert(AlertType.INFORMATION, "No Book Selected!", null, "Select a book from the list");
+	    				ClientConsole.newAlert(AlertType.INFORMATION,null, "No Book Selected!", "Select a book from the list");
 	    				return;
 	    			}
 	    			if(selected.getBorroBook().isPopular()) {
-	    				ClientConsole.newAlert(AlertType.INFORMATION, "Popular book!", null, "This book is popular therfore you cannot extend your borrow!");
+	    				ClientConsole.newAlert(AlertType.INFORMATION,null, "Popular book!", "This book is popular therfore you cannot extend your borrow!");
 	    				return;
 	    				}
 	    			else {
 	    					MyData data = new MyData("BorrowToExtend");
 	    					data.add("TheCopyInBorrow", selected);
+	    					data.add("requester", "user");
+	    					data.add("fromPicker", null);
 	    						rc.getCC().send(data);	
-	    						System.out.println(rc.getCC().getFromServer().getAction());
 	    						switch(rc.getCC().getFromServer().getAction()) {
 	    						case "ExtensionSucceed":
-	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated!");
+	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
 	    							break;
 	    						case "ExtensionFailed":
 	    							System.out.println((String)rc.getCC().getFromServer().getData("reason"));

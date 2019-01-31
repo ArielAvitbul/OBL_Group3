@@ -325,9 +325,9 @@ public class ReaderController {
 		} catch (IOException e) {e.printStackTrace();}
 		page.setLayoutY(240); // sets to the current layout Y value
     }
-    /* This function checks if login fields are empty after clicking the login button
-     * input: none
-     * output: T/F
+    /**This function checks if login fields are empty after clicking the login button
+     * @author Good Guy
+     * @return True - if the login fields are valid , False - otherwise
      */
 	private boolean isValidLoginFields() {
 		return !(loginIdField.getText().isEmpty() && passField.getText().isEmpty());
@@ -360,10 +360,7 @@ public class ReaderController {
 	 * output: none
 	 */
 	
-    /*This function handles a Reader login request and sends it to server if its valid
-     * input:none
-     * output: successful or unsuccessful login reaction 
-     */
+
     @FXML
     private void submitLogin (MouseEvent event)
     {

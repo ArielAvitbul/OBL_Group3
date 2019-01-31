@@ -254,7 +254,7 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.history((Integer)data.getData("id")));
 	  		    	break;
 	  		  case "BorrowToExtend":
-	  		    	client.sendToClient(serverCont.updateExtension((CopyInBorrow)data.getData("TheCopyInBorrow")));
+	  		    	client.sendToClient(serverCont.updateExtension((CopyInBorrow)data.getData("TheCopyInBorrow"),(String)data.getData("requester"),(Timestamp)data.getData("fromPicker")));
 	  		    	break;
 	  		  case "getCopiesInBorrow":
 	  		    	MyData copiesInBorrow = new MyData("copiesInBorrow");
