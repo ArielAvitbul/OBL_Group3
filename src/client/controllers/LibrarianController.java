@@ -213,10 +213,14 @@ public class LibrarianController {
 	    		data.add("email", emailField.getText());
 	    		data.add("phone", phoneField.getText());
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
+	    		System.out.println(statusBox.getSelectionModel().getSelectedItem().toString());
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
+	    			MyData updatedMember = ((MyData)rc.getCC().getFromServer().getData("updatedMember"));
+	    			member = ((Member)updatedMember.getData("member"));
+	    			//member = ((Member)((MyData)rc.getCC().getFromServer().getData("updatedMember")).getData("member"));
 	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
 	    			break;
 	    		case "fail":
