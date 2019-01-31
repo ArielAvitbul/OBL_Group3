@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
+import client.ClientConsole;
 import common.Book;
 import common.BookReservation;
 import common.Borrow;
@@ -33,12 +35,19 @@ import common.MyData;
 import common.MyFile;
 import common.SendMail;
 import common.Violation;
+import javafx.scene.control.Alert.AlertType;
 
 public class ServerController {
 	public ServerController(MyDB db) {
 		this.db=db;
 	}
 	final MyDB db;
+	
+	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
+	    long diff = d2.getTime() - d1.getTime();
+	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+	}
+	
 	public ArrayList<Book> getAllBooks() {
 		ArrayList<Book> books = new ArrayList<>();
 		try {
@@ -336,28 +345,55 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		return toReturn;
 	}
 	
-	public MyData updateExtension(CopyInBorrow copyInBorrow) throws SQLException {
-		MyData toReturn;
-		if(checkReservations(copyInBorrow)) {
-			toReturn = new MyData("ExtensionFailed");
-			toReturn.add("updatedBorrow", copyInBorrow);
-			toReturn.add("reason", "This book has been reserved!");
+	public MyData updateExtension(CopyInBorrow copyInBorrow , String requester , Timestamp fromPicker) throws SQLException {
+		MyData toReturn = null;
+		switch (requester) {
+			case "user":
+				if(checkReservations(copyInBorrow)) {
+					toReturn = new MyData("ExtensionFailed");
+					toReturn.add("updatedBorrow", copyInBorrow);
+					toReturn.add("reason", "This book has been reserved!");
+				}
+				else {
+					toReturn = updateBorrows(copyInBorrow , "user" , null);
+					if(updateExtensions((CopyInBorrow)toReturn.getData("updatedBorrow"))==0) {
+						toReturn = new MyData("ExtensionFailed");
+						toReturn.add("updatedBorrow", copyInBorrow);
+						toReturn.add("reason", "Can't update borrow!");
+					}
+					else {
+						writeMsgToLibrerians(copyInBorrow);
+					}
+					break;
+				}
+				break;
+			case "employee":
+				if(checkReservations(copyInBorrow)) {
+					toReturn = new MyData("hasReservations");
+					toReturn.add("msgToPrint", "This book has reservations for it.\nAre you sure you want to extend?");
+				}
+				else {
+					toReturn = updateBorrows(copyInBorrow , "employee" , fromPicker);
+					if(updateExtensions((CopyInBorrow)toReturn.getData("updatedBorrow"))==0) {
+						toReturn = new MyData("ExtensionFailed");
+						toReturn.add("updatedBorrow", copyInBorrow);
+						toReturn.add("reason", "Can't update borrow!");
+					}
+				}
+				break;
+			case "employeeAfterConfirmation":
+				toReturn = updateBorrows(copyInBorrow , "employee" , fromPicker);
+				if(updateExtensions((CopyInBorrow)toReturn.getData("updatedBorrow"))==0) {
+					toReturn = new MyData("ExtensionFailed");
+					toReturn.add("updatedBorrow", copyInBorrow);
+					toReturn.add("reason", "Can't update borrow!");
+				}
+				break;
 		}
-		else {
-		toReturn = updateBorrows(copyInBorrow);
-		if(updateExtensions((CopyInBorrow)toReturn.getData("updatedBorrow"))==0) {
-			toReturn = new MyData("ExtensionFailed");
-			toReturn.add("updatedBorrow", copyInBorrow);
-			toReturn.add("reason", "Can't update borrow!");
-		}
-		else {
-		writeMsgToLibrerians(copyInBorrow);
-			}
-		}
-		return toReturn;	
+		return toReturn;
 	}
 	private boolean checkReservations(CopyInBorrow copyInBorrow) throws SQLException {
-		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE bookID="+copyInBorrow.getBorroBook().getBookID());
+		ResultSet rs = db.select("SELECT * FROM book_reservations WHERE bookID="+copyInBorrow.getBorroBook().getBookID()+" AND arrivedDate is null");
 		return db.hasResults(rs);
 	}
 	private int updateExtensions(CopyInBorrow copyInBorrow) throws SQLException {
@@ -366,18 +402,24 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		PreparedStatement ps = db.update(insertQ);
 		ps.setInt(1, copyInBorrow.getNewBorrow().getMemberID());
 		ps.setInt(2, copyInBorrow.getNewBorrow().getBorrowID());
-		ps.setDate(3, new Date(copyInBorrow.getNewBorrow().getReturnDate().getTime()));
+		ps.setTimestamp(3, copyInBorrow.getNewBorrow().getReturnDate());
 		return ps.executeUpdate();
 		
 	}
-	private MyData updateBorrows(CopyInBorrow copyInBorrow) throws SQLException {
+	private MyData updateBorrows(CopyInBorrow copyInBorrow , String requester , Timestamp fromPicker) throws SQLException {
 		MyData toReturn;
+		int daysToExtend;
 		Calendar c = Calendar.getInstance();
 		c.setTime(copyInBorrow.getNewBorrow().getReturnDate());
-		c.add(Calendar.DAY_OF_MONTH, 7);
+		if(requester.equals("user")) 
+			daysToExtend = (int)getDifferenceDays(copyInBorrow.getNewBorrow().getReturnDate(), copyInBorrow.getNewBorrow().getBorrowDate());
+		else
+			daysToExtend = (int)getDifferenceDays(fromPicker, copyInBorrow.getNewBorrow().getReturnDate());
+		c.add(Calendar.DAY_OF_MONTH, daysToExtend);
 		copyInBorrow.getNewBorrow().setReturnDate(new Timestamp(c.getTimeInMillis()));
-		System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
-		System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
+		System.out.println(new Timestamp(c.getTimeInMillis()));
+		//System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
+		//System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
 		String query = "UPDATE borrows SET returnDate=? WHERE borrowID=?";
 		PreparedStatement ps = db.update(query);
 		ps.setTimestamp(1,copyInBorrow.getNewBorrow().getReturnDate());
@@ -392,7 +434,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		}
 		return toReturn;
 	}
-	
 	private void writeMsgToLibrerians(CopyInBorrow toUpdate) throws SQLException {
 		ArrayList<Integer> librerians = new ArrayList<Integer>();
 		MemberCard borrower = getMemberCard(toUpdate.getNewBorrow().getMemberID());

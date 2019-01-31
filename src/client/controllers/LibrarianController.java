@@ -345,13 +345,15 @@ public class LibrarianController {
     	    @FXML
     	    void initialize() {
     	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
-    	    	        public void updateItem(LocalDate date, boolean empty) {
-    	    	            super.updateItem(date, empty);
-    	    	            LocalDate today = LocalDate.now();
+	    	        public void updateItem(LocalDate date, boolean empty) {
+	    	            super.updateItem(date, empty);
+	    	            LocalDate today = LocalDate.now();
+	    	            setDisable(empty || date.compareTo(today) < 0 );
+	    	            if(date.isAfter(LocalDate.now().plusDays(14)))
+	    	            	setDisable(true);
+	    	        }
+	    	    });
 
-    	    	            setDisable(empty || date.compareTo(today) < 0 );
-    	    	        }
-    	    	    });
     	    	SearchResultTable.setVisible(false);
     	    	dateSelector.setVisible(false);
     	    	submitBorrow.setVisible(false);
@@ -409,6 +411,7 @@ public class LibrarianController {
 		    @FXML
 		    void selectBook(MouseEvent event) {
 		    	selected = SearchResultTable.getSelectionModel().getSelectedItem();
+
 		    }
 		    @FXML
 		    void submitBorrowRequest(MouseEvent event) {
@@ -564,7 +567,8 @@ public class LibrarianController {
     	    }
     	}
     	protected class ManualExtension {
-
+    	    @FXML
+    	    private VBox returnDateVbox;
     	    @FXML
     	    private ImageView back_memberManagement;
     	    @FXML
@@ -582,8 +586,6 @@ public class LibrarianController {
 
     	    @FXML
     	    void initialize() {
-
-        	    	
     	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
     	    			for(Borrow toCheck : member.getMemberCard().getBorrowHistory()) 
     	    				if(isCurrBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck)))
@@ -625,7 +627,56 @@ public class LibrarianController {
     	    }
     	    @FXML
     	    void manualyExtend(MouseEvent event) {
+    	    	MyData toSend = new MyData("BorrowToExtend");
+    	    	toSend.add("TheCopyInBorrow", borrowsTV.getSelectionModel().getSelectedItem());
+    	    	toSend.add("requester", "employee");
+				Date fromPicker = new Date();
+				fromPicker.setDate(newReturnDate.getValue().getDayOfMonth());
+				int fix = newReturnDate.getValue().getMonthValue() == 1 ? 12 : newReturnDate.getValue().getMonthValue()-1;
+				fromPicker.setMonth(fix);
+				System.out.println(newReturnDate.getValue().getYear());
+				fromPicker.setYear(newReturnDate.getValue().getYear()-1900);
+				System.out.println(fromPicker);
+				Timestamp toServer = new Timestamp(fromPicker.getTime());
+				toSend.add("fromPicker", toServer);
+				rc.getCC().send(toSend);
+				switch(rc.getCC().getFromServer().getAction()) {
+				case "ExtensionSucceed":
+					ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
+					break;
+				case "ExtensionFailed":
+					ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
+					break;
+				case "hasReservations":
+					if((ClientConsole.newAlert(AlertType.CONFIRMATION, null , "Reserved Book!", (String)rc.getCC().getFromServer().getData("msgToPrint")).get()==ButtonType.OK)) {
+						toSend.add("requester", "employeeAfterConfirmation");
+						rc.getCC().send(toSend);
+						switch(rc.getCC().getFromServer().getAction()) {
+					case "ExtensionSucceed":
+						ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
+						break;
+					case "ExtensionFailed":
+						ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
+						break;
+					}
+					}
+					break;
+				}
     	    	
+    	    	}
+    	    @FXML
+    	    void selectCopy(MouseEvent event) {
+    	    	returnDateVbox.setVisible(true);
+    	    	CopyInBorrow selected = borrowsTV.getSelectionModel().getSelectedItem();
+	            LocalDate min = selected.getNewBorrow().getReturnDate().toLocalDateTime().toLocalDate();
+	            LocalDate max = selected.getNewBorrow().getReturnDate().toLocalDateTime().toLocalDate();
+    	    	newReturnDate.setDayCellFactory(picker -> new DateCell(){
+	    	        public void updateItem(LocalDate date, boolean empty) {
+	    	            super.updateItem(date, empty);
+	                    setDisable(date.isAfter(max.plusDays(ReaderController.getDifferenceDays(selected.getNewBorrow().getReturnDate(), selected.getNewBorrow().getBorrowDate()))) || date.isBefore(min));
+	    	        }
+	    	    });
+
     	    }
 
     	}

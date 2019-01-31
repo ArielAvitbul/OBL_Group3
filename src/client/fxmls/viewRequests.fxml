@@ -28,31 +28,38 @@
                   <Insets top="25.0" />
                </VBox.margin>
             </Label>
-            <TableView fx:id="borrowsTV" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="472.0">
+            <TableView fx:id="borrowsTV" minHeight="-Infinity" minWidth="-Infinity" onMousePressed="#selectCopy" prefHeight="150.0" prefWidth="472.0">
               <columns>
                 <TableColumn fx:id="bookNameCol" prefWidth="160.0" text="Book" />
                 <TableColumn fx:id="bookAuthorCol" prefWidth="166.0" text="Author(s)" />
                   <TableColumn fx:id="returnDateCol" prefWidth="154.0" text="Return Date" />
               </columns>
             </TableView>
-            <Label text="Select the new return date:" textFill="#9a8f8f">
-               <font>
-                  <Font name="Calibri" size="24.0" />
-               </font>
-            </Label>
-            <DatePicker fx:id="newReturnDate" promptText="Select New Return Date" showWeekNumbers="true">
-               <VBox.margin>
-                  <Insets bottom="20.0" left="150.0" />
-               </VBox.margin>
-            </DatePicker>
-            <ImageView onMouseEntered="#entered" onMouseExited="#exited" onMousePressed="#manualyExtend" pickOnBounds="true" preserveRatio="true" translateX="10.0" translateY="-25.0">
-               <image>
-                  <Image url="@../images/buttons/askForExtend.jpg" />
-               </image>
-               <VBox.margin>
-                  <Insets left="150.0" />
-               </VBox.margin>
-            </ImageView>
+            <VBox fx:id="returnDateVbox" prefHeight="200.0" prefWidth="100.0" spacing="15.0" visible="false">
+               <children>
+                  <Label text="Select the new return date:" textFill="#9a8f8f">
+                     <font>
+                        <Font name="Calibri" size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="50.0" />
+                     </VBox.margin>
+                  </Label>
+                  <DatePicker fx:id="newReturnDate" promptText="Select New Return Date" showWeekNumbers="true">
+                     <VBox.margin>
+                        <Insets bottom="20.0" left="150.0" />
+                     </VBox.margin>
+                  </DatePicker>
+                  <ImageView onMouseEntered="#entered" onMouseExited="#exited" onMousePressed="#manualyExtend" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/buttons/askForExtend.jpg" />
+                     </image>
+                     <VBox.margin>
+                        <Insets left="150.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
          </children>
       </VBox>
    </children>

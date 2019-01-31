@@ -2,6 +2,7 @@ package client.controllers;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.sql.Time;
 import java.util.ArrayList;
 
@@ -244,21 +245,22 @@ public class MemberController {
 				private void submitExtensionRequest(MouseEvent e) {
 	    			CopyInBorrow selected = (CopyInBorrow)ExtensionCurrBooks.getSelectionModel().getSelectedItem();
 	    			if(selected==null) {
-	    				ClientConsole.newAlert(AlertType.INFORMATION, "No Book Selected!", null, "Select a book from the list");
+	    				ClientConsole.newAlert(AlertType.INFORMATION,null, "No Book Selected!", "Select a book from the list");
 	    				return;
 	    			}
 	    			if(selected.getBorroBook().isPopular()) {
-	    				ClientConsole.newAlert(AlertType.INFORMATION, "Popular book!", null, "This book is popular therfore you cannot extend your borrow!");
+	    				ClientConsole.newAlert(AlertType.INFORMATION,null, "Popular book!", "This book is popular therfore you cannot extend your borrow!");
 	    				return;
 	    				}
 	    			else {
 	    					MyData data = new MyData("BorrowToExtend");
 	    					data.add("TheCopyInBorrow", selected);
+	    					data.add("requester", "user");
+	    					data.add("fromPicker", null);
 	    						rc.getCC().send(data);	
-	    						System.out.println(rc.getCC().getFromServer().getAction());
 	    						switch(rc.getCC().getFromServer().getAction()) {
 	    						case "ExtensionSucceed":
-	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated!");
+	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
 	    							break;
 	    						case "ExtensionFailed":
 	    							System.out.println((String)rc.getCC().getFromServer().getData("reason"));
