@@ -140,7 +140,6 @@ public class LibrarianController {
     		else
     			rc.setBottom(event);
 	    }
-
         @FXML
         void goBack(MouseEvent event) {
         	rc.setBottom(event, "librarianArea");
@@ -208,8 +207,6 @@ public class LibrarianController {
         @FXML
         void saveMemberInfo(MouseEvent event) {
         	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-        	
-
 	    		MyData data = new MyData("saveInfo");
 	    		data.add("admin", librarian.getID()); 
 	    		data.add("id", Integer.parseInt(idField.getText()));
