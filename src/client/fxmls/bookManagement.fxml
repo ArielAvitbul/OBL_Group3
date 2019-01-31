@@ -92,5 +92,10 @@
       </ImageView>
       <ChoiceBox fx:id="choicePopular" layoutX="608.0" layoutY="268.0" prefWidth="150.0" />
       <Button layoutX="645.0" layoutY="321.0" mnemonicParsing="false" onAction="#chooseTOCtoUpdate" text="Choose File" />
+      <ImageView fx:id="back_inventoryManagement" layoutX="766.0" layoutY="28.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
