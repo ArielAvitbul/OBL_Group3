@@ -18,7 +18,9 @@ public class MyFile implements Serializable {
 	public MyFile(Book book) {
 		this.fileName = String.valueOf(book.getBookID());
 	}
-	
+	public MyFile(String bookName) {
+		this.fileName = bookName;
+	}
 	
 	public String getFileName() {
 		return fileName;

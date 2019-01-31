@@ -93,6 +93,7 @@ public class ClientConsole extends Application implements CommonIF
   		portField.clear();
   	}
   }
+  
   //Instance methods ************************************************
   
   /**
@@ -128,21 +129,21 @@ public class ClientConsole extends Application implements CommonIF
   
   /**
    * This method is responsible for the creation of the Client GUI.
- * @throws IOException 
+   * @throws IOException
    */
 	@Override
 	public void start(Stage primaryStage) throws IOException {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/connectToServerGUI.fxml"));
-			Scene scene = new Scene(loader.load());
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("fxmls/connectToServerGUI.fxml"));
+		Scene scene = new Scene(loader.load());
 			primaryStage.setScene(scene);
 			primaryStage.show();
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-				@Override
-				public void handle(WindowEvent event) {
-						Platform.exit();
-				        System.exit(0);
-				}
-			});
+	primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		@Override
+		public void handle(WindowEvent event) {
+				Platform.exit();
+		        System.exit(0);
+		}
+	});
 	}
 	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
@@ -155,4 +156,5 @@ public class ClientConsole extends Application implements CommonIF
 	{
 		launch(args);
 	}
+
 }

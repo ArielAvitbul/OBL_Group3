@@ -220,7 +220,6 @@ public class ManagerController {
 			calculationBox.getChildren().add(avg);
 			calculationBox.getChildren().add(median);
 		}
-		
-	}
 
-}
+		}
+	}

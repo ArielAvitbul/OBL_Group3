@@ -1,15 +1,16 @@
 package common;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
+
 
 public class BookReservation implements Serializable{
 
 	private int memberID;
-	private Date orderDate;
+	private Timestamp orderDate;
 	private int bookID;
 	
-	public BookReservation(int memberID, Date orderDate, int bookID) 
+	public BookReservation(int memberID, Timestamp orderDate, int bookID) 
 	{
 		super();
 		this.memberID = memberID;
@@ -27,12 +28,12 @@ public class BookReservation implements Serializable{
 		this.memberID = memberID;
 	}
 
-	public Date getOrderDate() 
+	public Timestamp getOrderDate() 
 	{
 		return orderDate;
 	}
 
-	public void setOrderDate(Date orderDate) 
+	public void setOrderDate(Timestamp orderDate) 
 	{
 		this.orderDate = orderDate;
 	}

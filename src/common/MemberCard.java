@@ -10,7 +10,7 @@ public class MemberCard implements Serializable{
 	private String phoneNumber="";
 	private String emailAddress="";
 	private ArrayList<Borrow> borrowHistory=null;
-	private ArrayList<Violation> violationHostory=null;
+	private ArrayList<Violation> violationHistory=null;
 	private ArrayList<BookReservation> reservationHistory=null;
 	private int lateReturns=0;
 
@@ -22,7 +22,7 @@ public class MemberCard implements Serializable{
 		this.phoneNumber = phoneNumber;
 		this.emailAddress = emailAddress;
 		this.borrowHistory = borrowHistory;
-		this.violationHostory = violationHostory;
+		this.violationHistory = violationHostory;
 		this.lateReturns = lateReturns;
 		this.reservationHistory=reservationHistory;
 	}
@@ -87,12 +87,12 @@ public class MemberCard implements Serializable{
 	
 	public ArrayList<Violation> getViolationHostory() 
 	{
-		return violationHostory;
+		return violationHistory;
 	}
 	
 	public void setViolationHostory(ArrayList<Violation> violationHostory) 
 	{
-		this.violationHostory = violationHostory;
+		this.violationHistory = violationHostory;
 	}
 	
 	public int getLateReturns() 

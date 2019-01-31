@@ -1,6 +1,8 @@
 package client.controllers;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import client.ClientConsole;
@@ -105,8 +107,24 @@ public class MemberController {
 
 	    @FXML
 	    void replacePage(MouseEvent event) {
-	    	rc.setBottom(event);
+	    	if(checkPossibility(event)==0)
+	    		return;
+	    	else
+	    		rc.setBottom(event);
 	    }
+	    private int checkPossibility(MouseEvent event) {
+			// TODO Auto-generated method stub
+	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("orderBook"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Your user is freeze. you can't order books");
+	    		return 0;
+	    	}
+	    	if(member.getStatus().equals(Member.Status.FREEZE) &&(((ImageView)event.getSource()).getId().equals("extensionRequest"))) {
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Your user is freeze. you can't extend any borrow");
+	    		return 0;
+	    	}
+	    	return 1;
+
+		}
 	    @FXML
 	    void saveInfo(MouseEvent event) {
 	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.").get() == ButtonType.OK) {
@@ -141,24 +159,24 @@ public class MemberController {
 			ArrayList<History> arrOb = (ArrayList<History>)rc.getCC().getFromServer().getData("list");
 			BorrowTable.getItems().addAll(arrOb);
 			System.out.println(arrOb);
-			colname.setCellValueFactory(new PropertyValueFactory<History, String>("bookName"));
-			colborrowdate.setCellValueFactory(new PropertyValueFactory<History,Date>("borrowDate"));
-			colreturndate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualReturnDate"));
+			colType.setCellValueFactory(new PropertyValueFactory<History,String>("type"));
+			colName.setCellValueFactory(new PropertyValueFactory<History,String>("name"));
+			colDate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualDate"));
 		}
         @FXML
     	private AnchorPane pane;
         @FXML
         private ImageView r;
+
+        @FXML
+        private TableColumn<History, String> colType;
+
+        @FXML
+        private TableColumn<History, String> colName;
+
+        @FXML
+        private TableColumn<History, Date> colDate;
         
-		@FXML
-		private TableColumn<History, String> colname;
-
-		@FXML
-		private TableColumn<History, Date> colborrowdate;
-
-		@FXML
-		private TableColumn<History, Date> colreturndate;
-		    
 		@FXML
 		private TableView<History> BorrowTable;
 			
@@ -180,7 +198,7 @@ public class MemberController {
 	    	    private TableColumn<CopyInBorrow, String> BookNameCol;
 	    	    
 	    	    @FXML
-	    	    private TableColumn<CopyInBorrow, Date> RetDateCol;
+	    	    private TableColumn<CopyInBorrow, Timestamp> RetDateCol;
 	    	    
 	    	    @FXML
 	    	    private TableColumn<CopyInBorrow, String> BookAuthorCol;
@@ -191,7 +209,7 @@ public class MemberController {
 	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
 	    	    	int i = 0;
 	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
-	    	    		if(isCurrentBorrow(i))
+	    	    		if(isExtendableBorrow(i))
 	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
 	    	    			i++;
 	    	    	}
@@ -207,7 +225,7 @@ public class MemberController {
 	    	    			ExtensionCurrBooks.getItems().addAll(copies);
 	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
 	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
-	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Date>("returnDate"));
+	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Timestamp>("returnDate"));
 	    	    			
 	    	    		}
 	    				rc.addTo(ExtensionAnPane, new MyImage("askForExtend", "\\client\\images\\buttons\\askForExtend.jpg", 231, 358, e->submitExtensionRequest(e)), true);
@@ -216,19 +234,37 @@ public class MemberController {
 	    	    	}
 	    	    
 
-				private boolean isCurrentBorrow(int i) {
+				private boolean isExtendableBorrow(int i) {
+					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
+					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
+						return false;
 					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
-				}	    	
+				}	  
+				@FXML
 				private void submitExtensionRequest(MouseEvent e) {
 	    			CopyInBorrow selected = (CopyInBorrow)ExtensionCurrBooks.getSelectionModel().getSelectedItem();
+	    			if(selected==null) {
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "No Book Selected!", null, "Select a book from the list");
+	    				return;
+	    			}
 	    			if(selected.getBorroBook().isPopular()) {
-	    				rc.getCC().newAlert(AlertType.INFORMATION, "Popular book!", null, "This book is popular therfore you cannot extend your borrow!");
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "Popular book!", null, "This book is popular therfore you cannot extend your borrow!");
 	    				return;
 	    				}
 	    			else {
 	    					MyData data = new MyData("BorrowToExtend");
-	    					data.add("TheBorrow", selected.getNewBorrow());
-	    						rc.getCC().send(data);					
+	    					data.add("TheCopyInBorrow", selected);
+	    						rc.getCC().send(data);	
+	    						System.out.println(rc.getCC().getFromServer().getAction());
+	    						switch(rc.getCC().getFromServer().getAction()) {
+	    						case "ExtensionSucceed":
+	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated!");
+	    							break;
+	    						case "ExtensionFailed":
+	    							System.out.println((String)rc.getCC().getFromServer().getData("reason"));
+	    							ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
+	    							break;
+	    						}
 	    				}
 	    			}
 				}

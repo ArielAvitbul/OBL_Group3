@@ -44,7 +44,7 @@ public class MyDB {
 	public boolean hasResults(ResultSet rs) throws SQLException {
 		return rs.first();
 	}
-@Override
+	@Override
 	protected void finalize() throws Throwable {
 	conn.close();
 	System.out.println("Database finalized.");

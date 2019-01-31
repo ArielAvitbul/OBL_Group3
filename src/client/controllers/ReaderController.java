@@ -5,9 +5,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import client.ClientConsole;
 import client.MyImage;
@@ -45,6 +49,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 public class ReaderController {
@@ -54,11 +61,11 @@ public class ReaderController {
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
 	}
-	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, String FreeText, GridPane genresPane) {
+	protected ArrayList<Book> getSearchResults(String bookName, String authorsName, ArrayList<String> FreeText, GridPane genresPane) {
     	MyData searchBook = new MyData ("searchBook");
     	searchBook.add("bookName", bookName);
     	searchBook.add("authorsName", authorsName);
-    	// searchBook.add("freeText",FreeText);
+    	searchBook.add("freeText",FreeText);
     	// TODO: add that ^
     	ArrayList<String> genres= new ArrayList<>();
     	for (Node p : genresPane.getChildren())
@@ -70,6 +77,10 @@ public class ReaderController {
     }
 	protected ClientConsole getCC() {
 		return cc;
+	}
+	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
+	    long diff = d2.getTime() - d1.getTime();
+	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 	@FXML
 	void initialize() {
@@ -166,6 +177,9 @@ public class ReaderController {
     protected void setBottom(MouseEvent ev, String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     		switch (fxml) {
+    		case "viewRequests":
+    		controllers.put(fxml,((MemberManagement)controllers.get("memberManagement")).new ManualExtension());
+    		break;
     		case "report":
     			controllers.put(fxml, ((ManagerController)controllers.get("manager")).new Report());
     			break;
@@ -185,8 +199,8 @@ public class ReaderController {
     				controllers.put(fxml,(((LibrarianController)controllers.get("librarian")).new MemberManagement(((MemberManagement)controllers.get("memberManagement")).getMember())));
     			}
     			break;
-    		case "viewRequests":
-    			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new ViewRequests());
+    		case "exceptionalEvent":
+    			controllers.put(fxml,((MemberManagement)controllers.get("memberManagement")).new ExceptionalEvent());
     			break;
     		case "borrowCopy":
     			controllers.put(fxml, ((MemberManagement)controllers.get("memberManagement")).new BorrowCopy());
@@ -217,6 +231,9 @@ public class ReaderController {
     			break;
     		case "orderBook":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
+    			break;
+    		case "showInbox":
+    			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new ShowInbox());
     			break;
     			default: // unrecognized fxml
     				ClientConsole.newAlert(AlertType.ERROR, null, "Unrecognized FXML", "Hey, make sure you wrote the write fxml name and handled it correctly.");
@@ -326,7 +343,8 @@ public class ReaderController {
 			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
 			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
-			availbleCol.setCellValueFactory(new PropertyValueFactory<Book, String>("currentNumberOfCopies"));
+			availbleCol.setCellValueFactory(new PropertyValueFactory<Book, String>("Avlible"));
+			shelfCol.setCellValueFactory(new PropertyValueFactory<Book, String>("ShellLocation"));
 			tableBooks.setPlaceholder(new Label("Enter search details"));
 				}
 		    @FXML
@@ -344,6 +362,10 @@ public class ReaderController {
 
 		    @FXML
 		    private TextField freeTextField;
+		    @FXML
+		    private TextFlow textForClosedDate;
+    	    @FXML
+    	    private TableColumn<Book, String> shelfCol;
 
 		    @FXML
 		    private ListView<String> searchResultList;
@@ -377,11 +399,39 @@ public class ReaderController {
 		    	tableBooks.getItems().clear();
     	    	orderBookButton.setVisible(false);
     	    	indexBookButton.setVisible(false);
-	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTextField.getText(),GenrePane));
+    	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
+	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
 	    	    	orderBookButton.setVisible(true);
 	    	    	indexBookButton.setVisible(true);
 		    }
-		    
+		    @FXML
+		    void getClosedReturn(MouseEvent event) {
+		    	if (event.isPrimaryButtonDown() && event.getClickCount()==1)
+		    	{
+		    		textForClosedDate.getChildren().clear();
+		    		Book book = tableBooks.getSelectionModel().getSelectedItem();
+		    		if (book.getCurrentNumberOfCopies()==0)
+		    		{
+		    			MyData getClosedReturn = new MyData("getClosedReturn");
+		    			getClosedReturn.add("book", book);
+		    			cc.send(getClosedReturn);
+		    			String result = cc.getFromServer().getAction();
+
+		        		if (result.equals("succeed")) {
+		        			Text t = new Text();
+		        			java.util.Date returnDateUTIL = new java.util.Date(((Date) cc.getFromServer().getData("returnDate")).getTime());
+		        			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		        			t.setText("The closed return date is " + dateFormat.format(returnDateUTIL));
+		        			t.setFont(new Font("Calibari",16));
+		        		    textForClosedDate.getChildren().add(t);
+		        		}
+		        		else if(result.equals("fail"))
+		        		ClientConsole.newAlert(AlertType.INFORMATION, null, "fail", (String)cc.getFromServer().getData("fail"));
+
+		    		}
+		    	}
+		    }
 		    @FXML
 		    void tableOfContent(MouseEvent event) throws IOException {
 		    		Book book = tableBooks.getSelectionModel().getSelectedItem();

@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.TextFlow?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView layoutX="356.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="355.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/searchBook.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="searchButton" layoutX="137.0" layoutY="343.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="searchButton" layoutX="109.0" layoutY="361.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#submitSearch" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/search.png" />
          </image>
@@ -39,15 +34,16 @@
             <Image url="@../images/buttons/watchIndex.jpg" />
          </image>
       </ImageView>
-      <TableView fx:id="tableBooks" layoutX="371.0" layoutY="122.0" prefHeight="253.0" prefWidth="482.0">
+      <TableView fx:id="tableBooks" layoutX="316.0" layoutY="127.0" onMousePressed="#getClosedReturn" prefHeight="257.0" prefWidth="570.0">
        <columns>
           <TableColumn fx:id="nameCol" editable="false" prefWidth="143.19998168945312" text="Name" />
             <TableColumn fx:id="authorsCol" prefWidth="108.0" text="Author(s)" />
             <TableColumn fx:id="genreCol" minWidth="0.0" prefWidth="123.2000732421875" text="Genre" />
             <TableColumn fx:id="availbleCol" prefWidth="108.0" text="Book is availble ?" />
+            <TableColumn fx:id="shelfCol" prefWidth="86.39999999999998" text="Shelf Location" />
         </columns>
       </TableView>
-      <GridPane hgap="15.0" layoutX="57.0" layoutY="129.0" prefHeight="205.0" prefWidth="289.0" vgap="5.0">
+      <GridPane hgap="15.0" layoutX="7.0" layoutY="127.0" prefHeight="205.0" prefWidth="289.0" vgap="5.0">
          <children>
             <ImageView pickOnBounds="true" preserveRatio="true">
                <image>
@@ -103,5 +99,6 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
+      <TextFlow fx:id="textForClosedDate" layoutX="479.0" layoutY="83.0" prefHeight="32.0" prefWidth="322.0" />
    </children>
 </AnchorPane>
