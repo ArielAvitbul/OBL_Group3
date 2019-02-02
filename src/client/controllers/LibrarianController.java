@@ -93,6 +93,7 @@ public class LibrarianController {
      * @param event - MouseEvent
      */
     @FXML
+    //Guy Feldman
     void searchMember(MouseEvent event) {
     	try {
     	MyData data = new MyData("search_member");
