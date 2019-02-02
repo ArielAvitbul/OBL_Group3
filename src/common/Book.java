@@ -18,12 +18,12 @@ public class Book implements Serializable{
 	private String shortDescription;
 	private int numberOfCopies;
 	private Date purchaseDate;
-	private String shellLocation;
+	private String shelfLocation;
 	private boolean isPopular;
 	private int currentNumberOfCopies;
 	
 	public Book(int bookID, String bookName, String authorsNames, float editionNumber, Date printDate, String topics,
-			String shortDescription, int numberOfCopies, Date purchaseDate, String shellLocation, boolean isPopular,
+			String shortDescription, int numberOfCopies, Date purchaseDate, String shelfLocation, boolean isPopular,
 			int currentNumberOfCopies) {
 		this.bookID = bookID;
 		this.bookName = bookName;
@@ -34,7 +34,7 @@ public class Book implements Serializable{
 		this.shortDescription = shortDescription;
 		this.numberOfCopies = numberOfCopies;
 		this.purchaseDate = purchaseDate;
-		this.shellLocation = shellLocation;
+		this.shelfLocation = shelfLocation;
 		this.isPopular = isPopular;
 		this.currentNumberOfCopies = currentNumberOfCopies;
 	}
@@ -129,14 +129,14 @@ public class Book implements Serializable{
 		this.purchaseDate = purchaseDate;
 	}
 
-	public String getShellLocation() 
+	public String getShelfLocation() 
 	{
-		return shellLocation;
+		return shelfLocation;
 	}
 
-	public void setShellLocation(String shellLocation) 
+	public void getShelfLocation(String shelfLocation) 
 	{
-		this.shellLocation = shellLocation;
+		this.shelfLocation = shelfLocation;
 	}
 
 	public boolean isPopular() 

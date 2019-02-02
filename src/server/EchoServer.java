@@ -116,7 +116,6 @@ public class EchoServer extends AbstractServer
 			float days = daysBetween(today, returnDateUTIL) ;
 			if (days>0)
 			{
-				
 				String query1 = "UPDATE members SET status = 'FREEZE' WHERE id= '"+memberID+"'";
 				db.updateWithExecute(query1);
 				String lateQuery = "UPDATE member_cards SET lateReturns = lateReturns + ? WHERE userID= '"+memberID+"'";
@@ -138,7 +137,6 @@ public class EchoServer extends AbstractServer
 					ps.setInt(4, 0);
 					ps.setInt(5, borrowID);
 					ps.executeUpdate();
-					serverCont.writeMsg(0, memberID, "Your account has been frozen due to : Late Book Return.");
 					Boolean timeLate=	rs.getBoolean("3timesLate");
 					String latesQuery = "SELECT lateReturns FROM member_cards WHERE userID='"+memberID+"'";
 					ResultSet rs2 = db.select(latesQuery);
@@ -146,24 +144,20 @@ public class EchoServer extends AbstractServer
 						 int latesReturn = rs2.getInt("lateReturns");
 							if(latesReturn==3 &&timeLate == false)
 							{
-								String managerQuery = "SELECT id FROM managers";
-								ResultSet rs3 = db.select(managerQuery);
-								while(rs3.next()) {
-									String messageQuery = "INSERT INTO messages(sender,reciever,content) "
-											+ "VALUES(?,?,?)";
+								
+									String messageQuery = "INSERT INTO messages(sender,reciever,content) VALUES(?,?,?)";
 									PreparedStatement ps1 = db.update(messageQuery);
-									ps1.setInt(1, memberID);
-									ps1.setInt(2,rs3.getInt("ID"));
+									ps1.setInt(1, 0);
+									ps1.setInt(2,memberID);
 									ps1.setString(3, "Late in return 3 times.");
 									ps1.executeUpdate();
-								}
-
 								String latesReurnQuery = "UPDATE borrows SET 3timesLate = ? WHERE borrowID= '"+borrowID+"'";
 								PreparedStatement stmt4 = db.update(latesReurnQuery);
 								stmt4.setBoolean(1, true);
 								stmt4.executeUpdate();
+								serverCont.writeMsg(0, memberID, "Your account has been locked due to : 3 times Late Book Return.");
+							} else
 								serverCont.writeMsg(0, memberID, "Your account has been frozen due to : Late Book Return.");
-							}
 					}
 				}
 

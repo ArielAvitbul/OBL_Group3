@@ -53,7 +53,7 @@ public class ServerController {
 		try {
 			ResultSet rs = db.select("SELECT * from books WHERE deleted = '0'");
 		while (rs.next()) {//TODO: add table of content PDF.
-			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
+			Book book = new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shelfLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 			books.add(book);
 		}
 		} catch (SQLException e) {
@@ -63,7 +63,7 @@ public class ServerController {
 	}
 	public Book getBook(int bookID) throws SQLException {
 		ResultSet rs = db.select("SELECT * from books WHERE deleted = '0' AND bookid="+ bookID);		if (db.hasResults(rs))
-			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shellLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
+			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shelfLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
 		return null;
 	}
 	/**
@@ -655,10 +655,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		Date toServer = Date.valueOf((LocalDate)data.getData("printDate"));
 		try {
 			PreparedStatement ps = db.update("INSERT INTO books (`bookName`, `authorsNames` , `editionNumber` , `printDate` , `shortDescription`, `numberOfCopies`"
-					+ " , `shellLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`) "
+					+ " , `shelfLocation` , `isPopular` , `topics` , `currentNumberOfCopies` , `purchaseDate`) "
 					+ "VALUES ('"+data.getData("bookName")+"' , '"+data.getData("authorsNames")+
 					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
-					"' , '"+data.getData("shellLocation")+"' , ? , '"+data.getData("topics")+"' , '"+data.getData("currentNumberOfCopies")+
+					"' , '"+data.getData("shelfLocation")+"' , ? , '"+data.getData("topics")+"' , '"+data.getData("currentNumberOfCopies")+
 					"' , '"+data.getData("purchaseDate")+"')");
 			ps.setBoolean(1, (boolean)data.getData("isPopular"));
 			ps.executeUpdate();
@@ -688,9 +688,9 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 	public MyData updateBook(MyData data) throws SQLException, IOException  {
 		MyData bookToUpdate;
 
-			String query= "UPDATE books SET shellLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=?, topics='"+data.getData("genres")+"' WHERE bookID="+data.getData("bookID");
+			String query= "UPDATE books SET shelfLocation=?, numberOfCopies=?,currentNumberOfCopies=?,editionNumber=?,isPopular=?, topics='"+data.getData("genres")+"' WHERE bookID="+data.getData("bookID");
 			PreparedStatement ps=db.update(query);
-			ps.setString(1, (String) data.getData("shellLocation"));
+			ps.setString(1, (String) data.getData("shelfLocation"));
 			Integer num = (Integer)data.getData("numberOfCopies");
 			if(num.intValue()>=0)
 			ps.setInt(2, (Integer)data.getData("numberOfCopies"));
@@ -1141,6 +1141,12 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					ps.setInt(2, (Integer)dfs.getData("memberID"));
 					if (ps.executeUpdate()!=1)
 						data.setAction("Failure");
+					else {
+						ps = db.update("UPDATE member_cards SET lateReturns = 0 WHERE id =?"); // since it was handled by a manager, reset lateReturns
+						ps.setInt(1, (Integer)dfs.getData("memberID"));
+						if (ps.executeUpdate()!=1)
+							data.setAction("Failure");
+					}
 					break;
 			}
 			if (!data.getAction().equals("Failure")) {

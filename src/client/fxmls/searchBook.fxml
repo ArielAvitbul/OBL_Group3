@@ -29,16 +29,6 @@
             <Image url="@../images/buttons/search.png" />
          </image>
       </ImageView>
-      <ImageView fx:id="orderBookButton" layoutX="633.0" layoutY="393.0" pickOnBounds="true" preserveRatio="true" visible="false">
-         <image>
-            <Image url="@../images/buttons/orderBook.jpg" />
-         </image>
-      </ImageView>
-      <ImageView fx:id="indexBookButton" layoutX="479.0" layoutY="393.0" onMouseReleased="#tableOfContent" pickOnBounds="true" preserveRatio="true" visible="false">
-         <image>
-            <Image url="@../images/buttons/watchIndex.jpg" />
-         </image>
-      </ImageView>
       <TableView fx:id="tableBooks" layoutX="316.0" layoutY="127.0" onMousePressed="#getClosedReturn" prefHeight="257.0" prefWidth="570.0">
        <columns>
           <TableColumn fx:id="nameCol" editable="false" prefWidth="143.19998168945312" text="Name" />
@@ -105,5 +95,14 @@
          </rowConstraints>
       </GridPane>
       <TextFlow fx:id="textForClosedDate" layoutX="479.0" layoutY="83.0" prefHeight="32.0" prefWidth="322.0" />
+      <HBox fx:id="underTable" layoutX="506.0" layoutY="393.0" prefHeight="17.0" prefWidth="216.0" spacing="10.0">
+         <children>
+            <ImageView fx:id="indexBookButton" onMouseReleased="#tableOfContent" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/watchIndex.jpg" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>
