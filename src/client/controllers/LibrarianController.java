@@ -751,6 +751,8 @@ public class LibrarianController {
     	     */
     	    @FXML
     	    void manualyExtend(MouseEvent event) {
+    	    	if (borrowsTV.getSelectionModel().getSelectedItem()==null)
+    	    		return;
     	    	MyData toSend = new MyData("BorrowToExtend");
     	    	toSend.add("TheCopyInBorrow", borrowsTV.getSelectionModel().getSelectedItem());
     	    	if(borrowsTV.getSelectionModel().getSelectedItem().getBorroBook().isPopular()) {

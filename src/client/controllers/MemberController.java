@@ -276,6 +276,7 @@ public class MemberController {
 	    	    }
 	    	    @FXML
 	    	    void initialize() {
+	    	    	ExtensionCurrBooks.getItems().clear();
 	    	    	ArrayList<CopyInBorrow> copies = null;
 	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
 	    	    	int i = 0;
@@ -337,8 +338,9 @@ public class MemberController {
 	    						case "ExtensionSucceed":
 	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
 	    							rc.getCC().send(new MyData("search_member"));
-	    							MyData fromServer = rc.getCC().getFromServer();
-	    							member = (Member)fromServer.getData("member");
+	    							for (Borrow b : member.getMemberCard().getBorrowHistory())
+	    								if (b.equals(selected.getNewBorrow()))
+	    									b.setReturnDate(new Timestamp(b.getReturnDate().getTime()+(b.getReturnDate().getTime()-b.getBorrowDate().getTime())));
 	    							initialize();
 	    							break;
 	    						case "ExtensionFailed":
