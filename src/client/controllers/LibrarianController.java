@@ -877,7 +877,6 @@ public class LibrarianController {
 	    	data.add("lastname", lastnameField.getText());
 	    	data.add("email", emailField.getText());
 	    	data.add("phone", phoneField.getText());
-	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Verify", "Are you sure you want to create this user ("+ usernameField.getText() +")")==ButtonType.OK) {
 	    	if(usernameField.getText().equals("")) {
 	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a user name. please insert now");
     			return;
@@ -932,7 +931,6 @@ public class LibrarianController {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", (String)rcv.getData("reason"));
 		    		break;
 		    	}
-	    	}
 	    	}
 	    	}
 	    	}catch (NumberFormatException e) {

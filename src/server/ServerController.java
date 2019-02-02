@@ -599,8 +599,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					"' , '"+data.getData("editionNumber")+"' , '"+toServer+"' , '"+data.getData("shortDescription")+"' , '"+data.getData("numberOfCopies")+
 					"' , '"+data.getData("shellLocation")+"' , ? , '"+data.getData("topics")+"' , '"+data.getData("currentNumberOfCopies")+
 					"' , '"+data.getData("purchaseDate")+"')");
-			ps.setBoolean(1, (Boolean)data.getData("isPopular"));
-			ps.setBoolean(2, false);
+			ps.setBoolean(1, (boolean)data.getData("isPopular"));
 			ps.executeUpdate();
 		}
 		catch (SQLException e) {
@@ -1062,12 +1061,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		
 		/**
 		 *  Writes a message from System
+		 *  if from is 0, that means it's a System Message
 		 * @author Ariel
 		 * @param to - 1 : Managers, 2 : Librarians
 		 * @param toUpdate - relevant copy in borrow
 		 * @throws SQLException
 		 */
-		private void writeMsg(int from, int to, String content) throws SQLException {
+		protected void writeMsg(int from, int to, String content) throws SQLException {
 				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) ALUES("+from+","+to+","+content+")");
 		}
 }

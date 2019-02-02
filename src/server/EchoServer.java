@@ -93,8 +93,8 @@ public class EchoServer extends AbstractServer
   //Instance methods ************************************************
   private void checkLateReturns() throws SQLException {
 		String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID "
-				+ "FROM oblg3.copy_in_borrow "
-				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
+				+ "FROM copy_in_borrow "
+				+ "INNER JOIN borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
 		ResultSet rs = db.select(MyQuery);
 		while (rs.next()) 
 		{
@@ -129,6 +129,7 @@ public class EchoServer extends AbstractServer
 					ps.setInt(4, 0);
 					ps.setInt(5, borrowID);
 					ps.executeUpdate();
+					serverCont.writeMsg(0, memberID, "Your account has been frozen due to : Late Book Return.");
 				}
 
 			}
@@ -141,6 +142,7 @@ public class EchoServer extends AbstractServer
 					String userName = rs2.getString("firstName");
 					String msg = "Hello "+userName+"\n\n You need to return the book ";
 					new SendMail(memberMail,"Return Book",msg);
+					serverCont.writeMsg(0, memberID, msg);
 			}
 
 		}

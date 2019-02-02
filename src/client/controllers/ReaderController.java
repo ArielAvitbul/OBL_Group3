@@ -391,7 +391,6 @@ public class ReaderController {
     		} else if (result.equals("login_failed")) {
     			ClientConsole.newAlert(AlertType.INFORMATION, null, "Login failed!", (String)cc.getFromServer().getData("reason"));
     			passField.clear();
-    			loginIdField.clear();
     		}
     	}
     	else
