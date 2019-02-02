@@ -782,6 +782,11 @@ public class LibrarianController {
     	    void manualyExtend(MouseEvent event) {
     	    	MyData toSend = new MyData("BorrowToExtend");
     	    	toSend.add("TheCopyInBorrow", borrowsTV.getSelectionModel().getSelectedItem());
+    	    	if(borrowsTV.getSelectionModel().getSelectedItem().getBorroBook().isPopular()) {
+    	    		ClientConsole.newAlert(AlertType.ERROR, null , "Popular Book", "this book is popular therfore you cannot extend your borrow!");
+    	    		initialize();
+    	    		return;
+    	    	}
     	    	toSend.add("requester", "employee");
 				Date fromPicker = new Date();
 				fromPicker.setDate(newReturnDate.getValue().getDayOfMonth());
