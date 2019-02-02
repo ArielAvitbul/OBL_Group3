@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -18,7 +22,7 @@
             <Image url="@../images/texts/titles/memberManagement.png" />
          </image>
       </ImageView>
-      <GridPane hgap="15.0" layoutX="350.0" layoutY="130.0" vgap="5.0">
+      <GridPane fx:id="infoGrid" hgap="15.0" layoutX="350.0" layoutY="130.0" vgap="5.0">
          <children>
             <TextField fx:id="usernameField" GridPane.columnIndex="1" />
             <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1" />

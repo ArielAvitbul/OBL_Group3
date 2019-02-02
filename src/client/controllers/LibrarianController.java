@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import client.ClientConsole;
+import client.controllers.MemberController.ExtensionRequestController;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
@@ -120,6 +121,10 @@ public class LibrarianController {
     protected class MemberManagement {
     	private Member member;
     	/**
+    	 * @param workedOnMc - Controller to use on member that the librarian searched.
+    	 */
+    	private MemberController workedOnMc = new MemberController(rc, this.member);
+    	/**
     	 * 
     	 * @param member - Searched member instance
     	 */
@@ -206,61 +211,39 @@ public class LibrarianController {
          * @param event - MouseEvent
          */
         @FXML
+        private GridPane infoGrid;
+        @FXML
         void saveMemberInfo(MouseEvent event) {
 	    		MyData data = new MyData("saveInfo");
-	    		data.add("admin", librarian.getID()); 
-	    		data.add("id", Integer.parseInt(idField.getText()));
-	    		if(usernameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the userName. please insert now");
+	    		for (Node n : infoGrid.getChildren()) {
+	    			if ((n instanceof TextField || n instanceof PasswordField) && ((TextField)n).getText().isEmpty()) {
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Some information is missing, please try again after fixing the issue.");
 	    			return;
+	    			}
 	    		}
-	    		else
-	    			data.add("username", usernameField.getText());
-	    		if(passwordField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the password. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("password", passwordField.getText());
-	    		if(firstnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the first name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("firstName", firstnameField.getText());
-	    		if(lastnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the last name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("lastName", lastnameField.getText());
-	    		if(emailField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the email address. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("email", emailField.getText());
-	    		if(phoneField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the phone number. please insert now");
-	    			return;
-	    		}
-	    		data.add("phone", phoneField.getText());
-	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
+	    		Member tempMember = member; //incase of a failure
+	    		member.setUserStatus(statusBox.getSelectionModel().getSelectedItem());
+	    		member.setUserName(usernameField.getText());
+	    		member.setPassword(passwordField.getText());
+	    		member.getMemberCard().setFirstName(firstnameField.getText());
+	    		member.getMemberCard().setLastName(lastnameField.getText());
+	    		member.getMemberCard().setEmailAddress(emailField.getText());
+	    		member.getMemberCard().setPhoneNumber(phoneField.getText());
+	    		data.add("member", member);
 	    		if(checkFields()==1) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member = ((Member)(((MyData)rc.getCC().getFromServer().getData("updatedMember"))).getData("member"));
 	    			break;
 	    		case "fail":
 	    		default:
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
+	    			member=tempMember;
 	    			break;
 	    		}
-	    		
-	    	}
+	    			}
         }
         }
         private int checkFields() {
@@ -502,27 +485,29 @@ public class LibrarianController {
 		    @FXML
 		    void selectBook(MouseEvent event) {
 		    	selected = SearchResultTable.getSelectionModel().getSelectedItem();
-		    	if(!selected.isPopular()) {
-    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
-	    	        public void updateItem(LocalDate date, boolean empty) {
-	    	            super.updateItem(date, empty);
-	    	            LocalDate today = LocalDate.now();
-	    	            setDisable(empty || date.compareTo(today) < 0 );
-	    	            if(date.isAfter(LocalDate.now().plusDays(14)))
-	    	            	setDisable(true);
-	    	        }
-	    	    });
-		    	}
-		    	else {
-	    	    	returnDatePicker.setDayCellFactory(picker -> new DateCell(){
-		    	        public void updateItem(LocalDate date, boolean empty) {
-		    	            super.updateItem(date, empty);
-		    	            LocalDate today = LocalDate.now();
-		    	            setDisable(empty || date.compareTo(today) < 0 );
-		    	            if(date.isAfter(LocalDate.now().plusDays(3)))
+		    	if(selected != null) {
+		    		if(!selected.isPopular()) {
+		    			returnDatePicker.setDayCellFactory(picker -> new DateCell(){
+		    				public void updateItem(LocalDate date, boolean empty) {
+		    					super.updateItem(date, empty);
+		    					LocalDate today = LocalDate.now();
+		    					setDisable(empty || date.compareTo(today) < 0 );
+		    					if(date.isAfter(LocalDate.now().plusDays(14)))
+		    						setDisable(true);
+		    				}
+		    			});
+		    		}
+		    		else {
+		    			returnDatePicker.setDayCellFactory(picker -> new DateCell(){
+		    				public void updateItem(LocalDate date, boolean empty) {
+		    					super.updateItem(date, empty);
+		    					LocalDate today = LocalDate.now();
+		    					setDisable(empty || date.compareTo(today) < 0 );
+		    					if(date.isAfter(LocalDate.now().plusDays(3)))
 		    	            	setDisable(true);
-		    	        }
-	    	    	});
+		    	        	}
+	    	    		});
+		    		}
 		    	}
 		    }
         
@@ -720,9 +705,12 @@ public class LibrarianController {
 
     	    @FXML
     	    void initialize() {
+    	    	ExtensionRequestController checkExtendable = workedOnMc.new ExtensionRequestController();
+    	    	borrowsTV.getItems().clear();
+    	    	newReturnDate.getEditor().clear();
     	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
     	    			for(Borrow toCheck : member.getMemberCard().getBorrowHistory()) 
-    	    				if(isCurrBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck)))
+    	    				if(checkExtendable.isExtendableBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck) , member))
     	    					currBorrows.add(toCheck);
     	    	    	MyData data = new MyData("getCopiesInBorrow");
     	    	    	data.add("borrows", currBorrows);
@@ -732,6 +720,7 @@ public class LibrarianController {
     	    	    		if((ArrayList<Book>) rc.getCC().getFromServer().getData("copies")==null) 
     	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
     	    	    		else {
+    	    	    			borrowsTV.setPlaceholder(new Label("No Extendable Borrows!"));
     	    	    			ArrayList<CopyInBorrow> copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
     	    	    			borrowsTV.getItems().addAll(copies);
     	    	    			bookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
@@ -756,16 +745,6 @@ public class LibrarianController {
     	    	rc.setBottom("memberManagement");
     	    }
     	    /**
-    	     * @author Good Guy
-    	     * @param index -  index of a borrow in the member's member card
-    	     * @return True - if this borrow is still active (the member has the copy)
-    	     * 	 , False - otherwise
-    	     */
-    	    protected boolean isCurrBorrow(int index) {
-    	    	return member.getMemberCard().getBorrowHistory().get(index).getReturnDate().after(new java.util.Date());
-
-    	    }
-    	    /**
     	     * The manualyExtend method is responsible for handling the manual extension request, performed by the librarian
     	     * @author Good Guy
     	     * @param event - the event that caused this method call
@@ -786,6 +765,8 @@ public class LibrarianController {
 				switch(rc.getCC().getFromServer().getAction()) {
 				case "ExtensionSucceed":
 					ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
+					getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
+					initialize();
 					break;
 				case "ExtensionFailed":
 					ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
@@ -797,11 +778,13 @@ public class LibrarianController {
 						switch(rc.getCC().getFromServer().getAction()) {
 					case "ExtensionSucceed":
 						ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
+						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
+						initialize();
 						break;
 					case "ExtensionFailed":
 						ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
 						break;
-					}
+					  }
 					}
 					break;
 				}
@@ -815,17 +798,19 @@ public class LibrarianController {
     	     */
     	    @FXML
     	    void selectCopy(MouseEvent event) {
-    	    	returnDateVbox.setVisible(true);
     	    	CopyInBorrow selected = borrowsTV.getSelectionModel().getSelectedItem();
+    	    	if(selected != null) {
+    	    	returnDateVbox.setVisible(true);
 	            LocalDate min = selected.getNewBorrow().getReturnDate().toLocalDateTime().toLocalDate();
 	            LocalDate max = selected.getNewBorrow().getReturnDate().toLocalDateTime().toLocalDate();
     	    	newReturnDate.setDayCellFactory(picker -> new DateCell(){
 	    	        public void updateItem(LocalDate date, boolean empty) {
 	    	            super.updateItem(date, empty);
 	                    setDisable(date.isAfter(max.plusDays(ReaderController.getDifferenceDays(selected.getNewBorrow().getReturnDate(), selected.getNewBorrow().getBorrowDate()))) || date.isBefore(min));
-	    	        }
-	    	    });
+	    	        	}
+    	    		});
 
+    	    	}
     	    }
 
     	}

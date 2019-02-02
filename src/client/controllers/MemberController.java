@@ -294,8 +294,9 @@ public class MemberController {
 	    	    	ArrayList<CopyInBorrow> copies = null;
 	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
 	    	    	int i = 0;
+	    	    	Borrow x = member.getMemberCard().getBorrowHistory().get(0);
 	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
-	    	    		if(isExtendableBorrow(i))
+	    	    		if(isExtendableBorrow(i,member))
 	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
 	    	    			i++;
 	    	    	}
@@ -303,14 +304,12 @@ public class MemberController {
 	    	    	data.add("borrows", currBorrows);
 	    	    		rc.getCC().send(data);
 	    	    		copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
-	    	    		if(copies==null) 
-	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
-	    	    		else {
+
 	    	    			ExtensionCurrBooks.getItems().addAll(copies);
 	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
 	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
 	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Timestamp>("returnDate"));
-	    	    		}
+	    	    		
 	    	    	}
 	    	    
 	    	    /**
@@ -321,11 +320,11 @@ public class MemberController {
 	    	     * @see MemberCard
 	    	     * @see Borrow
 	    	     */
-				private boolean isExtendableBorrow(int i) {
+				protected boolean isExtendableBorrow(int i, Member member) {
 					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
-					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
+					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>6)
 						return false;
-					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
+					return true;
 				}	  
 				/**
 				 * This method handles the extension request submitted by the member
@@ -455,6 +454,7 @@ public class MemberController {
     	    @FXML
     	    void deleteMsg(MouseEvent event) {
     	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
+    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Confirm", "Are you sure you want to delete this message ('"+toDelete.getSubject()+"')?")==ButtonType.OK) {
     	    	MyData data = new MyData("deleteMsg");
     	    	data.add("toDelete", toDelete);
     	    	rc.getCC().send(data);
@@ -471,6 +471,7 @@ public class MemberController {
     	    		messagesTV.getItems().clear();
     	    		initialize();
     	    		break;
+    	    	}
     	    	}
     	    }
     	    @FXML

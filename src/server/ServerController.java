@@ -84,7 +84,7 @@ public class ServerController {
 		else if (memberMatch.getBoolean("loggedin"))
 			ret.add("reason", "Already logged in!");
 		else if(memberMatch.getString("status").equals("LOCK"))
-			ret.add("reason", "Your user is lock!");
+			ret.add("reason", "Your user is locked!");
 		else {
 			ret.setAction("login_approved");
 			setLoggedIn(true,memberMatch.getInt("id"));
@@ -235,31 +235,12 @@ public class ServerController {
 	 * @throws SQLException
 	 * @author Ariel
 	 */
-	public MyData saveInfo(int userid, String firstName,String lastName, String password, String email, String phone) throws SQLException {
+	public MyData saveInfo(int userid, String username, String firstName,String lastName, String password, String email, String phone, String status) throws SQLException {
 		MyData result = new MyData("fail");
 		if (db.updateWithExecute("UPDATE member_cards set firstName='"+firstName+"',lastName='"+lastName+"',emailAddress='"+ email +"', phoneNumber='"+phone+"' WHERE userID='"+userid+"'")==1
-				&& db.updateWithExecute("UPDATE members set password='"+password+"' WHERE id='"+userid+"'")==1) {//user found
+				&& db.updateWithExecute("UPDATE members set username='"+username+"',password='"+password+"',status='"+status+"' WHERE id='"+userid+"'")==1)//user found
 			result.setAction("success");
-			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
-		}else // member was not found, keep the fail action, add a message
-			result.add("message", "Member was not found in the database.");
-		return result;
-	}
-	/**
-	 * This method saves info including status update (Admins only!)
-	 * @param userid
-	 * @param username
-	 * @param status
-	 * @return MyData instance with the results
-	 * @throws SQLException
-	 * @author Ariel
-	 */
-	public MyData saveInfoAdmin(int userid, String username, String status) throws SQLException {
-		MyData result = new MyData("fail");
-		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
-			result.setAction("success");
-			result.add("updatedMember", searchMember(userid));
-		}else
+		else // member was not found, keep the fail action, add a message
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
@@ -540,6 +521,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				}
 				break;
 		}
+		toReturn.add("updatedMemberCard", getMemberCard(copyInBorrow.getNewBorrow().getMemberID()));
 		return toReturn;
 	}
 	
