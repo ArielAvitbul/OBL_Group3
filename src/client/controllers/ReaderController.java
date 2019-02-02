@@ -296,7 +296,7 @@ public class ReaderController {
     			break;
     		case "searchBook":
     			try {
-    				controllers.put(fxml, new SearchController((Member)objects[0]));
+    				controllers.put(fxml, new SearchController(((MemberController)controllers.get("member"))));
         		} catch (NullPointerException e) {
         				controllers.put(fxml, new SearchController());
         		}
@@ -315,9 +315,6 @@ public class ReaderController {
     			break;
     		case "extensionRequest":
     			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new ExtensionRequestController());
-    			break;
-    		case "orderBook":
-    			controllers.put(fxml,((MemberController)controllers.get("memberArea")).new OrderBookController());
     			break;
     		case "inbox":
     			controllers.put(fxml, ((MemberController)controllers.get("member")).new Inbox());
@@ -432,10 +429,10 @@ public class ReaderController {
 	        }
 		}*/
 		protected class SearchController {
-			private Member member=null;
+			private MemberController mc = null;
 			protected SearchController() {}
-			protected SearchController(Member member) {
-				this.member=member;
+			protected SearchController(MemberController mc) {
+				this.mc=mc;
 			}
 			@FXML
 				void initialize() {
@@ -496,6 +493,8 @@ public class ReaderController {
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
 		    	tableBooks.getItems().clear();
+		    	if (this.mc!=null)
+		        	addTo(underTable,new MyImage("inbox","client/images/buttons/orderBook.jpg", e->mc.orderBook(tableBooks.getSelectionModel().getSelectedItem())),true); // add Logout button
     	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
 	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
 	    	    	//orderBookButton.setVisible(true);
