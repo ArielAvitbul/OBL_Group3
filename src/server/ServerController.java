@@ -391,7 +391,6 @@ public MyData getClosedReturnBook(MyData data) throws SQLException {
 	ResultSet rs1 = db.select("SELECT * FROM borrows where bookID ='" + book.getBookID()+"' and actualReturnDate is null order by returnDate limit 1");
 	if(db.hasResults(rs1)) {
 	Date returnDate = rs1.getDate("returnDate");
-	System.out.println(returnDate);
 	data.setAction("succeed");
 	data.add("returnDate", returnDate);
 	return data;
@@ -591,9 +590,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			daysToExtend = (int)getDifferenceDays(fromPicker, copyInBorrow.getNewBorrow().getReturnDate());
 		c.add(Calendar.DAY_OF_MONTH, daysToExtend);
 		copyInBorrow.getNewBorrow().setReturnDate(new Timestamp(c.getTimeInMillis()));
-		System.out.println(new Timestamp(c.getTimeInMillis()));
-		//System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
-		//System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
 		String query = "UPDATE borrows SET returnDate=? WHERE borrowID=?";
 		PreparedStatement ps = db.update(query);
 		ps.setTimestamp(1,copyInBorrow.getNewBorrow().getReturnDate());
@@ -843,7 +839,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		if(ps.executeUpdate()==1) {
 			ResultSet rs = db.select("SELECT LAST_INSERT_ID()");
 			rs.next();
-			System.out.println(rs.getInt(1));
 			query = "INSERT INTO copy_in_borrow(copyNumber,bookID,borrowID) "
 					+ "VALUES(?,?,?)";
 			ps = db.update(query);
@@ -860,7 +855,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 						toReturn = new MyData("borrowSuccess");
 						((Book)bookAndBorrow.getData("theCopy")).setCurrentNumberOfCopies(toUpdate);
 						toReturn.add("UpdatedBookAndBorrow", bookAndBorrow);
-						System.out.println(getMemberCard((int)bookAndBorrow.getData("id")));
 						toReturn.add("updatedMemberCard", getMemberCard((int)bookAndBorrow.getData("id")));
 						return toReturn;
 				 }

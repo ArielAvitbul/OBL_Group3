@@ -368,54 +368,10 @@ public class MemberController {
 	     * @author Ariel
 	     *
 	     */
-    	protected class OrderBookController {
-    		@FXML
-    		void initialize() {
-					rc.getCC().send(new MyData("getBooks"));
-    			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
-    			resultTable.getItems().addAll(books);
-    			nameCol.setCellValueFactory(new PropertyValueFactory<>("bookName"));
-    			genreCol.setCellValueFactory(new PropertyValueFactory<>("topics"));
-    			authorsCol.setCellValueFactory(new PropertyValueFactory<>("authorsNames"));
-    		}
-
-    	    @FXML
-    	    private TableColumn<Book, String> genreCol;
-
-    	    @FXML
-    	    private TableColumn<Book, String> nameCol;
-    	    
-    	    @FXML
-    	    private TableColumn<Book, String> authorsCol;
-    	    
-    		@FXML
-    		private TableView<Book> resultTable;
-
-    		@FXML
-    		private AnchorPane pane;
-
-    		  @FXML
-    		    void entered(MouseEvent event) {
-    	    	rc.mouseEntered(event);
-    	    }
-
-    	    @FXML
-    	    void exited(MouseEvent event) {
-    	    	rc.mouseExited(event);
-    	    }
-    	    /**
-    	     * This function handles the action after clicking 'Order Book' button
-    	     * @param event - MouseEvent
-    	     */
-    	    @FXML
-    	    void goBack(MouseEvent event) {
-    	    	rc.setBottom("memberArea");
-    	    }
-    	    @FXML
-    	    void orderBook(MouseEvent event) {
-    	    	if(resultTable.getSelectionModel().getSelectedItem()!=null)
+	    
+	    public void orderBook(Book book) {
+    	    	if(book!=null)
     	    	{
-    	    	Book book = resultTable.getSelectionModel().getSelectedItem();
 				if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
     	    	MyData data = new MyData("orderBook");
     	    	data.add("id", getMember().getID());
@@ -440,8 +396,7 @@ public class MemberController {
         	    }
    	    	 else
     	    		ClientConsole.newAlert(AlertType.WARNING, null, "Book is not choose", "Please choose book before order.");
-    	    }
-    	}
+	    }
     	
     	protected class Inbox {
         	private ArrayList<Message> myMessages;

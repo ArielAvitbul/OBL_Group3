@@ -1400,6 +1400,8 @@ public class LibrarianController {
 		    	    	}
 		    	    	else 
 		    	    		 data.add("FileChose", false);
+		    	    	} else
+		    	    		data.add("FileChose", false);
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
