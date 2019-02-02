@@ -94,7 +94,7 @@
             <Image url="@../images/texts/edit_member_card.png" />
          </image>
       </ImageView>
-      <HBox layoutX="184.0" layoutY="60.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
+      <HBox layoutX="131.0" layoutY="60.0" prefHeight="32.0" prefWidth="386.0" spacing="15.0">
          <children>
             <ImageView fx:id="viewRequests" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -114,6 +114,11 @@
             <ImageView fx:id="exceptionalEvent" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../images/buttons/Events.jpg" />
+               </image>
+            </ImageView>
+                        <ImageView fx:id="viewMemberOrders" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#replacePage" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../images/buttons/reservation.jpg" />
                </image>
             </ImageView>
          </children>

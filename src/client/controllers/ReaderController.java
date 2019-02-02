@@ -256,6 +256,9 @@ public class ReaderController {
     protected void setBottom(String fxml,Object... objects) { // button name must be equal to the fxml name
     	FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("client/fxmls/"+fxml+".fxml"));
     		switch (fxml) {
+    		case "viewMemberOrders":
+    			controllers.put(fxml,((MemberManagement)controllers.get("memberManagement")).new PickOrderController());
+    			break;
     		case "viewRequests":
     		controllers.put(fxml,((MemberManagement)controllers.get("memberManagement")).new ManualExtension());
     		break;
@@ -488,7 +491,8 @@ public class ReaderController {
     	    	indexBookButton.setVisible(false);
     	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
 	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
-	    	    	orderBookButton.setVisible(true);
+	    	    	//orderBookButton.setVisible(true);
+	    	    	if(tableBooks.getSelectionModel().getSelectedItem()!=null)
 	    	    	indexBookButton.setVisible(true);
 		    }
 		    @FXML
@@ -497,6 +501,8 @@ public class ReaderController {
 		    	{
 		    		textForClosedDate.getChildren().clear();
 		    		Book book = tableBooks.getSelectionModel().getSelectedItem();
+		    		if (book !=null)
+		    		{
 		    		if (book.getCurrentNumberOfCopies()==0)
 		    		{
 		    			MyData getClosedReturn = new MyData("getClosedReturn");
@@ -517,11 +523,14 @@ public class ReaderController {
 		        		ClientConsole.newAlert(AlertType.INFORMATION, null, "fail", (String)cc.getFromServer().getData("fail"));
 
 		    		}
+		    		}
 		    	}
 		    }
 		    @FXML
 		    void tableOfContent(MouseEvent event) throws IOException {
 		    		Book book = tableBooks.getSelectionModel().getSelectedItem();
+		    		if(book!=null)
+		    		{
 		    		MyData tableOfContents = new MyData("tableOfContents");
 		    		tableOfContents.add("book", book);
 	    				cc.send(tableOfContents);
@@ -534,7 +543,7 @@ public class ReaderController {
 						bos.close();
 						if (Desktop.isDesktopSupported())
 						     Desktop.getDesktop().open(new File("./src/client/TableOfContents/"+book.getBookID()+".pdf"));
-		   
+		    		}
 		    }
 		    
 

@@ -91,8 +91,15 @@ public class EchoServer extends AbstractServer
   }
   
   //Instance methods ************************************************
+  /**
+   * Author feldman
+   * function for checking if users late in return books
+   * and check if there is one day to return book - if there is its send  reminder Email to the user.
+   * if user late in return he freeze until he return the book.
+   * @throws SQLException
+   */
   private void checkLateReturns() throws SQLException {
-		String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID "
+	  String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID, borrows.mailSend, borrows.3timesLate "
 				+ "FROM oblg3.copy_in_borrow "
 				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
 		ResultSet rs = db.select(MyQuery);
@@ -102,12 +109,14 @@ public class EchoServer extends AbstractServer
 			java.util.Date today = new java.util.Date();
 			Timestamp returnDate = rs.getTimestamp("returnDate");
 			int memberID = rs.getInt("memberID");
+			boolean mailSend = rs.getBoolean("mailSend");
+			int borrowID = rs.getInt("borrowID");
 			java.util.Date returnDateUTIL = new java.util.Date(returnDate.getTime());
 			//int days = (int) daysBetween(returnDateUTIL,borrowDateUTIL);
 			float days = daysBetween(today, returnDateUTIL) ;
 			if (days>0)
 			{
-				int borrowID = rs.getInt("borrowID");
+				
 				String query1 = "UPDATE members SET status = 'FREEZE' WHERE id= '"+memberID+"'";
 				db.updateWithExecute(query1);
 				String lateQuery = "UPDATE member_cards SET lateReturns = lateReturns + ? WHERE userID= '"+memberID+"'";
@@ -129,10 +138,36 @@ public class EchoServer extends AbstractServer
 					ps.setInt(4, 0);
 					ps.setInt(5, borrowID);
 					ps.executeUpdate();
+					Boolean timeLate=	rs.getBoolean("3timesLate");
+					String latesQuery = "SELECT lateReturns FROM member_cards WHERE userID='"+memberID+"'";
+					ResultSet rs2 = db.select(latesQuery);
+					if(db.hasResults(rs2)) {
+						 int latesReturn = rs2.getInt("lateReturns");
+							if(latesReturn==3 &&timeLate == false)
+							{
+								String managerQuery = "SELECT id FROM managers";
+								ResultSet rs3 = db.select(managerQuery);
+								while(rs3.next()) {
+									String messageQuery = "INSERT INTO messages(sender,reciever,content) "
+											+ "VALUES(?,?,?)";
+									PreparedStatement ps1 = db.update(messageQuery);
+									ps1.setInt(1, memberID);
+									ps1.setInt(2,rs3.getInt("ID"));
+									ps1.setString(3, "Late in return 3 times.");
+									ps1.executeUpdate();
+								}
+
+								String latesReurnQuery = "UPDATE borrows SET 3timesLate = ? WHERE borrowID= '"+borrowID+"'";
+								PreparedStatement stmt4 = db.update(latesReurnQuery);
+								stmt4.setBoolean(1, true);
+								stmt4.executeUpdate();
+							}
+					}
+
 				}
 
 			}
-			if(getDifferenceDays(today,returnDateUTIL)==1)
+			if(getDifferenceDays(today,returnDateUTIL)== -1 && mailSend == false)
 			{
 				String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
 				ResultSet rs2 = db.select(emailQuery);
@@ -141,6 +176,10 @@ public class EchoServer extends AbstractServer
 					String userName = rs2.getString("firstName");
 					String msg = "Hello "+userName+"\n\n You need to return the book ";
 					new SendMail(memberMail,"Return Book",msg);
+					String sendMailQuery = "UPDATE borrows SET mailSend = ? WHERE borrowID= '"+borrowID+"'";
+					PreparedStatement stmt3 = db.update(sendMailQuery);
+					stmt3.setBoolean(1, true);
+					stmt3.executeUpdate();
 			}
 
 		}
@@ -148,7 +187,13 @@ public class EchoServer extends AbstractServer
 		rs.close();
 }
 
-
+  /**
+   * @Author Feldman
+   * function get two dates and return the difference between them.
+   * @param d2 - Date
+   * @param d1 - Date
+   * @return the days between two dates (in days!)
+   */
 	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
@@ -157,7 +202,14 @@ public class EchoServer extends AbstractServer
 		float difference = (one.getTime()-date.getTime())/MILLISECONDS_PER_DAY; 
 		return difference;
 	}
-
+	
+	/**
+	 *@Author Feldman
+	 * function for check if user order don't take the book he order in two days
+	 * if he don't take the book the order is delete and the book is move to the next user in the queue of orders.
+	 * when the book move to another user mail send to him.
+	 * @throws SQLException
+	 */
 	 private void CancleResevion() throws SQLException
 	 {
 		 	java.util.Date today = new java.util.Date();
@@ -235,6 +287,9 @@ public class EchoServer extends AbstractServer
 	  		  	case "newBorrowRequest":
   		    	client.sendToClient(serverCont.writeNewBorrow(data));
   		    	break;
+		 		  case "BorrowOrderRequest":
+		  		    	client.sendToClient(serverCont.orderBorrowRequest(data));
+		  		    	break;
 	  		  	case "addNewBook":
 	  		    	client.sendToClient(serverCont.addNewBook(data));
 	  		    	break;
@@ -263,6 +318,9 @@ public class EchoServer extends AbstractServer
 	  		    	break;
 		  		case "copyToReturn":
 	  				client.sendToClient(serverCont.returnCopy(data));
+	  				break;
+		  		case "orderBooks":
+	  				client.sendToClient(serverCont.getOrderBooks(data));
 	  				break;
 	  		    case "addViolation":
 	  		    	client.sendToClient(serverCont.addViolation(data));

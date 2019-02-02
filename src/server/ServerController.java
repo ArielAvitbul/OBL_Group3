@@ -275,13 +275,29 @@ public class ServerController {
 		if (book==null)
 			return new MyData("fail","message","The book doesn't exists.");
 			if (book.getCurrentNumberOfCopies()==0) { // can order
+				ResultSet rs1 = db.select("SELECT COUNT(bookID) FROM book_reservations WHERE bookID='" + book.getBookID()+"'");
+				rs1.next();
+				int numberOfOrders= rs1.getInt(1);				
+				if (numberOfOrders < book.getNumberOfCopies())
+				{
 				Timestamp today = new Timestamp(System.currentTimeMillis());
 				db.insertWithExecute("INSERT INTO book_reservations (memberID, orderDate, bookID) VALUES ('"+userid+"', '"+today+"', '"+book.getBookID()+"')");
 				return new MyData("success","reservation",new BookReservation(userid, today ,book.getBookID()));
+				}
+				else return new MyData("fail_Order","message","Cant Order, all of the the copies already ordered.");
+
 			} else
 				return new MyData("fail","message","There are still available copies of that book in the library.");
 	}
-	
+	/**
+	 * Author Feldman
+	 * methos return the table of contents of book.
+	 * input data - book.
+	 * output - data - pdf file - table of contents
+	 * @param data
+	 * @return data
+	 * @throws SQLException
+	 */
 public MyData getTableOfContents(MyData data) throws SQLException {
 		
 		Book b = (Book) data.getData("book");
@@ -307,7 +323,44 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 		return data;
 		
 	}
+public MyData getOrderBooks(MyData data) throws SQLException {
+	ArrayList<Book> returnBookList = new ArrayList<>();
+	int flag =0;
 
+	String MyQuery = "select bookID from book_reservations where memberID = '"+data.getData("ID")+"'and arrivedDate is not null";
+		ResultSet rs = db.select(MyQuery);
+	while (rs.next()) 
+	{
+
+		Book book = getBook(rs.getInt("BookID"));
+		returnBookList.add(book);
+		flag=1;
+	}
+	rs.close();
+	if (flag ==1)
+	{
+		data.add("returnBooklist", returnBookList);
+		data.setAction("listOfReturnBooks");
+		return data;
+	}
+	else 
+	{
+		data.setAction("unfind_borrows_Book");
+		data.add("reason", "There is no books in borrow!");
+		return data;
+	}
+
+
+}
+
+/**
+ * Author Feldman
+ * method for delete book.
+ * input : data - book.
+ * @param data - message (success - if delete,  fail - if there is still borrowed copies)
+ * @return
+ * @throws SQLException
+ */
 public MyData deleteBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 ResultSet rs1 = db.select("SELECT * FROM copy_in_borrow where BookID ='" + book.getBookID()+"'");
@@ -324,7 +377,15 @@ data.add("book_in_borrow", "One or more of the copies is still borrow.");
 return data;
 }
 }
-
+/**
+ * Author Feldman
+ * method for returning the closed date the book will return - it start when reader choose book that is not
+ * Available.
+ * input : book.
+ * @param data
+ * @return data - the closed return book.
+ * @throws SQLException
+ */
 public MyData getClosedReturnBook(MyData data) throws SQLException {
 	Book book =  (Book) data.getData("book");
 	ResultSet rs1 = db.select("SELECT * FROM borrows where bookID ='" + book.getBookID()+"' and actualReturnDate is null order by returnDate limit 1");
@@ -833,7 +894,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			toReturn.add("reason", "Cannot write borrow in the system!");
 			return toReturn;
 	}
-	
+	/**
+	 * author Feldman
+	 * method return list of books that the user is borrow and not return it yet.
+	 * @param data
+	 * @return ArraList of books.
+	 * @throws SQLException
+	 */
 	public MyData getReturnBooks(MyData data) throws SQLException {
 		ArrayList<CopyInBorrow> returnBookList = new ArrayList<>();
 		int flag =0;
@@ -868,7 +935,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			}
 		}
 
-		
+	/**
+	 * Author Feldman
+	 * method for return book, it check if the user Freeze and have less then 2 lates 
+	 * it change him to Active.
+	 * if user return copy that there is order for the book, its send him mail to come take it.
+	 * the actual return date is saved in the database.
+	 * @param data 
+	 * @return message (success,fail)
+	 * @throws SQLException
+	 */
 		public MyData returnCopy(MyData data) throws SQLException {
 		CopyInBorrow copy =  (CopyInBorrow) data.getData("copy");
 			java.util.Date today = new java.util.Date();
@@ -1023,6 +1099,23 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			if (ps.executeUpdate() == 1) 
 				return new MyData("removed");
 			return new MyData("failed");
+		}
+
+		public MyData orderBorrowRequest(MyData bookAndBorrow) throws SQLException {
+			MyData data = writeNewBorrow(bookAndBorrow);
+			String deleteQuery = "DELETE FROM book_reservations WHERE bookID= ? AND memberID = ?";
+			PreparedStatement stmt1 = db.update(deleteQuery);
+			stmt1.setInt(1, (int)((Book) bookAndBorrow.getData("theCopy")).getBookID());
+			stmt1.setInt(2, ((int)bookAndBorrow.getData("ID")));
+			stmt1.executeUpdate();
+			String query = "UPDATE books SET currentNumberOfCopies = currentNumberOfCopies +? WHERE bookID= '"+(int)((Book) bookAndBorrow.getData("theCopy")).getBookID()+"'";
+			PreparedStatement stmt = db.update(query);
+			stmt.setInt(1, 1);
+			stmt.executeUpdate();
+
+			return data;
+
+
 		}
 		public MyData msgRead(boolean value, int msgID) throws SQLException {
 			MyData data = new MyData("Success");

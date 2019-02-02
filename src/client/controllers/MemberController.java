@@ -377,7 +377,7 @@ public class MemberController {
     			ArrayList<Book> books = (ArrayList<Book>)rc.getCC().getFromServer().getData("books"); // TODO: replace this with actual book results
     			resultTable.getItems().addAll(books);
     			nameCol.setCellValueFactory(new PropertyValueFactory<>("bookName"));
-    			genreCol.setCellValueFactory(new PropertyValueFactory<>("topic"));
+    			genreCol.setCellValueFactory(new PropertyValueFactory<>("topics"));
     			authorsCol.setCellValueFactory(new PropertyValueFactory<>("authorsNames"));
     		}
 
@@ -415,6 +415,8 @@ public class MemberController {
     	    }
     	    @FXML
     	    void orderBook(MouseEvent event) {
+    	    	if(resultTable.getSelectionModel().getSelectedItem()!=null)
+    	    	{
     	    	Book book = resultTable.getSelectionModel().getSelectedItem();
 				if (!getMember().getMemberCard().checkBookReserved(book.getBookID())) {
     	    	MyData data = new MyData("orderBook");
@@ -426,6 +428,9 @@ public class MemberController {
 					getMember().getMemberCard().addBookReservation(((BookReservation)rc.getCC().getFromServer().getData("reservation")));
 					ClientConsole.newAlert(AlertType.INFORMATION, null, "Success!", book.getBookName() +" was successfuly ordered.");
 					break;
+				case "fail_Order":
+					ClientConsole.newAlert(AlertType.WARNING, null, "", (String)rc.getCC().getFromServer().getData("message"));
+					break;
 				case "fail":
 					ClientConsole.newAlert(AlertType.WARNING, null, "", (String)rc.getCC().getFromServer().getData("message"));
 					break;
@@ -434,6 +439,9 @@ public class MemberController {
 				}
     	    	} else
     	    		ClientConsole.newAlert(AlertType.WARNING, null, "Reserved already", "You have already reserved that book.");
+        	    }
+   	    	 else
+    	    		ClientConsole.newAlert(AlertType.WARNING, null, "Book is not choose", "Please choose book before order.");
     	    }
     	}
     	
