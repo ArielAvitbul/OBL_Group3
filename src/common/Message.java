@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 public class Message implements Serializable {
 	private final int msgID;
-	private int from;
+	private String from;
 	private int to;
 	private String action="None";
 	Member regarding;
@@ -13,7 +13,7 @@ public class Message implements Serializable {
 	private boolean handled=false;
 	private boolean read;
 	
-	public Message(int msgID , int from , int to , String content, boolean read) {
+	public Message(int msgID , String from , int to , String content, boolean read) {
 		this.msgID=msgID;
 		this.from=from;
 		this.to=to;
@@ -22,7 +22,7 @@ public class Message implements Serializable {
 		this.date = new Date(System.currentTimeMillis());
 	}
 	
-	public Message(int msgID , int from , int to , String content, String action, Member regarding, boolean handled, boolean read) {
+	public Message(int msgID , String from , int to , String content, String action, Member regarding, boolean handled, boolean read) {
 		this.msgID=msgID;
 		this.from=from;
 		this.to=to;
@@ -34,7 +34,7 @@ public class Message implements Serializable {
 		this.date = new Date(System.currentTimeMillis());
 	}
 	
-	public int getFrom() {
+	public String getFrom() {
 		return from;
 	}
 	

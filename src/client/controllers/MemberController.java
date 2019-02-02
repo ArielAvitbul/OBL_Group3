@@ -482,6 +482,7 @@ public class MemberController {
     	            }
     	        });
     	    	MyData data = new MyData("getMessages");
+	    		data.add("rank", member.getClass().getSimpleName()); // To determine wether to reveal general inboxes to user.
     	    	data.add("member", member.getID());
     	    	rc.getCC().send(data);
     	    	switch(rc.getCC().getFromServer().getAction()) {
@@ -529,6 +530,8 @@ public class MemberController {
     	    }
     	    @FXML
     	    void showMessage(MouseEvent event) {
+    	    	if (messagesTV.getItems().isEmpty())
+    	    		return;
     	    		contentTF.getChildren().clear();
     	    		messagesTV.refresh();
     	    		Text header = new Text("Message Content:\n\n");
