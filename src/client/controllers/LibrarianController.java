@@ -238,8 +238,7 @@ public class LibrarianController {
 	    			member=tempMember;
 	    			break;
 	    		}
-	    		
-	    	}
+	    			}
         }
         }
         private int checkFields() {
