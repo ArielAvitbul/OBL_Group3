@@ -144,11 +144,12 @@ public class EchoServer extends AbstractServer
 							if(latesReturn==3 &&timeLate == false)
 							{
 								
-									String messageQuery = "INSERT INTO messages(sender,reciever,content) VALUES(?,?,?)";
+									String messageQuery = "INSERT INTO messages(sender,subject,reciever,content) VALUES(?,?,?,?)";
 									PreparedStatement ps1 = db.update(messageQuery);
 									ps1.setInt(1, 0);
-									ps1.setInt(2,memberID);
-									ps1.setString(3, "Late in return 3 times.");
+									ps1.setString(2, "3 Late in book returns");
+									ps1.setInt(3,memberID);
+									ps1.setString(4, "This issue was brought to the managers's attention.");
 									ps1.executeUpdate();
 								String latesReurnQuery = "UPDATE borrows SET 3timesLate = ? WHERE borrowID= '"+borrowID+"'";
 								PreparedStatement stmt4 = db.update(latesReurnQuery);
@@ -230,7 +231,9 @@ public class EchoServer extends AbstractServer
 					stmt1.setInt(1, memberID);
 					stmt1.setInt(2, bookID);
 					stmt1.executeUpdate();
-
+					ResultSet rs4 = db.select("SELECT memberID from book_reservations where bookID='"+bookID+"' and arrivedDate is null order by orderDate limit 1");
+					if (db.hasResults(rs4))
+						memberID=rs4.getInt("memberID");
 					String query1 = "UPDATE book_reservations SET arrivedDate = ? WHERE bookID= '"+bookID+"' and arrivedDate is null order by orderDate limit 1";
 					PreparedStatement stmt11 = db.update(query1);
 					stmt11.setTimestamp(1, sqlDate);

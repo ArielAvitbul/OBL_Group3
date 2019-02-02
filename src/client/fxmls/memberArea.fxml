@@ -35,10 +35,10 @@
             </ImageView>
          </children>
       </HBox>
-      <GridPane hgap="15.0" layoutX="333.0" layoutY="131.0" vgap="5.0">
+      <GridPane fx:id="infoGrid" hgap="15.0" layoutX="333.0" layoutY="131.0" vgap="5.0">
          <children>
             <TextField fx:id="idField" editable="false" GridPane.columnIndex="1" />
-            <TextField fx:id="usernameField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="firstnameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="lastnameField" GridPane.columnIndex="1" GridPane.rowIndex="4" />

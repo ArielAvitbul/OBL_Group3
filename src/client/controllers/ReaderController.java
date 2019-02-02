@@ -524,16 +524,18 @@ public class ReaderController {
 		    			String result = cc.getFromServer().getAction();
 
 		        		if (result.equals("succeed")) {
-		        			Text t = new Text();
+		        			
 		        			java.util.Date returnDateUTIL = new java.util.Date(((Date) cc.getFromServer().getData("returnDate")).getTime());
 		        			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-		        			t.setText("The closed return date is " + dateFormat.format(returnDateUTIL));
+		        			Text t = new Text("The nearest return date is " + dateFormat.format(returnDateUTIL));
 		        			t.setFont(new Font("Calibari",16));
 		        		    textForClosedDate.getChildren().add(t);
 		        		}
-		        		else if(result.equals("fail"))
-		        		ClientConsole.newAlert(AlertType.INFORMATION, null, "fail", (String)cc.getFromServer().getData("fail"));
+		        		else if(result.equals("fail")) {
+		        			Text t = new Text((String)cc.getFromServer().getData("fail"));
+		        			t.setFont(new Font("Calibari",16));
+		        		    textForClosedDate.getChildren().add(t);
+		        		}
 
 		    		}
 		    		}
