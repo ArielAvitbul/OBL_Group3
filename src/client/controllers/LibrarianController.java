@@ -16,6 +16,7 @@ import client.ClientConsole;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
+import common.BookReservation;
 import common.Librarian;
 import common.Manager;
 import common.Member;
@@ -610,6 +611,12 @@ public class LibrarianController {
 				
 			}
     	}
+        /**
+         * @author feldman
+         *class for the librarian area to return copy of book
+         *class start after librarian enter ID and press on "return copy" button
+         *the initialize bring all the book that the userID borrow and not return yet organized in table.
+         */
         protected class ReturnCopy {
     		@FXML
 			void initialize() {
@@ -665,7 +672,14 @@ public class LibrarianController {
     		void goBack(MouseEvent event) {
     			rc.setBottom("memberManagement");
     		}
-    		
+    		/**
+    		 * author feldman
+    		 * after labririan choose book from the list of book the function send the server for  
+    		 * hanlde the return book in the server side.
+    		 * @param event 
+    		 * strat after press return button.
+    		 */
+
     	    @FXML
     	    void returnCopyIsSelected(MouseEvent event) {
     	    	CopyInBorrow copy = returnsTable.getSelectionModel().getSelectedItem();
@@ -825,6 +839,127 @@ public class LibrarianController {
     	    }
 
     	}
+     	 /**
+   	  * class for handle resevation lists and borrow books in reservation
+   	  * @author feldman
+   	  *
+   	  */
+    	protected class PickOrderController{
+
+    	    @FXML
+    	    private ImageView BorrowButton;
+    	    @FXML
+    	    private DatePicker dateBorrow;
+    	    @FXML
+    	    private TableColumn<Book, String> BookNameCol;
+
+    	    @FXML
+    	    private TableView<Book> ExtensionCurrBooks;
+    	    @FXML
+    	    void initialize() {
+    	    	dateBorrow.setVisible(false);
+    	    BookNameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));	
+    			MyData orderBooks = new MyData ("orderBooks");
+    			orderBooks.add("ID", member.getID());
+    				rc.getCC().send(orderBooks);
+    			String result = (String)rc.getCC().getFromServer().getAction();
+	    			if (result.equals("listOfReturnBooks")) 
+	    			{
+	    				ArrayList<Book> returnBookList = (ArrayList<Book>) rc.getCC().getFromServer().getData("returnBooklist");
+	    				ExtensionCurrBooks.getItems().addAll(returnBookList);
+	    			}
+	    			else if (result.equals("unfind_borrows_Book")) {
+		    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No books found", (String)rc.getCC().getFromServer().getData("reason"));
+
+		    			}
+    	    }
+    	    /**
+    	     * method start when book choose in the table, and limit the datepicker to currect days 
+    	     * the user can borrow.
+    	     * @param event
+    	     */
+    	    @FXML
+    	    void selectedBook(MouseEvent event) {
+    	    	if(ExtensionCurrBooks.getSelectionModel().getSelectedItem()!=null)
+    	    	{
+    	    		dateBorrow.setVisible(true);
+    	    		Book newCopyToBorrow = ExtensionCurrBooks.getSelectionModel().getSelectedItem();
+    		    	if(!newCopyToBorrow.isPopular()) {
+    		    		dateBorrow.setDayCellFactory(picker -> new DateCell(){
+    		    	        public void updateItem(LocalDate date, boolean empty) {
+    		    	            super.updateItem(date, empty);
+    		    	            LocalDate today = LocalDate.now();
+    		    	            setDisable(empty || date.compareTo(today) < 0 );
+    		    	            if(date.isAfter(LocalDate.now().plusDays(14)))
+    		    	            	setDisable(true);
+    		    	        }
+    		    	    });
+    			    	}
+    			    	else {
+    			    		dateBorrow.setDayCellFactory(picker -> new DateCell(){
+    			    	        public void updateItem(LocalDate date, boolean empty) {
+    			    	            super.updateItem(date, empty);
+    			    	            LocalDate today = LocalDate.now();
+    			    	            setDisable(empty || date.compareTo(today) < 0 );
+    			    	            if(date.isAfter(LocalDate.now().plusDays(3)))
+    			    	            	setDisable(true);
+    			    	        }
+    			    	    });
+    			    	}
+    	    	}
+    	    }
+    	    /**
+    	     * @author feldman
+    	     * method handled the borrow request after the book is arrived and the user want to borrow it.
+    	     * @param event
+    	     */
+    	    @FXML
+    	    void borrowit(MouseEvent event) {
+    	    	if(ExtensionCurrBooks.getSelectionModel().getSelectedItem()!=null)
+    	    	{
+
+    	    		Book newCopyToBorrow = ExtensionCurrBooks.getSelectionModel().getSelectedItem();
+    	    		Date fromPicker = new Date();
+    				fromPicker.setDate(dateBorrow.getValue().getDayOfMonth());
+    				int fix = dateBorrow.getValue().getMonthValue() == 1 ? 12 : dateBorrow.getValue().getMonthValue()-1;
+    				fromPicker.setMonth(fix);
+    				System.out.println(dateBorrow.getValue().getYear());
+    				fromPicker.setYear(dateBorrow.getValue().getYear()-1900);
+    				System.out.println(fromPicker);
+    				Timestamp toServer = new Timestamp(fromPicker.getTime());
+
+    				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
+    				MyData toSend = new MyData("BorrowOrderRequest");
+    				toSend.add("theBorrow", newBorrow);
+    				toSend.add("theCopy", newCopyToBorrow);
+    				toSend.add("ID", member.getID());
+    				rc.getCC().send(toSend);
+    				switch(rc.getCC().getFromServer().getAction()) {
+					case "borrowSuccess":
+						ClientConsole.newAlert(AlertType.INFORMATION,null, "Borrow has been registered!" , "Borrow has been registered in the system!");
+					break;
+					case "borrowFailed":
+						ClientConsole.newAlert(AlertType.ERROR, null , "Something went wrong!", (String)rc.getCC().getFromServer().getData("reason"));
+					break;
+					default:
+					break;
+				}
+
+    	    	}
+
+    	    }
+
+    	    @FXML
+    	    void entered(MouseEvent event) {
+    	    	rc.mouseEntered(event);
+    	    }
+
+    	    @FXML
+    	    void exited(MouseEvent event) {
+    	    	rc.mouseExited(event);
+    	    }
+
+    	    }
     }
     /**
      * This class handles the Create User page management
@@ -1011,8 +1146,16 @@ public class LibrarianController {
 	    	rc.setBottom("bookManagement", books.get(inventoryTable.getSelectionModel().getSelectedIndex()));
 	    	else ClientConsole.newAlert(AlertType.INFORMATION, null, "Book Not Choose", "Plese chose book from the list.");
 	    }
+	    /**
+	     * strat when librarian choose to delete book
+	     * librarian choose book from the list and the functiom send the book to the server
+	     * for delete.
+	     * @param event
+	     */
 	    @FXML
 	    void deleteChosen(MouseEvent event) {
+	    	if(inventoryTable.getSelectionModel().getSelectedItem() !=null)
+	    	{
 	    	Book book = inventoryTable.getSelectionModel().getSelectedItem();
 
 	    	if(ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Are You Sure?", "you have chosen the book "+book.getBookName()+" to delete.\nPress OK to continue!")==ButtonType.OK) {
@@ -1027,6 +1170,9 @@ public class LibrarianController {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Cant delete book", (String)rc.getCC().getFromServer().getData("book_in_borrow"));
 	    			}
 	    	}
+	    	}
+	    	else 
+	    		ClientConsole.newAlert(AlertType.INFORMATION, null, "Book not select", "Please choose book to delete");
 	    }
 		@FXML
 		private TableView<Book> inventoryTable;
