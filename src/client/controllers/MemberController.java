@@ -297,7 +297,7 @@ public class MemberController {
 	    	    	int i = 0;
 	    	    	Borrow x = member.getMemberCard().getBorrowHistory().get(0);
 	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
-	    	    		if(isExtendableBorrow(i))
+	    	    		if(isExtendableBorrow(i,member))
 	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
 	    	    			i++;
 	    	    	}
@@ -321,11 +321,11 @@ public class MemberController {
 	    	     * @see MemberCard
 	    	     * @see Borrow
 	    	     */
-				private boolean isExtendableBorrow(int i) {
+				protected boolean isExtendableBorrow(int i, Member member) {
 					Timestamp returnDate =  new Timestamp(member.getMemberCard().getBorrowHistory().get(i).getReturnDate().getTime());
-					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>8)
+					if(ReaderController.getDifferenceDays(returnDate,new java.util.Date())>6)
 						return false;
-					return member.getMemberCard().getBorrowHistory().get(i).getReturnDate().after(new java.util.Date());
+					return true;
 				}	  
 				/**
 				 * This method handles the extension request submitted by the member

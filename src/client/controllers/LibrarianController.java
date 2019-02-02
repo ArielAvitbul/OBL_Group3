@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import client.ClientConsole;
+import client.controllers.MemberController.ExtensionRequestController;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
@@ -119,6 +120,10 @@ public class LibrarianController {
      */
     protected class MemberManagement {
     	private Member member;
+    	/**
+    	 * @param workedOnMc - Controller to use on member that the librarian searched.
+    	 */
+    	private MemberController workedOnMc = new MemberController(rc, this.member);
     	/**
     	 * 
     	 * @param member - Searched member instance
@@ -729,10 +734,12 @@ public class LibrarianController {
 
     	    @FXML
     	    void initialize() {
+    	    	ExtensionRequestController checkExtendable = workedOnMc.new ExtensionRequestController();
     	    	borrowsTV.getItems().clear();
+    	    	newReturnDate.getEditor().clear();
     	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
     	    			for(Borrow toCheck : member.getMemberCard().getBorrowHistory()) 
-    	    				if(isCurrBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck)))
+    	    				if(checkExtendable.isExtendableBorrow(member.getMemberCard().getBorrowHistory().indexOf(toCheck) , member))
     	    					currBorrows.add(toCheck);
     	    	    	MyData data = new MyData("getCopiesInBorrow");
     	    	    	data.add("borrows", currBorrows);
@@ -765,16 +772,6 @@ public class LibrarianController {
     	    @FXML
     	    void goBack(MouseEvent event) {
     	    	rc.setBottom("memberManagement");
-    	    }
-    	    /**
-    	     * @author Good Guy
-    	     * @param index -  index of a borrow in the member's member card
-    	     * @return True - if this borrow is still active (the member has the copy)
-    	     * 	 , False - otherwise
-    	     */
-    	    protected boolean isCurrBorrow(int index) {
-    	    	return member.getMemberCard().getBorrowHistory().get(index).getReturnDate().after(new java.util.Date());
-
     	    }
     	    /**
     	     * The manualyExtend method is responsible for handling the manual extension request, performed by the librarian
