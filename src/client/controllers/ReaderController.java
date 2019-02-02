@@ -97,6 +97,12 @@ public class ReaderController {
 	protected ClientConsole getCC() {
 		return cc;
 	}
+	/**
+	 * function that get two dates and calculate the difference between the two days.
+	 * @param d2
+	 * @param d1
+	 * @return the difference between teh dates
+	 */
 	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
@@ -128,6 +134,12 @@ public class ReaderController {
     @FXML
     private ImageView loginButton;
     
+    /**
+     * check if the node is inside the pane
+     * @param pane
+     * @param id
+     * @return boolean result
+     */
     private boolean isIn(Pane pane, String id) {
     	for (Node n : pane.getChildren())
     		if (n.getId().equals(id))
@@ -407,6 +419,11 @@ public class ReaderController {
     	else
     		ClientConsole.newAlert(AlertType.INFORMATION, null, "Empty fields", "One or more of your fields were empty");
     }
+    /**
+     * @author Ariel
+     * method handle check out from the system.
+     * @param event
+     */
 		private void submitLogout(MouseEvent event) {
 			removeFrom(mainPane, "logoutBox");
 			addTo(mainPane,loginBox,false);
@@ -435,6 +452,14 @@ public class ReaderController {
 	            e.printStackTrace();
 	        }
 		}*/
+		
+		/**
+		 * 
+		 * @author feldman
+		 * controller for search
+		 * include function : submitSearch, getClosedReturn.
+		 *
+		 */
 		protected class SearchController {
 			private MemberController mc = null;
 			protected SearchController() {}
@@ -497,6 +522,11 @@ public class ReaderController {
 		    void exited(MouseEvent event) {
 		    	mouseExited(event);
 		    }
+		    /**
+		     * Handle the search after insert search details.
+		     * Present the reader the results in table view.
+		     * @param event
+		     */
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
 		    	tableBooks.getItems().clear();
@@ -508,6 +538,11 @@ public class ReaderController {
 	    	    	if(tableBooks.getSelectionModel().getSelectedItem()!=null)
 	    	    	indexBookButton.setVisible(true);
 		    }
+		    /**
+		     * @author feldman
+		     * present the nearest return date of book that don't have copies in the library.
+		     * @param event
+		     */
 		    @FXML
 		    void getClosedReturn(MouseEvent event) {
 		    	if (event.isPrimaryButtonDown() && event.getClickCount()==1)
@@ -541,6 +576,13 @@ public class ReaderController {
 		    		}
 		    	}
 		    }
+		    /**
+		     * @author feldman
+		     * method that present the table of content of the chosen book
+		     * start when reader press on the table of content button.
+		     * @param event
+		     * @throws IOException
+		     */
 		    @FXML
 		    void tableOfContent(MouseEvent event) throws IOException {
 		    		Book book = tableBooks.getSelectionModel().getSelectedItem();

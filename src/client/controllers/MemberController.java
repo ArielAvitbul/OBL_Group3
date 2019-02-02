@@ -91,6 +91,7 @@ public class MemberController {
 		}
 		return 1;
 	}
+
 		@FXML
 		void initialize() {
 			idField.setText(String.valueOf(member.getID()));
@@ -351,7 +352,8 @@ public class MemberController {
 	    			}
 				}
 	    /**
-	     * a controller for Order Book page
+	     * a controller for Order Book page.
+	     * after choose book, the book send to the server for handle.
 	     * @author Ariel
 	     *
 	     */
@@ -384,7 +386,12 @@ public class MemberController {
    	    	 else
     	    		ClientConsole.newAlert(AlertType.WARNING, null, "Book is not choose", "Please choose book before order.");
 	    }
-    	
+    	/**
+    	 * Inbox area is for getting  from the system and members.
+    	 *	include function : delete and show message
+    	 * @author Ariel
+    	 *
+    	 */
     	protected class Inbox {
         	private ArrayList<Message> myMessages;
     	    @FXML
@@ -440,7 +447,10 @@ public class MemberController {
     	    		break;
     	    	}
     	    }
-
+/**
+ * function for delete messages
+ * @param event
+ */
     	    @FXML
     	    void deleteMsg(MouseEvent event) {
     	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
@@ -473,6 +483,10 @@ public class MemberController {
     	    void exited(MouseEvent event) {
     	    	rc.mouseExited(event);
     	    }
+    	    /**
+    	     * method to show the content of the message after press on the subject.
+    	     * @param event
+    	     */
     	    @FXML
     	    void showMessage(MouseEvent event) {
     	    	if (messagesTV.getItems().isEmpty())
