@@ -1394,14 +1394,13 @@ public class LibrarianController {
 							      bis.read(msg.getMybytearray(),0,mybytearray.length);
 							      data.add("getFile", msg);
 								  bis.close();
-								  Boolean k = true;
-								  data.add("FileChose", k);
+								  data.add("FileChose", true);
 							    }
 							catch (Exception e) {
 								System.out.println("Error send (Files)msg) to Server");
 							}
-		    	    	}
-
+		    	    	} else
+		    	    		data.add("FileChose", false);
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
