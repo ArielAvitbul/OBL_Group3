@@ -207,7 +207,6 @@ public class LibrarianController {
          */
         @FXML
         void saveMemberInfo(MouseEvent event) {
-        	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		MyData data = new MyData("saveInfo");
 	    		data.add("admin", librarian.getID()); 
 	    		data.add("id", Integer.parseInt(idField.getText()));
@@ -248,6 +247,7 @@ public class LibrarianController {
 	    		data.add("phone", phoneField.getText());
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
 	    		if(checkFields()==1) {
+	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
@@ -844,7 +844,11 @@ public class LibrarianController {
    	  *
    	  */
     	protected class PickOrderController{
-
+    	
+    	    @FXML
+    	    void goBack(MouseEvent event) {
+    	    	rc.setBottom("memberManagement");
+    	    }
     	    @FXML
     	    private ImageView BorrowButton;
     	    @FXML
@@ -1341,8 +1345,6 @@ public class LibrarianController {
 	    	    		if (((CheckBox)p).isSelected())
 	    	    			genres.add(p.getId());
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    	    	
-	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
 	    	    		if(!editionNumber.getText().equals(""))
@@ -1413,7 +1415,6 @@ public class LibrarianController {
 	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
 	    	    			break;
 	    	    		}
-	    	    	}
 	    	    }
 
 
