@@ -162,6 +162,7 @@ public class EchoServer extends AbstractServer
 								PreparedStatement stmt4 = db.update(latesReurnQuery);
 								stmt4.setBoolean(1, true);
 								stmt4.executeUpdate();
+								serverCont.writeMsg(0, memberID, "Your account has been frozen due to : Late Book Return.");
 							}
 					}
 				}
