@@ -190,6 +190,8 @@ public class ManagerController {
 			 ObservableList<Series<String, Number>> series = FXCollections.observableArrayList();
 			 int biggest=0;
 			 addCalcBox(average,median);
+			 if (maxVal<10)
+				 maxVal=10;
 			 for (Entry<Integer, MyData> data : result.entrySet()) {
 				 XYChart.Series<String, Number> s = new XYChart.Series<String, Number>();
 				 s.setName((String)data.getValue().getAction());
