@@ -248,7 +248,6 @@ public class LibrarianController {
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
 	    		if(checkFields()==1) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
@@ -259,7 +258,6 @@ public class LibrarianController {
 	    		default:
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
 	    			break;
-	    		}
 	    		}
 	    	}
         }
@@ -1394,14 +1392,14 @@ public class LibrarianController {
 							      bis.read(msg.getMybytearray(),0,mybytearray.length);
 							      data.add("getFile", msg);
 								  bis.close();
-								  Boolean k = true;
-								  data.add("FileChose", k);
+								  data.add("FileChose", true);
 							    }
 							catch (Exception e) {
 								System.out.println("Error send (Files)msg) to Server");
 							}
 		    	    	}
-
+		    	    	else 
+		    	    		 data.add("FileChose", false);
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
