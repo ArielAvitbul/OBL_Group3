@@ -455,6 +455,7 @@ public class MemberController {
     	    @FXML
     	    void deleteMsg(MouseEvent event) {
     	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
+    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, null, "Confirm", "Are you sure you want to delete this message ('"+toDelete.getSubject()+"')?")==ButtonType.OK) {
     	    	MyData data = new MyData("deleteMsg");
     	    	data.add("toDelete", toDelete);
     	    	rc.getCC().send(data);
@@ -471,6 +472,7 @@ public class MemberController {
     	    		messagesTV.getItems().clear();
     	    		initialize();
     	    		break;
+    	    	}
     	    	}
     	    }
     	    @FXML
