@@ -295,6 +295,7 @@ public class MemberController {
 	    	    	ArrayList<CopyInBorrow> copies = null;
 	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
 	    	    	int i = 0;
+	    	    	Borrow x = member.getMemberCard().getBorrowHistory().get(0);
 	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
 	    	    		if(isExtendableBorrow(i))
 	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
@@ -304,14 +305,12 @@ public class MemberController {
 	    	    	data.add("borrows", currBorrows);
 	    	    		rc.getCC().send(data);
 	    	    		copies = (ArrayList<CopyInBorrow>) rc.getCC().getFromServer().getData("copies");
-	    	    		if(copies==null) 
-	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "No Active Borrows!", null, "You dont have any borrows to extend!");
-	    	    		else {
+
 	    	    			ExtensionCurrBooks.getItems().addAll(copies);
 	    	    			BookNameCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("borroBook"));  	    			
 	    	    			BookAuthorCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,String>("bookAuthor"));
 	    	    			RetDateCol.setCellValueFactory(new PropertyValueFactory<CopyInBorrow,Timestamp>("returnDate"));
-	    	    		}
+	    	    		
 	    	    	}
 	    	    
 	    	    /**

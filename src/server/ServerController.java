@@ -537,6 +537,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				}
 				break;
 		}
+		toReturn.add("updatedMemberCard", getMemberCard(copyInBorrow.getNewBorrow().getMemberID()));
 		return toReturn;
 	}
 	
