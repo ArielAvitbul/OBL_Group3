@@ -484,7 +484,7 @@ public class LibrarianController {
 		    	SearchResultTable.getItems().clear();
 		    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
     				ArrayList<Book> result = rc.getSearchResults(nameField.getText(), authorsField.getText(), freeTxt, GenrePane);
-		    	if (!(result.isEmpty())) {
+		    	if (!result.isEmpty()) {
 	    	    	SearchResultTable.getItems().addAll(result);
 	    	    	SearchResultTable.setVisible(true);
 	    	    	submitBorrow.setVisible(true);
