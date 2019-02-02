@@ -26,9 +26,15 @@ public class MemberCard implements Serializable{
 		this.lateReturns = lateReturns;
 		this.reservationHistory=reservationHistory;
 	}
-	
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
 	public ArrayList<BookReservation> getReservationHistory() {
-		System.out.println(reservationHistory);
 		return reservationHistory;
 	}
 	public boolean checkBookReserved(int bookid) {

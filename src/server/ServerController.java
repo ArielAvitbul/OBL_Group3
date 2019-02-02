@@ -84,7 +84,7 @@ public class ServerController {
 		else if (memberMatch.getBoolean("loggedin"))
 			ret.add("reason", "Already logged in!");
 		else if(memberMatch.getString("status").equals("LOCK"))
-			ret.add("reason", "Your user is lock!");
+			ret.add("reason", "Your user is locked!");
 		else {
 			ret.setAction("login_approved");
 			setLoggedIn(true,memberMatch.getInt("id"));
@@ -235,31 +235,12 @@ public class ServerController {
 	 * @throws SQLException
 	 * @author Ariel
 	 */
-	public MyData saveInfo(int userid, String firstName,String lastName, String password, String email, String phone) throws SQLException {
+	public MyData saveInfo(int userid, String username, String firstName,String lastName, String password, String email, String phone, String status) throws SQLException {
 		MyData result = new MyData("fail");
 		if (db.updateWithExecute("UPDATE member_cards set firstName='"+firstName+"',lastName='"+lastName+"',emailAddress='"+ email +"', phoneNumber='"+phone+"' WHERE userID='"+userid+"'")==1
-				&& db.updateWithExecute("UPDATE members set password='"+password+"' WHERE id='"+userid+"'")==1) {//user found
+				&& db.updateWithExecute("UPDATE members set username='"+username+"',password='"+password+"',status='"+status+"' WHERE id='"+userid+"'")==1)//user found
 			result.setAction("success");
-			result.add("member_card", getMemberCard(userid)); // return the new updated member card!
-		}else // member was not found, keep the fail action, add a message
-			result.add("message", "Member was not found in the database.");
-		return result;
-	}
-	/**
-	 * This method saves info including status update (Admins only!)
-	 * @param userid
-	 * @param username
-	 * @param status
-	 * @return MyData instance with the results
-	 * @throws SQLException
-	 * @author Ariel
-	 */
-	public MyData saveInfoAdmin(int userid, String username, String status) throws SQLException {
-		MyData result = new MyData("fail");
-		if (db.updateWithExecute("UPDATE members set username='"+username+"',status='"+status+"' WHERE id='"+userid+"'")==1) {
-			result.setAction("success");
-			result.add("updatedMember", searchMember(userid));
-		}else
+		else // member was not found, keep the fail action, add a message
 			result.add("message", "Member was not found in the database.");
 		return result;
 	}
@@ -510,7 +491,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					}
 					else {
 						MemberCard borrower = getMemberCard(copyInBorrow.getNewBorrow().getMemberID());
-						writeMsg(0,2, "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+copyInBorrow.getBorroBookName()+"\nHas been extended in a week!");
+						writeMsg(0,2, "Book extension", "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+copyInBorrow.getBorroBookName()+"\nHas been extended in a week!");
 					}break;
 				}
 				break;
@@ -1040,10 +1021,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				toReturn = new MyData("noMessages");
 			else {
 				do {
-					if (rs.getString("action").equals("None")) // check if message has action
-						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getBoolean("wasRead")));
+					if (rs.getString("action")==null) // check if message has action
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("subject"),rs.getString("content"),rs.getBoolean("wasRead")));
 					else
-						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("subject"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
 				}while(rs.next());
 				toReturn = new MyData("messages");
 				toReturn.add("messages", theMessages);
@@ -1161,7 +1142,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		 * @param toUpdate - relevant copy in borrow
 		 * @throws SQLException
 		 */
-		protected void writeMsg(int from, int to, String content) throws SQLException {
-				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) VALUES("+from+","+to+","+content+")");
+		protected void writeMsg(int from, int to, String subject, String content) throws SQLException {
+			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content) VALUES("+from+","+to+",'"+subject+"','"+content+"')");
 		}
+		protected void writeMsg(int from, int to, String subject, String content,String action, Integer regarding) throws SQLException {
+			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content,action,regarding) VALUES("+from+","+to+",'"+subject+"','"+content+"','"+action+"',"+regarding+")");
+	}
 }

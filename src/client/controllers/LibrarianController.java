@@ -211,62 +211,39 @@ public class LibrarianController {
          * @param event - MouseEvent
          */
         @FXML
+        private GridPane infoGrid;
+        @FXML
         void saveMemberInfo(MouseEvent event) {
 	    		MyData data = new MyData("saveInfo");
-	    		data.add("admin", librarian.getID()); 
-	    		data.add("id", Integer.parseInt(idField.getText()));
-	    		if(usernameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the userName. please insert now");
+	    		for (Node n : infoGrid.getChildren()) {
+	    			if ((n instanceof TextField || n instanceof PasswordField) && ((TextField)n).getText().isEmpty()) {
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Some information is missing, please try again after fixing the issue.");
 	    			return;
+	    			}
 	    		}
-	    		else
-	    			data.add("username", usernameField.getText());
-	    		if(passwordField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the password. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("password", passwordField.getText());
-	    		if(firstnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the first name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("firstName", firstnameField.getText());
-	    		if(lastnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the last name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("lastName", lastnameField.getText());
-	    		if(emailField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the email address. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("email", emailField.getText());
-	    		if(phoneField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the phone number. please insert now");
-	    			return;
-	    		}
-	    		data.add("phone", phoneField.getText());
-	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
+	    		Member tempMember = member; //incase of a failure
+	    		member.setUserStatus(statusBox.getSelectionModel().getSelectedItem());
+	    		member.setUserName(usernameField.getText());
+	    		member.setPassword(passwordField.getText());
+	    		member.getMemberCard().setFirstName(firstnameField.getText());
+	    		member.getMemberCard().setLastName(lastnameField.getText());
+	    		member.getMemberCard().setEmailAddress(emailField.getText());
+	    		member.getMemberCard().setPhoneNumber(phoneField.getText());
+	    		data.add("member", member);
 	    		if(checkFields()==1) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member = ((Member)(((MyData)rc.getCC().getFromServer().getData("updatedMember"))).getData("member"));
 	    			break;
 	    		case "fail":
 	    		default:
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
+	    			member=tempMember;
 	    			break;
 	    		}
-	    		}
-	    	}
+	    			}
         }
         }
         private int checkFields() {
@@ -586,11 +563,8 @@ public class LibrarianController {
 				fromPicker.setDate(returnDatePicker.getValue().getDayOfMonth());
 				int fix = returnDatePicker.getValue().getMonthValue() == 1 ? 12 : returnDatePicker.getValue().getMonthValue()-1;
 				fromPicker.setMonth(fix);
-				System.out.println(returnDatePicker.getValue().getYear());
 				fromPicker.setYear(returnDatePicker.getValue().getYear()-1900);
-				System.out.println(fromPicker);
 				Timestamp toServer = new Timestamp(fromPicker.getTime());
-				System.out.println(toServer);
 				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
 				MyData toSend = new MyData("newBorrowRequest");
 				toSend.add("theBorrow", newBorrow);
@@ -603,10 +577,7 @@ public class LibrarianController {
 						SearchResultTable.getItems().remove(newCopyToBorrow);
 						SearchResultTable.getItems().add(index,(Book)((MyData)rc.getCC().getFromServer().getData("UpdatedBookAndBorrow")).getData("theCopy"));
 						ClientConsole.newAlert(AlertType.INFORMATION,null, "Borrow has been registered!" , "Borrow has been registered in the system!");
-						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
-						System.out.println(getMember());
-						System.out.println(getMember().getMemberCard());
-						
+						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));					
 					break;
 					case "borrowFailed":
 						ClientConsole.newAlert(AlertType.ERROR, null , "Something went wrong!", (String)rc.getCC().getFromServer().getData("reason"));
@@ -931,9 +902,7 @@ public class LibrarianController {
     				fromPicker.setDate(dateBorrow.getValue().getDayOfMonth());
     				int fix = dateBorrow.getValue().getMonthValue() == 1 ? 12 : dateBorrow.getValue().getMonthValue()-1;
     				fromPicker.setMonth(fix);
-    				System.out.println(dateBorrow.getValue().getYear());
     				fromPicker.setYear(dateBorrow.getValue().getYear()-1900);
-    				System.out.println(fromPicker);
     				Timestamp toServer = new Timestamp(fromPicker.getTime());
 
     				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
@@ -1223,7 +1192,6 @@ public class LibrarianController {
 		protected class BookManagement {
 			private Book book;
 	    	public BookManagement(Book book) {
-	    		System.out.println("book on management: "+book);
 	    		this.book=book;
 	    	}
 	    	/**
@@ -1399,13 +1367,14 @@ public class LibrarianController {
 							      bis.read(msg.getMybytearray(),0,mybytearray.length);
 							      data.add("getFile", msg);
 								  bis.close();
-								  data.add("FileChose", true);
+								  Boolean k = true;
+								  data.add("FileChose", k);
 							    }
 							catch (Exception e) {
 								System.out.println("Error send (Files)msg) to Server");
 							}
-		    	    	} else
-		    	    		data.add("FileChose", false);
+		    	    	}
+
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
@@ -1552,9 +1521,8 @@ public class LibrarianController {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an edition number. please insert now");
 	    			return;
 		    	}
-		    	if(!(printDate.getValue()==null)) {
-		    		System.out.println(printDate.getValue());
-		    		data.add("printDate", printDate.getValue());}
+		    	if(!(printDate.getValue()==null))
+		    		data.add("printDate", printDate.getValue());
 		    	else {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a print date. please insert now");
 	    			return;
@@ -1721,7 +1689,6 @@ public class LibrarianController {
 	    }
 	    @FXML
 	    void showMessage(MouseEvent event) {
-	    	System.out.println(messagesTV.getSelectionModel().getSelectedIndex());
 	    		contentTF.getChildren().clear();
 	    		Text header = new Text("Message Content:\n\n");
 	    		header.setFont(new Font("Calibri", 20));

@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
+import common.Member;
 import common.MyData;
 import common.SendMail;
 import ocsf.server.AbstractServer;
@@ -59,9 +60,9 @@ public class EchoServer extends AbstractServer
 	db = new MyDB(sqlUser,sqlPass);
 	listen();
 	initialize();
-	serverCont = new ServerController(db);
   }
   private void initialize() throws SQLException {
+	  serverCont = new ServerController(db);
 	  db.updateWithExecute("UPDATE members set loggedin=0");
 	  Date now = Calendar. getInstance().getTime(), nextMidnight = new Date(now.getYear(),now.getMonth(),now.getDate()+1,0,0,0);
 	  AutomatedActions(nextMidnight);
@@ -99,21 +100,19 @@ public class EchoServer extends AbstractServer
    * @throws SQLException
    */
   private void checkLateReturns() throws SQLException {
-	  String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID, borrows.mailSend, borrows.3timesLate "
-				+ "FROM oblg3.copy_in_borrow "
-				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
+	  String MyQuery = "SELECT * FROM oblg3.copy_in_borrow INNER JOIN borrows ON copy_in_borrow.borrowID=borrows.borrowID";
 		ResultSet rs = db.select(MyQuery);
 		while (rs.next()) 
 		{
-
 			java.util.Date today = new java.util.Date();
 			Timestamp returnDate = rs.getTimestamp("returnDate");
 			int memberID = rs.getInt("memberID");
-			boolean mailSend = rs.getBoolean("mailSend");
-			int borrowID = rs.getInt("borrowID");
+			boolean mailSent = rs.getBoolean("mailSent");
+			int borrowID = rs.getInt("borrows.borrowID");
+			Book book = serverCont.getBook(rs.getInt("bookID"));
 			java.util.Date returnDateUTIL = new java.util.Date(returnDate.getTime());
 			//int days = (int) daysBetween(returnDateUTIL,borrowDateUTIL);
-			float days = daysBetween(today, returnDateUTIL) ;
+			float days = daysBetween(today, returnDateUTIL);
 			if (days>0)
 			{
 				String query1 = "UPDATE members SET status = 'FREEZE' WHERE id= '"+memberID+"'";
@@ -155,24 +154,24 @@ public class EchoServer extends AbstractServer
 								PreparedStatement stmt4 = db.update(latesReurnQuery);
 								stmt4.setBoolean(1, true);
 								stmt4.executeUpdate();
-								serverCont.writeMsg(0, memberID, "Your account has been locked due to : 3 times Late Book Return.");
-							} else
-								serverCont.writeMsg(0, memberID, "Your account has been frozen due to : Late Book Return.");
+								serverCont.writeMsg(0, 1, "3rd Late Book Return",memberID +" was late to return books for the 3rd time.\nHe is now frozen and waiting on a manager's action.", "3Late", memberID);
+							}
+								serverCont.writeMsg(0, memberID, "Late Book Return","Your account has been frozen due to : Late Book Return.");
 					}
 				}
 
 			}
-			if(getDifferenceDays(today,returnDateUTIL)== -1 && mailSend == false)
+			if(getHourDiff(returnDateUTIL,today)<=24 && !mailSent)
 			{
 				String emailQuery = "SELECT emailAddress, firstName FROM member_cards WHERE userID='"+memberID+"'";
 				ResultSet rs2 = db.select(emailQuery);
 				if(db.hasResults(rs2)) {
 					String memberMail = rs2.getString("emailAddress");
 					String userName = rs2.getString("firstName");
-					String msg = "Hello "+userName+"\n\n You need to return the book ";
-					new SendMail(memberMail,"Return Book",msg);
-					serverCont.writeMsg(0, memberID, msg);
-					String sendMailQuery = "UPDATE borrows SET mailSend = ? WHERE borrowID= '"+borrowID+"'";
+					String msg = "Hello "+userName+"\n\n This is a reminder regarding the book\n"+ book.getBookName() +"\nRemember to return it in time!\nReturn date :"+returnDateUTIL.toString()+".\n\nGood day.";
+					new SendMail(memberMail,"Return Book Reminder",msg);
+					serverCont.writeMsg(0,memberID, "Reminder", msg);
+					String sendMailQuery = "UPDATE borrows SET mailSent = ? WHERE borrowID= "+borrowID;
 					PreparedStatement stmt3 = db.update(sendMailQuery);
 					stmt3.setBoolean(1, true);
 					stmt3.executeUpdate();
@@ -183,6 +182,9 @@ public class EchoServer extends AbstractServer
 		rs.close();
 }
 
+  private long getHourDiff(Date d1, Date d2) {
+	  return TimeUnit.HOURS.convert(d1.getTime()-d2.getTime(), TimeUnit.MILLISECONDS);
+  }
   /**
    * @Author Feldman
    * function get two dates and return the difference between them.
@@ -190,7 +192,7 @@ public class EchoServer extends AbstractServer
    * @param d1 - Date
    * @return the days between two dates (in days!)
    */
-	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
+	public static long getDifferenceDays(java.util.Date d1,java.util.Date d2) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
@@ -342,12 +344,8 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.login(data));
 	  		    	break;
 	  		  case "saveInfo":
-	  			  MyData normalSave = serverCont.saveInfo((Integer)data.getData("id"),(String)data.getData("firstName"),(String)data.getData("lastName"),(String)data.getData("password"),(String)data.getData("email"),(String)data.getData("phone"));
-	  			  if (normalSave.getAction().equals("success") && data.getData().containsKey("admin")) { // Member Management saveInfo
-	  				// TODO: add change log
-	  				  client.sendToClient(serverCont.saveInfoAdmin((Integer)data.getData("id"), (String)data.getData("username"), (String)data.getData("status")));
-	  		    	} else // Member Area saveInfo
-	  		    		client.sendToClient(normalSave);
+	  			  Member member = (Member)data.getData("member");
+	  		    		client.sendToClient(serverCont.saveInfo(member.getID(),member.getUserName(),member.getMemberCard().getFirstName(),member.getMemberCard().getLastName(),member.getPassword(),member.getMemberCard().getEmailAddress(),member.getMemberCard().getPhoneNumber(),member.getStatus().toString()));
 	  		    	break;
 	  		    case "orderBook":
 	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Book)data.getData("book")));

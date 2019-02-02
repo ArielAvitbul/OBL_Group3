@@ -37,6 +37,10 @@ public class Member extends Reader implements Serializable
 		return id;
 	}
 	
+	public void setUserName(String username) {
+		this.userName=username;
+	}
+	
 	public String getUserName() 
 	{
 		return userName;
