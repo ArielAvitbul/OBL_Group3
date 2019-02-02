@@ -538,6 +538,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				}
 				break;
 		}
+		toReturn.add("updatedMemberCard", getMemberCard(copyInBorrow.getNewBorrow().getMemberID()));
 		return toReturn;
 	}
 	
@@ -591,9 +592,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			daysToExtend = (int)getDifferenceDays(fromPicker, copyInBorrow.getNewBorrow().getReturnDate());
 		c.add(Calendar.DAY_OF_MONTH, daysToExtend);
 		copyInBorrow.getNewBorrow().setReturnDate(new Timestamp(c.getTimeInMillis()));
-		System.out.println(new Timestamp(c.getTimeInMillis()));
-		//System.out.println(copyInBorrow.getNewBorrow().getReturnDate());
-		//System.out.println(copyInBorrow.getNewBorrow().getBorrowID());
 		String query = "UPDATE borrows SET returnDate=? WHERE borrowID=?";
 		PreparedStatement ps = db.update(query);
 		ps.setTimestamp(1,copyInBorrow.getNewBorrow().getReturnDate());
@@ -1161,6 +1159,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		 * @throws SQLException
 		 */
 		protected void writeMsg(int from, int to, String content) throws SQLException {
-				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) ALUES("+from+","+to+","+content+")");
+				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) VALUES("+from+","+to+","+content+")");
 		}
 }
