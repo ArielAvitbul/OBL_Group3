@@ -51,6 +51,11 @@ public class ManagerController {
 	void replacePage(MouseEvent event) {
 		rc.setBottom(event);
 	}
+	/**
+	 * class that responsible about the reports.
+	 * @author Ariel
+	 *
+	 */
 	public class Report {
 		private ComboBox<String> activityBox;
 		@FXML
@@ -81,6 +86,9 @@ public class ManagerController {
 	    void goBack(MouseEvent event) {
 	    	rc.setBottom("managerArea");
 	    }
+	    /**
+	     * initialize the reports.
+	     */
 		@FXML void initialize() {
 			ReportBox.getItems().add("Borrow Report");
 			ReportBox.getItems().add("Late Return Report");
@@ -101,6 +109,10 @@ public class ManagerController {
 			    	sideBox.getChildren().remove(activityBox);
 			  });
 		}
+		/**
+		 * function that produce the reports
+		 * @param event - click on produce report.
+		 */
 		@FXML
 		void produceReport(MouseEvent event) {
 			MyData data = new MyData(ReportBox.getSelectionModel().getSelectedItem());
@@ -131,7 +143,15 @@ public class ManagerController {
 					 break;
 				}
 		}
-
+		/**
+		 * function that make the activity report
+		 * @param active - number of active users
+		 * @param locked - number of locked users
+		 * @param frozen - number of frozen users
+		 * @param totalBorrowedCopies - number of totalBorrowedCopies
+		 * @param lateReturners - number of lateReturners
+		 * @return pieChart of the activity report.
+		 */
 		private PieChart createActivityReport(int active, int locked, int frozen, int totalBorrowedCopies, int lateReturners) {
 			ObservableList<PieChart.Data> pieChartData =
 			FXCollections.observableArrayList(
@@ -145,7 +165,14 @@ public class ManagerController {
 			piechart.setTitle("Activity Report");
 			return piechart;
 		}
-		
+		/**
+		 * function that make the borrow report
+		 * @param borrows - hashMap of all the borrows.
+		 * @param maxVal - the max in line x at the chart
+		 * @param median - the median of the chart
+		 * @param average - the average of the chart
+		 * @return barChart of borrow report.
+		 */
 		private BarChart<String,Number> createBorrowReport(HashMap<Boolean,ArrayList<Float>> borrows, float maxVal, float median, float average) {
 			XYChart.Series<String, Number> regular = new XYChart.Series<String, Number>();
 			 regular.setName("Regular");
@@ -185,7 +212,14 @@ public class ManagerController {
 				barchart.setTitle("Borrow Report");
 				return barchart;
 		}
-		
+		/**
+		 * function that create a late return report
+		 * @param result - hashMap that contain the result
+		 * @param maxVal - the max value at line x
+		 * @param median - the median of the graph
+		 * @param average - the average of the graph 
+		 * @return a barChart that present the late return report
+		 */
 		private BarChart<String,Number> createLateReturnReport(HashMap<Integer,MyData> result,float maxVal, float median, float average) {
 			 ObservableList<Series<String, Number>> series = FXCollections.observableArrayList();
 			 int biggest=0;
@@ -218,7 +252,11 @@ public class ManagerController {
 		     barchart.setTitle("Late Return Report");
 			 return barchart;
 		}
-		
+		/**
+		 * function that add a box with the median and average to the graph.
+		 * @param averageValue - the value of the average
+		 * @param medianValue - the value of the median
+		 */
 		private void addCalcBox(float averageValue, float medianValue) {
 			Label avg = new Label("Average: "+ String.format("%.02f", averageValue));
 			avg.setFont(new Font(16));

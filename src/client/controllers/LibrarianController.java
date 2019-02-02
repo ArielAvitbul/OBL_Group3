@@ -150,6 +150,11 @@ public class LibrarianController {
         void goBack(MouseEvent event) {
         	rc.setBottom("librarianArea");
         }
+        /**
+         * this function check if the user is not freeze or lock 
+         * @param event - click on some button at member management
+         * @return if the librarian can do thind at the member management
+         */
   	  private int checkPossibility(MouseEvent event) {
 	
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
@@ -164,6 +169,9 @@ public class LibrarianController {
 
 		}
     	@FXML
+    	/**
+    	 * initialize the parameters of member on member management.
+    	 */
     	void initialize() {
     		if (librarian instanceof Manager && !(member instanceof Manager))
     			statusBox.getItems().addAll(Member.Status.values());
@@ -246,6 +254,10 @@ public class LibrarianController {
 	    			}
         }
         }
+        /**
+         * this function check fields in member management, if they are ligal.
+         * @return 0 - if they are ligal, 1 - otherwise.
+         */
         private int checkFields() {
         	if(!emailField.getText().contains("@")) {
 				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
@@ -348,20 +360,7 @@ public class LibrarianController {
     	    }
 
     	}
-        protected class ViewRequests {
-    		@FXML
-    		void entered(MouseEvent e) {
-    			rc.mouseEntered(e);
-    		}
-    		@FXML
-    		void exited(MouseEvent e) {
-    			rc.mouseExited(e);
-    		}
-    		@FXML
-    		void goBack(MouseEvent event) {
-    			rc.setBottom("memberManagement");
-    		}
-    	}
+
         /**
          * The BorrowCopy class is the controller that handles the borrow process's GUI
          * @author Good Guy
@@ -431,7 +430,9 @@ public class LibrarianController {
 
     	    @FXML
     	    private TableColumn<Book, String> AvalCopiesCol;
-    	    
+    	    /**
+    	     * initialize the screen of borrow copy.
+    	     */
     	    @FXML
     	    void initialize() {
 
@@ -461,6 +462,10 @@ public class LibrarianController {
     			if (event.getCode().equals(KeyCode.ENTER)) 
     				submitSearch(null);
     	    }
+    		/**
+    		 * function that show the search result.
+    		 * @param event - click on search button.
+    		 */
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
 		    	selected = null;
@@ -482,6 +487,10 @@ public class LibrarianController {
 	    			authorsField.clear();
 		    	}
 		    }
+		    /**
+		     * function that update the book that chosen, and the date that chosen at the datePicker.
+		     * @param event - click on the table.
+		     */
 		    @FXML
 		    void selectBook(MouseEvent event) {
 		    	selected = SearchResultTable.getSelectionModel().getSelectedItem();
@@ -510,7 +519,10 @@ public class LibrarianController {
 		    		}
 		    	}
 		    }
-        
+        /**
+         * function that submit the borrow request.
+         * @param event - click on borrow copy button.
+         */
 		    @FXML
 		    void submitBorrowRequest(MouseEvent event) {
 		    	switch (isValidBorrow(selected)) {
@@ -533,7 +545,11 @@ public class LibrarianController {
 		    			break;
 		    		}
 		    	}
-
+		    	/**
+		    	 * function that called from submitBorrowRequest to check what is the window that need to pop.
+		    	 * @param toCheck - the selected book
+		    	 * @return string that tells us what is the result.
+		    	 */
 			private String isValidBorrow(Book toCheck) {
 				if(toCheck == null) 
 					return "NoBookSelected";
@@ -557,6 +573,10 @@ public class LibrarianController {
 				long difference = (one.getTime()-date.getTime())/MILLISECONDS_PER_DAY; 
 				return Math.abs(difference);
 			}
+			/**
+			 * function that update the borrow after all the check.
+			 * @param newCopyToBorrow - the book that we want to borrow.
+			 */
 			private void updateNewBorrow(Book newCopyToBorrow) {
 				//Date fromPicker = Date.valueOf(returnDatePicker.getValue());
 				Date fromPicker = new Date();
@@ -702,7 +722,9 @@ public class LibrarianController {
 
     	    @FXML
     	    private TableColumn<CopyInBorrow, Date> returnDateCol;
-
+    	    /**
+    	     * initialize the manual exception.
+    	     */
     	    @FXML
     	    void initialize() {
     	    	ExtensionRequestController checkExtendable = workedOnMc.new ExtensionRequestController();
@@ -985,17 +1007,14 @@ public class LibrarianController {
 	    void goBack(MouseEvent event) {
 	    	rc.setBottom("librarianArea");
 	    }
+	    /**
+	     * function that call the server to create the user, with all the new parameters.
+	     * @param event - click on save.
+	     */
 	    @FXML
 	    void submit(MouseEvent event) {
 	    	try {
 	    	MyData data = new MyData("createUser");
-	    	data.add("username", usernameField.getText());
-	    	data.add("password", passwordField.getText());
-	    	data.add("id", Integer.parseInt(idField.getText()));
-	    	data.add("firstname", firstnameField.getText());
-	    	data.add("lastname", lastnameField.getText());
-	    	data.add("email", emailField.getText());
-	    	data.add("phone", phoneField.getText());
 	    	if(usernameField.getText().equals("")) {
 	    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a user name. please insert now");
     			return;
@@ -1057,7 +1076,10 @@ public class LibrarianController {
 	    		idField.clear();
 	    	}
 	    }
-	    
+	    /**
+	     * function that check if the fields are ligal.
+	     * @return 0 - if they are, 1- otherwise.
+	     */
 		private int checkFields() {
 			if(!emailField.getText().contains("@")) {
 				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "You enterred an incorrect email. please try again");
@@ -1101,6 +1123,9 @@ public class LibrarianController {
 	protected class InventoryManagement {
 		
 		private ArrayList<Book> books;
+		/**
+		 * initialize the table in the inventory management.
+		 */
 		@FXML
 		void initialize() {
 				rc.getCC().send(new MyData("getBooks"));
@@ -1625,6 +1650,11 @@ public class LibrarianController {
 	        }
 	    }
 	}
+	/**
+	 * class that responsible of the inboxes of the users.
+	 * @author Ariel
+	 *
+	 */
 	protected class ShowInbox {
     	private ArrayList<Message> myMessagse;
 	    @FXML
@@ -1649,6 +1679,9 @@ public class LibrarianController {
 	    void goBack(MouseEvent event) {
 	    	rc.setBottom("librarianArea");
 	    }
+	    /**
+	     * initialize the inboxes.
+	     */
 	    @FXML
 	    void initialize() {
 	    	MyData data = new MyData("getMessages");
@@ -1667,7 +1700,10 @@ public class LibrarianController {
 	    	}
 
 	    }
-
+	    /**
+	     * function that responsible of delete a message after click on "delete" button
+	     * @param event - click on delete.
+	     */
 	    @FXML
 	    void deleteMsg(MouseEvent event) {
 	    	Message toDelete = messagesTV.getSelectionModel().getSelectedItem();
@@ -1698,6 +1734,10 @@ public class LibrarianController {
 	    void exited(MouseEvent event) {
 	    	rc.mouseExited(event);
 	    }
+	    /**
+	     * function that responsible of show the message.
+	     * @param event - click on the message.
+	     */
 	    @FXML
 	    void showMessage(MouseEvent event) {
 	    		contentTF.getChildren().clear();
