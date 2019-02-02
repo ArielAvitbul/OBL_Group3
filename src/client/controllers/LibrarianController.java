@@ -165,7 +165,7 @@ public class LibrarianController {
 		}
     	@FXML
     	void initialize() {
-    		if (librarian instanceof Manager) 
+    		if (librarian instanceof Manager && !(member instanceof Manager))
     			statusBox.getItems().addAll(Member.Status.values());
     		else
     			statusBox.getItems().add(member.getStatus());

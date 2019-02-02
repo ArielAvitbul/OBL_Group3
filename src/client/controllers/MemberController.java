@@ -294,7 +294,6 @@ public class MemberController {
 	    	    	ArrayList<CopyInBorrow> copies = null;
 	    	    	ArrayList<Borrow> currBorrows = new ArrayList<Borrow>();
 	    	    	int i = 0;
-	    	    	Borrow x = member.getMemberCard().getBorrowHistory().get(0);
 	    	    	while(member.getMemberCard().getBorrowHistory().size()>i) {
 	    	    		if(isExtendableBorrow(i,member))
 	    	    			currBorrows.add(member.getMemberCard().getBorrowHistory().get(i));
