@@ -116,7 +116,6 @@ public class EchoServer extends AbstractServer
 			float days = daysBetween(today, returnDateUTIL) ;
 			if (days>0)
 			{
-				
 				String query1 = "UPDATE members SET status = 'FREEZE' WHERE id= '"+memberID+"'";
 				db.updateWithExecute(query1);
 				String lateQuery = "UPDATE member_cards SET lateReturns = lateReturns + ? WHERE userID= '"+memberID+"'";

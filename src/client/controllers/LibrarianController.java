@@ -347,7 +347,6 @@ public class LibrarianController {
     	    	switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member.setMemberCard((MemberCard)rc.getCC().getFromServer().getData("member_card"));
 	    			break;
 	    		case "fail":
 	    		default:
@@ -1165,6 +1164,8 @@ public class LibrarianController {
 	    		String result = (String)rc.getCC().getFromServer().getAction();
 	    		if (result.equals("succeed")) {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "The book is delete", (String)rc.getCC().getFromServer().getData("succeed"));
+	    			inventoryTable.getItems().clear();
+	    			initialize();
 	    			}
 	    		else if (result.equals("book_in_borrow")) {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "Cant delete book", (String)rc.getCC().getFromServer().getData("book_in_borrow"));
@@ -1231,7 +1232,7 @@ public class LibrarianController {
 	    		if(book.isPopular()==true)
 	    			choicePopular.getSelectionModel().select("Yes");
 	    		else choicePopular.getSelectionModel().select("No");
-	    		shellLocation.setText(book.getShellLocation());
+	    		shelfLocation.setText(book.getShelfLocation());
 	    		if(book.getTopics().contains("Kids"))
 	    			Kids.setSelected(true);
 	    		if(book.getTopics().contains("Drama"))
@@ -1267,7 +1268,7 @@ public class LibrarianController {
 	    	    private CheckBox Popular;
 
 	    	    @FXML
-	    	    private TextField shellLocation;
+	    	    private TextField shelfLocation;
 
 	    	    @FXML
 	    	    private CheckBox Drama;
@@ -1358,8 +1359,8 @@ public class LibrarianController {
 	    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new number of copies. please insert now");
 	    	    			return;
 	    	    		}
-	    	    		if(!shellLocation.getText().equals(""))
-	    	    			data.add("shellLocation", shellLocation.getText());
+	    	    		if(!shelfLocation.getText().equals(""))
+	    	    			data.add("shelfLocation", shelfLocation.getText());
 		    	    		else {
 		    	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert new shelf location. please insert now");
 		    	    			return;
@@ -1471,7 +1472,7 @@ public class LibrarianController {
 	        private ChoiceBox<String> popularChoice;
 
 	        @FXML
-	        private TextField shellLocation;
+	        private TextField shelfLocation;
 
 	        @FXML
 	        private CheckBox Drama;
@@ -1578,8 +1579,8 @@ public class LibrarianController {
 	    			return;
     	    	}
 		    	data.add("purchaseDate", new Date(System.currentTimeMillis()));
-		    	if(!shellLocation.getText().equals("")) 
-		    		data.add("shellLocation", shellLocation.getText());
+		    	if(!shelfLocation.getText().equals("")) 
+		    		data.add("shelfLocation", shelfLocation.getText());
 		    	else {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a shelf location. please insert now");
 	    			return;

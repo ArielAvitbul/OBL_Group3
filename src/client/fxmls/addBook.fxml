@@ -26,7 +26,7 @@
       <TextField fx:id="editionNumber" layoutX="145.0" layoutY="204.0" />
       <TextField fx:id="shortDescription" layoutX="599.0" layoutY="93.0" />
       <TextField fx:id="numberOfCopies" layoutX="599.0" layoutY="149.0" />
-      <TextField fx:id="shellLocation" layoutX="599.0" layoutY="204.0" />
+      <TextField fx:id="shelfLocation" layoutX="599.0" layoutY="204.0" />
       <Text layoutX="14.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name of book:" wrappingWidth="115.99999237060547">
          <font>
             <Font name="System Bold" size="16.0" />
@@ -62,7 +62,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Text>
-      <Text layoutX="396.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shell location:" wrappingWidth="155.73678588867188">
+      <Text layoutX="396.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shelf location:" wrappingWidth="155.73678588867188">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>

@@ -295,7 +295,11 @@ public class ReaderController {
     			controllers.put(fxml, ((LibrarianController)controllers.get("librarianArea")).new CreateUser());
     			break;
     		case "searchBook":
-    			controllers.put(fxml, new SearchController());
+    			try {
+    				controllers.put(fxml, new SearchController((Member)objects[0]));
+        		} catch (NullPointerException e) {
+        				controllers.put(fxml, new SearchController());
+        		}
     			break;
     		case "memberArea":
     			controllers.put(fxml, controllers.get("member"));
@@ -412,7 +416,7 @@ public class ReaderController {
 				resetBottom();
 				controllers.clear();
    }
-		public void popup(MouseEvent event, Object controller) {
+		/*public void popup(MouseEvent event, Object controller) {
 			String fxml = ((ImageView)event.getSource()).getId();
 			if (fxml.equals("orderBook"))
 				fxml="searchBook";
@@ -426,19 +430,24 @@ public class ReaderController {
 	        catch (IOException e) {
 	            e.printStackTrace();
 	        }
-		}
+		}*/
 		protected class SearchController {
+			private Member member=null;
+			protected SearchController() {}
+			protected SearchController(Member member) {
+				this.member=member;
+			}
 			@FXML
 				void initialize() {
 			nameCol.setCellValueFactory(new PropertyValueFactory<Book, String>("bookName"));
 			genreCol.setCellValueFactory(new PropertyValueFactory<Book, String>("topics"));
 			authorsCol.setCellValueFactory(new PropertyValueFactory<Book, String>("authorsNames"));
 			availbleCol.setCellValueFactory(new PropertyValueFactory<Book, String>("Avlible"));
-			shelfCol.setCellValueFactory(new PropertyValueFactory<Book, String>("ShellLocation"));
+			shelfCol.setCellValueFactory(new PropertyValueFactory<Book, String>("ShelfLocation"));
 			tableBooks.setPlaceholder(new Label("Enter search details"));
 				}
-		    @FXML
-		    private ImageView orderBookButton;	
+			@FXML
+		    private HBox underTable;
 		    @FXML
 		    private ImageView indexBookButton;
 		    @FXML
@@ -487,8 +496,6 @@ public class ReaderController {
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
 		    	tableBooks.getItems().clear();
-    	    	orderBookButton.setVisible(false);
-    	    	indexBookButton.setVisible(false);
     	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
 	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
 	    	    	//orderBookButton.setVisible(true);
