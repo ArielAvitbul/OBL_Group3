@@ -228,6 +228,7 @@ public class ReaderController {
     /**
      * Removes the bottom page
      */
+    @FXML
     private void resetBottom() {
     	mainPane.getChildren().remove(page);
     }

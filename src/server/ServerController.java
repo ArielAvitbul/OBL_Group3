@@ -449,9 +449,9 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 						toReturn.add("reason", "Can't update borrow!");
 					}
 					else {
-						writeMsgToLibrerians(copyInBorrow);
-					}
-					break;
+						MemberCard borrower = getMemberCard(copyInBorrow.getNewBorrow().getMemberID());
+						writeMsg(0,2, "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+copyInBorrow.getBorroBookName()+"\nHas been extended in a week!");
+					}break;
 				}
 				break;
 			case "employee":
@@ -547,29 +547,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		}
 		return toReturn;
 	}
-	
-	/**
-	 * This method writes message to librarians regarding a certain extension of a borrow
-	 * @param toUpdate - Extended copy in borrow 
-	 * @throws SQLException
-	 * @author Good Guy
-	 */
-	private void writeMsgToLibrerians(CopyInBorrow toUpdate) throws SQLException {
-		ArrayList<Integer> librerians = new ArrayList<Integer>();
-		MemberCard borrower = getMemberCard(toUpdate.getNewBorrow().getMemberID());
-		String insertQ = "INSERT INTO messages(sender,reciever,content) "
-				+ "VALUES(?,?,?)";
-		String query = "SELECT id FROM librarians";
-		ResultSet rs = db.select(query);
-		while(rs.next()) {
-			PreparedStatement ps = db.update(insertQ);
-			ps.setInt(1, toUpdate.getNewBorrow().getMemberID());
-			ps.setInt(2, rs.getInt("id"));
-			ps.setString(3, "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+toUpdate.getBorroBookName()+"\nHas been extended in a week!");
-			ps.executeUpdate();
-		}
-	}
-
 	/**
 	 * 
 	 * @param id - the id of the member
@@ -963,25 +940,40 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			 }
 			 return data;
 		  }
+		public String getUserName(int userid) throws SQLException {
+			if (userid==0)
+				return "System";
+			ResultSet rs = db.select("SELECT username from members where id="+userid);
+			if (rs.first())
+				return rs.getString("username");
+			else
+				return "Unknown";
+		}
 		/**
-		 * @author Good Guy
-		 * @param librarianID
-		 * @return MyData instance representing the messages.
+		 * get relevant messages
+		 * @author Ariel
+		 * @param userID - userID requesting this method
+		 * @param rank - Member/Librarian/Manager
+		 * @return
 		 * @throws SQLException
 		 */
-		public MyData getMessages(int librarianID) throws SQLException {
+		public MyData getMessages(int userID,String rank) throws SQLException {
 			MyData toReturn;
 			ArrayList<Message> theMessages = new ArrayList<Message>();
-			//String query = "SELECT * FROM messages WHERE to="+librarianID;
-			ResultSet rs = db.select("SELECT * FROM messages WHERE reciever="+librarianID+" order by wasRead");
+			String inboxAddition="";
+			if (rank.equals("Manager"))
+				inboxAddition+=" OR reciever=1"; // 1 : manager inbox
+			if (rank.equals("Librarian"))
+				inboxAddition+=" OR reciever=2"; // 2 : librarian inbox
+			ResultSet rs = db.select("SELECT * FROM messages WHERE reciever="+userID+""+inboxAddition+" order by wasRead");
 			if(!db.hasResults(rs))
 				toReturn = new MyData("noMessages");
 			else {
 				do {
 					if (rs.getString("action").equals("None")) // check if message has action
-						theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content"),rs.getBoolean("wasRead")));
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getBoolean("wasRead")));
 					else
-						theMessages.add(new Message(rs.getInt("msgID"),rs.getInt("sender"), rs.getInt("reciever"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
 				}while(rs.next());
 				toReturn = new MyData("messages");
 				toReturn.add("messages", theMessages);
@@ -1024,6 +1016,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				return new MyData("removed");
 			return new MyData("failed");
 		}
+		/**
+		 * Updates 'wasRead' value in DB
+		 * @author Ariel
+		 * @param value
+		 * @param msgID
+		 * @return result
+		 * @throws SQLException
+		 */
 		public MyData msgRead(boolean value, int msgID) throws SQLException {
 			MyData data = new MyData("Success");
 			PreparedStatement ps = db.update("UPDATE messages SET wasRead =? WHERE msgID=?");
@@ -1033,6 +1033,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				data.setAction("Failure");
 			return data;
 		}
+		/**
+		 * Handles actions from messages
+		 * @author Ariel
+		 * @param dfs - data recieved from server
+		 * @return MyData type result
+		 * @throws SQLException
+		 */
 		public MyData msgAction(MyData dfs) throws SQLException {
 			MyData data = new MyData("Success");
 			switch (dfs.getAction()) {
@@ -1051,5 +1058,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					data.setAction("Failure");
 			}
 			return data;
+		}
+		
+		/**
+		 *  Writes a message from System
+		 * @author Ariel
+		 * @param to - 1 : Managers, 2 : Librarians
+		 * @param toUpdate - relevant copy in borrow
+		 * @throws SQLException
+		 */
+		private void writeMsg(int from, int to, String content) throws SQLException {
+				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) ALUES("+from+","+to+","+content+")");
 		}
 }

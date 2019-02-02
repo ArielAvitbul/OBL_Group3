@@ -310,7 +310,7 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.msgAction(data));
 	  		    	break;
 	  		    case "getMessages":
-	  		    	client.sendToClient(serverCont.getMessages((int)data.getData("member")));
+	  		    	client.sendToClient(serverCont.getMessages((int)data.getData("member"),(String)data.getData("rank")));
 	  		    	break;
 	  		    case "client_stopped":
 	  		    case "logout":

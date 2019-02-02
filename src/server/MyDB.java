@@ -16,7 +16,10 @@ public class MyDB {
 		try {
 			   Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://"+IP+":"+port+"/"+schema,user,pass);
+		if (conn!=null)
 		System.out.println("SQL Succesfully connected.");
+		else
+			System.out.println("SQL didn't connect.");
 		} catch (ClassNotFoundException e) {System.out.println("Something went wrong with the driver...");}
 	catch (SQLException e) {e.printStackTrace();System.exit(1);}
 	}
