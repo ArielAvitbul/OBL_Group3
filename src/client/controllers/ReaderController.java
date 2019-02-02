@@ -577,9 +577,9 @@ public class ReaderController {
 		    	}
 		    }
 		    /**
-		     * @author feldman
 		     * method that present the table of content of the chosen book
 		     * start when reader press on the table of content button.
+		     * @author feldman
 		     * @param event
 		     * @throws IOException
 		     */
