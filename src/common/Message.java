@@ -12,20 +12,23 @@ public class Message implements Serializable {
 	private String content;
 	private boolean handled=false;
 	private boolean read;
+	private String subject;
 	
-	public Message(int msgID , String from , int to , String content, boolean read) {
+	public Message(int msgID , String from , int to, String subject , String content, boolean read) {
 		this.msgID=msgID;
 		this.from=from;
 		this.to=to;
+		this.subject=subject;
 		this.content=content;
 		this.read=read;
 		this.date = new Date(System.currentTimeMillis());
 	}
 	
-	public Message(int msgID , String from , int to , String content, String action, Member regarding, boolean handled, boolean read) {
+	public Message(int msgID , String from , int to , String subject, String content, String action, Member regarding, boolean handled, boolean read) {
 		this.msgID=msgID;
 		this.from=from;
 		this.to=to;
+		this.subject=subject;
 		this.content=content;
 		this.action=action;
 		this.regarding=regarding;
@@ -82,5 +85,13 @@ public class Message implements Serializable {
 
 	public void setRead(boolean read) {
 		this.read = read;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
  }

@@ -510,7 +510,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 					}
 					else {
 						MemberCard borrower = getMemberCard(copyInBorrow.getNewBorrow().getMemberID());
-						writeMsg(0,2, "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+copyInBorrow.getBorroBookName()+"\nHas been extended in a week!");
+						writeMsg(0,2, "Book extension", "The Borrow of "+borrower.getFirstName()+" "+borrower.getLastName()+"\nWith the book "+copyInBorrow.getBorroBookName()+"\nHas been extended in a week!");
 					}break;
 				}
 				break;
@@ -1039,10 +1039,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				toReturn = new MyData("noMessages");
 			else {
 				do {
-					if (rs.getString("action").equals("None")) // check if message has action
-						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getBoolean("wasRead")));
+					if (rs.getString("action")==null) // check if message has action
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("subject"),rs.getString("content"),rs.getBoolean("wasRead")));
 					else
-						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
+						theMessages.add(new Message(rs.getInt("msgID"),getUserName(rs.getInt("sender")), rs.getInt("reciever"), rs.getString("subject"), rs.getString("content"),rs.getString("action"),(Member)searchMember(rs.getInt("regarding")).getData("member"),rs.getBoolean("handled"),rs.getBoolean("wasRead")));
 				}while(rs.next());
 				toReturn = new MyData("messages");
 				toReturn.add("messages", theMessages);
@@ -1160,7 +1160,10 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		 * @param toUpdate - relevant copy in borrow
 		 * @throws SQLException
 		 */
-		protected void writeMsg(int from, int to, String content) throws SQLException {
-				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) VALUES("+from+","+to+","+content+")");
+		protected void writeMsg(int from, int to, String subject, String content) throws SQLException {
+			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content) VALUES("+from+","+to+",'"+subject+"','"+content+"')");
 		}
+		protected void writeMsg(int from, int to, String subject, String content,String action, Integer regarding) throws SQLException {
+			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content,action,regarding) VALUES("+from+","+to+",'"+subject+"','"+content+"','"+action+"',"+regarding+")");
+	}
 }

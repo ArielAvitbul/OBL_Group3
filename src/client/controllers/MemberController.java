@@ -215,7 +215,6 @@ public class MemberController {
 				rc.getCC().send(data);
 			ArrayList<History> arrOb = (ArrayList<History>)rc.getCC().getFromServer().getData("list");
 			BorrowTable.getItems().addAll(arrOb);
-			System.out.println(arrOb);
 			colType.setCellValueFactory(new PropertyValueFactory<History,String>("type"));
 			colName.setCellValueFactory(new PropertyValueFactory<History,String>("name"));
 			colDate.setCellValueFactory(new PropertyValueFactory<History,Date>("actualDate"));
@@ -356,7 +355,6 @@ public class MemberController {
 	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
 	    							break;
 	    						case "ExtensionFailed":
-	    							System.out.println((String)rc.getCC().getFromServer().getData("reason"));
 	    							ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
 	    							break;
 	    						}
@@ -411,6 +409,8 @@ public class MemberController {
 
     	    @FXML
     	    private TableColumn<Message, Date> dateColumn;
+    	    @FXML
+    	    private TableColumn<Message, String> subjectColumn;
     	    
     	    @FXML
     	    private ImageView deleteMsg;
@@ -444,6 +444,7 @@ public class MemberController {
     	    		messagesTV.getItems().addAll(myMessages);
     	    		fromColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("from"));
     	    		dateColumn.setCellValueFactory(new PropertyValueFactory<Message, Date>("date"));
+    	    		subjectColumn.setCellValueFactory(new PropertyValueFactory<Message, String>("subject"));
     	    		break;
     	    	case "noMessages":
     	    		messagesTV.setPlaceholder(new Label("No New Messages!"));
@@ -502,7 +503,7 @@ public class MemberController {
     	    		switch (selectedMsg.getAction()) {
     	    		case "3Late":
     	    			VBox actionBox = new VBox(5);
-    	    			actionBox.getChildren().add(new Text("\n\nThe user is currently frozen\nand is waiting on a manager's action.\nWould you like to take action?\n\n"));
+    	    			actionBox.getChildren().add(new Text(selectedMsg.getContent()));
     	    			actionBox.getChildren().add(new Label("Change "+ selectedMsg.getRegarding().getMemberCard().getFirstName()+"'s status: "));
     	    			ChoiceBox<Member.Status> statusBox = new ChoiceBox<>();
     	        		statusBox.getItems().addAll(Member.Status.values());

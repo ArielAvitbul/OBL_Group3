@@ -28,7 +28,6 @@ public class MemberCard implements Serializable{
 	}
 	
 	public ArrayList<BookReservation> getReservationHistory() {
-		System.out.println(reservationHistory);
 		return reservationHistory;
 	}
 	public boolean checkBookReserved(int bookid) {

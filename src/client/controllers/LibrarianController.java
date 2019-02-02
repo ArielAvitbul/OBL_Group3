@@ -579,11 +579,8 @@ public class LibrarianController {
 				fromPicker.setDate(returnDatePicker.getValue().getDayOfMonth());
 				int fix = returnDatePicker.getValue().getMonthValue() == 1 ? 12 : returnDatePicker.getValue().getMonthValue()-1;
 				fromPicker.setMonth(fix);
-				System.out.println(returnDatePicker.getValue().getYear());
 				fromPicker.setYear(returnDatePicker.getValue().getYear()-1900);
-				System.out.println(fromPicker);
 				Timestamp toServer = new Timestamp(fromPicker.getTime());
-				System.out.println(toServer);
 				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
 				MyData toSend = new MyData("newBorrowRequest");
 				toSend.add("theBorrow", newBorrow);
@@ -596,10 +593,7 @@ public class LibrarianController {
 						SearchResultTable.getItems().remove(newCopyToBorrow);
 						SearchResultTable.getItems().add(index,(Book)((MyData)rc.getCC().getFromServer().getData("UpdatedBookAndBorrow")).getData("theCopy"));
 						ClientConsole.newAlert(AlertType.INFORMATION,null, "Borrow has been registered!" , "Borrow has been registered in the system!");
-						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));
-						System.out.println(getMember());
-						System.out.println(getMember().getMemberCard());
-						
+						getMember().setMemberCard((MemberCard)rc.getCC().getFromServer().getData("updatedMemberCard"));					
 					break;
 					case "borrowFailed":
 						ClientConsole.newAlert(AlertType.ERROR, null , "Something went wrong!", (String)rc.getCC().getFromServer().getData("reason"));
@@ -786,9 +780,7 @@ public class LibrarianController {
 				fromPicker.setDate(newReturnDate.getValue().getDayOfMonth());
 				int fix = newReturnDate.getValue().getMonthValue() == 1 ? 12 : newReturnDate.getValue().getMonthValue()-1;
 				fromPicker.setMonth(fix);
-				System.out.println(newReturnDate.getValue().getYear());
 				fromPicker.setYear(newReturnDate.getValue().getYear()-1900);
-				System.out.println(fromPicker);
 				Timestamp toServer = new Timestamp(fromPicker.getTime());
 				toSend.add("fromPicker", toServer);
 				rc.getCC().send(toSend);
@@ -926,9 +918,7 @@ public class LibrarianController {
     				fromPicker.setDate(dateBorrow.getValue().getDayOfMonth());
     				int fix = dateBorrow.getValue().getMonthValue() == 1 ? 12 : dateBorrow.getValue().getMonthValue()-1;
     				fromPicker.setMonth(fix);
-    				System.out.println(dateBorrow.getValue().getYear());
     				fromPicker.setYear(dateBorrow.getValue().getYear()-1900);
-    				System.out.println(fromPicker);
     				Timestamp toServer = new Timestamp(fromPicker.getTime());
 
     				Borrow newBorrow = new Borrow(newCopyToBorrow.getBookID() , member.getID(), new Timestamp(System.currentTimeMillis()) , toServer);
@@ -1218,7 +1208,6 @@ public class LibrarianController {
 		protected class BookManagement {
 			private Book book;
 	    	public BookManagement(Book book) {
-	    		System.out.println("book on management: "+book);
 	    		this.book=book;
 	    	}
 	    	/**
@@ -1547,9 +1536,8 @@ public class LibrarianController {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert an edition number. please insert now");
 	    			return;
 		    	}
-		    	if(!(printDate.getValue()==null)) {
-		    		System.out.println(printDate.getValue());
-		    		data.add("printDate", printDate.getValue());}
+		    	if(!(printDate.getValue()==null))
+		    		data.add("printDate", printDate.getValue());
 		    	else {
 		    		ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You didn't insert a print date. please insert now");
 	    			return;
@@ -1716,7 +1704,6 @@ public class LibrarianController {
 	    }
 	    @FXML
 	    void showMessage(MouseEvent event) {
-	    	System.out.println(messagesTV.getSelectionModel().getSelectedIndex());
 	    		contentTF.getChildren().clear();
 	    		Text header = new Text("Message Content:\n\n");
 	    		header.setFont(new Font("Calibri", 20));
