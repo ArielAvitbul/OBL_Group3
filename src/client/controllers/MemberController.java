@@ -336,6 +336,10 @@ public class MemberController {
 	    						switch(rc.getCC().getFromServer().getAction()) {
 	    						case "ExtensionSucceed":
 	    							ClientConsole.newAlert(AlertType.INFORMATION, null ,"Your borrow has been extended!", "your return date has been updated by your previous borrow length!");
+	    							rc.getCC().send(new MyData("search_member"));
+	    							MyData fromServer = rc.getCC().getFromServer();
+	    							member = (Member)fromServer.getData("member");
+	    							initialize();
 	    							break;
 	    						case "ExtensionFailed":
 	    							ClientConsole.newAlert(AlertType.ERROR, null ,"Extension Failed!", (String)rc.getCC().getFromServer().getData("reason"));
