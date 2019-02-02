@@ -127,6 +127,13 @@ public class ReaderController {
     private ImageView loginPicture;
     @FXML
     private ImageView loginButton;
+    
+    private boolean isIn(Pane pane, String id) {
+    	for (Node n : pane.getChildren())
+    		if (n.getId().equals(id))
+    			return true;
+    	return false;
+    }
     /**
      * This method removes objects from a pane
      * @param pane pane to remove from
@@ -493,8 +500,8 @@ public class ReaderController {
 		    @FXML
 		    void submitSearch(MouseEvent  event) {
 		    	tableBooks.getItems().clear();
-		    	if (this.mc!=null)
-		        	addTo(underTable,new MyImage("inbox","client/images/buttons/orderBook.jpg", e->mc.orderBook(tableBooks.getSelectionModel().getSelectedItem())),true); // add Logout button
+		    	if (this.mc!=null && !isIn(underTable, "orderBook"))
+		        	addTo(underTable,new MyImage("orderBook","client/images/buttons/orderBook.jpg", e->mc.orderBook(tableBooks.getSelectionModel().getSelectedItem())),true); // add Logout button
     	    	ArrayList<String> freeTxt = new ArrayList<String>(Arrays.asList(freeTextField.getText().split(" ")));
 	    	    	tableBooks.getItems().addAll(getSearchResults(nameField.getText(),authorsField.getText(),freeTxt,GenrePane));
 	    	    	//orderBookButton.setVisible(true);

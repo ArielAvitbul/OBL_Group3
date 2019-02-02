@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import common.Book;
 import common.Borrow;
 import common.CopyInBorrow;
+import common.Member;
 import common.MyData;
 import common.SendMail;
 import ocsf.server.AbstractServer;
@@ -343,12 +344,8 @@ public class EchoServer extends AbstractServer
 	  		    	client.sendToClient(serverCont.login(data));
 	  		    	break;
 	  		  case "saveInfo":
-	  			  MyData normalSave = serverCont.saveInfo((Integer)data.getData("id"),(String)data.getData("firstName"),(String)data.getData("lastName"),(String)data.getData("password"),(String)data.getData("email"),(String)data.getData("phone"));
-	  			  if (normalSave.getAction().equals("success") && data.getData().containsKey("admin")) { // Member Management saveInfo
-	  				// TODO: add change log
-	  				  client.sendToClient(serverCont.saveInfoAdmin((Integer)data.getData("id"), (String)data.getData("username"), (String)data.getData("status")));
-	  		    	} else // Member Area saveInfo
-	  		    		client.sendToClient(normalSave);
+	  			  Member member = (Member)data.getData("member");
+	  		    		client.sendToClient(serverCont.saveInfo(member.getID(),member.getUserName(),member.getMemberCard().getFirstName(),member.getMemberCard().getLastName(),member.getPassword(),member.getMemberCard().getEmailAddress(),member.getMemberCard().getPhoneNumber(),member.getStatus().toString()));
 	  		    	break;
 	  		    case "orderBook":
 	  		    	client.sendToClient(serverCont.orderBook(((Integer)data.getData("id")), (Book)data.getData("book")));

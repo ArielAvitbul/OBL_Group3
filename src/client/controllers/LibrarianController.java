@@ -206,57 +206,36 @@ public class LibrarianController {
          * @param event - MouseEvent
          */
         @FXML
+        private GridPane infoGrid;
+        @FXML
         void saveMemberInfo(MouseEvent event) {
 	    		MyData data = new MyData("saveInfo");
-	    		data.add("admin", librarian.getID()); 
-	    		data.add("id", Integer.parseInt(idField.getText()));
-	    		if(usernameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the userName. please insert now");
+	    		for (Node n : infoGrid.getChildren()) {
+	    			if ((n instanceof TextField || n instanceof PasswordField) && ((TextField)n).getText().isEmpty()) {
+	    				ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Some information is missing, please try again after fixing the issue.");
 	    			return;
+	    			}
 	    		}
-	    		else
-	    			data.add("username", usernameField.getText());
-	    		if(passwordField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the password. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("password", passwordField.getText());
-	    		if(firstnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the first name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("firstName", firstnameField.getText());
-	    		if(lastnameField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the last name. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("lastName", lastnameField.getText());
-	    		if(emailField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the email address. please insert now");
-	    			return;
-	    		}
-	    		else
-	    			data.add("email", emailField.getText());
-	    		if(phoneField.getText().equals("")) {
-	    			ClientConsole.newAlert(AlertType.ERROR, null, "Error", "You deleted the phone number. please insert now");
-	    			return;
-	    		}
-	    		data.add("phone", phoneField.getText());
-	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
+	    		Member tempMember = member; //incase of a failure
+	    		member.setUserStatus(statusBox.getSelectionModel().getSelectedItem());
+	    		member.setUserName(usernameField.getText());
+	    		member.setPassword(passwordField.getText());
+	    		member.getMemberCard().setFirstName(firstnameField.getText());
+	    		member.getMemberCard().setLastName(lastnameField.getText());
+	    		member.getMemberCard().setEmailAddress(emailField.getText());
+	    		member.getMemberCard().setPhoneNumber(phoneField.getText());
+	    		data.add("member", member);
 	    		if(checkFields()==1) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Success", "Your information was successfuly saved.");
-	    			member = ((Member)(((MyData)rc.getCC().getFromServer().getData("updatedMember"))).getData("member"));
 	    			break;
 	    		case "fail":
 	    		default:
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
+	    			member=tempMember;
 	    			break;
 	    		}
 	    		
