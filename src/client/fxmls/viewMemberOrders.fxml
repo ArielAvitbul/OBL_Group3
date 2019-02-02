@@ -21,7 +21,7 @@
       </ImageView>
       <ImageView fx:id="ExtensionHeader" layoutX="313.0" layoutY="22.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../images/texts/titles/reservations.png" />
+            <Image url="@../images/texts/titles/arrivedOrders.png" />
          </image>
       </ImageView>
       <DatePicker fx:id="dateBorrow" layoutX="379.0" layoutY="327.0" />

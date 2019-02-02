@@ -348,9 +348,12 @@ ResultSet rs1 = db.select("SELECT * FROM copy_in_borrow where BookID ='" + book.
 if(!db.hasResults(rs1)) {
 	String query1 = "UPDATE books SET deleted = '1' WHERE bookID= '"+book.getBookID()+"'";
 	db.updateWithExecute(query1);
+	File file = new File("./src/server/TableOfContents/"+book.getBookID()+".pdf");
+	file.delete();
 	data.setAction("succeed");
 	data.add("succeed", "Return book is succeed");
 	return data;
+	
 }
 else {
 data.setAction("book_in_borrow");
