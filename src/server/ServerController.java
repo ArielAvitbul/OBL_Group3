@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 
-import client.ClientConsole;
 import common.Book;
 import common.BookReservation;
 import common.Borrow;
@@ -35,19 +34,39 @@ import common.MyData;
 import common.MyFile;
 import common.SendMail;
 import common.Violation;
-import javafx.scene.control.Alert.AlertType;
 
+/**
+ * a controller for the server
+ * @author Ariel
+ *
+ */
 public class ServerController {
+	/**
+	 * Builder for our server controller
+	 * runs and controls all the methods for server
+	 * @author Ariel
+	 *
+	 */
 	public ServerController(MyDB db) {
 		this.db=db;
 	}
 	final MyDB db;
-	
+	/**
+	 * This function calculates the difference between 2 days and returns it in a long value
+	 * @author Ariel
+	 * @param d2 bigger date
+	 * @param d1 smaller date
+	 * @return
+	 */
 	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {
 	    long diff = d2.getTime() - d1.getTime();
 	    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
-	
+	/**
+	 * returns all the books in the database (not including deleted ones)
+	 * @author Ariel
+	 * @return
+	 */
 	public ArrayList<Book> getAllBooks() {
 		ArrayList<Book> books = new ArrayList<>();
 		try {
@@ -61,6 +80,13 @@ public class ServerController {
 		}
 		return books;
 	}
+	/**
+	 * return a Book by bookID
+	 * @author Ariel
+	 * @param bookID book's bookID
+	 * @return
+	 * @throws SQLException
+	 */
 	public Book getBook(int bookID) throws SQLException {
 		ResultSet rs = db.select("SELECT * from books WHERE deleted = '0' AND bookid="+ bookID);		if (db.hasResults(rs))
 			return new Book(rs.getInt("bookID"), rs.getString("bookName"), rs.getString("authorsNames"), rs.getFloat("editionNumber"), rs.getDate("printDate"), rs.getString("topics"), rs.getString("shortDescription"), rs.getInt("numberOfCopies"), rs.getDate("purchaseDate"), rs.getString("shelfLocation"), rs.getBoolean("isPopular"),rs.getInt("currentNumberOfCopies"));
@@ -304,6 +330,13 @@ public MyData getTableOfContents(MyData data) throws SQLException {
 		return data;
 		
 	}
+/**
+ * returns a list of all the reserved books for the memberID in data
+ * @author Ariel
+ * @param data
+ * @return
+ * @throws SQLException
+ */
 public MyData getOrderBooks(MyData data) throws SQLException {
 	ArrayList<Book> returnBookList = new ArrayList<>();
 	int flag =0;
@@ -386,7 +419,13 @@ else {
 	return data;
 	}
 }
-
+/**
+ * returns a specific borrow using it's borrowID
+ * @author Ariel
+ * @param borrowID
+ * @return
+ * @throws SQLException
+ */
 public Borrow getBorrow(int borrowID) throws SQLException {
 	ResultSet rs = db.select("SELECT * from borrows WHERE borrowID="+ borrowID);
 	rs.next();
@@ -409,7 +448,16 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return true; // if one of the strings is empty, then there's nothing to check and it will get here, so just return true.
 		}
 	}
-	
+	/**
+	 * Searches a book in the database
+	 * @author Ariel
+	 * @param genres
+	 * @param bookName
+	 * @param authorsName
+	 * @param freeTxt
+	 * @return
+	 * @throws SQLException
+	 */
 	public MyData searchBook(ArrayList<String> genres, String bookName, String authorsName , ArrayList<String>freeTxt) throws SQLException {
 		MyData ret = new MyData("result");
 		ArrayList<Book> result = new ArrayList<>();
@@ -432,7 +480,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		ret.add("search_results", result);
 		return ret;
 	}
-	
+	/**
+	 * This function is used by searchBook, it handles free text result management
+	 * @author Ariel
+	 * @param b - related book
+	 * @param freeTxt - free text
+	 * @return
+	 */
 	public boolean resultByFreeText(Book b , ArrayList<String> freeTxt) {
 		boolean result = false;
 		for(String s : freeTxt) {
@@ -665,7 +719,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		ret.setAction("success");
 		return ret;
 	}
-	
+	/**
+	 * handles book update
+	 * @author Ariel
+	 * @param data - data recieved from client
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
 	public MyData updateBook(MyData data) throws SQLException, IOException  {
 		MyData bookToUpdate;
 
@@ -705,8 +766,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		bookToUpdate.add("reason", new String("there was an error"));
 		return bookToUpdate;
 	}
-	
-	public MyData getActivityReports() throws SQLException {
+	/**
+	 * gets all the activity reports dates from database
+	 * @author Ariel
+	 * @return activity report dates used to show old activity reports
+	 * @throws SQLException
+	 */
+	public MyData getActivityReportDates() throws SQLException {
 		MyData data = new MyData("result");
 		ResultSet rs = db.select("SELECT time from activity_reports");
 		if (db.hasResults(rs)) {
@@ -715,6 +781,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		} else data.setAction("Failure");
 		return data;
 	}
+	/**
+	 * Gets real-time information from server used to generate real-time reports
+	 * @author Ariel
+	 * @param data
+	 * @return
+	 * @throws SQLException
+	 */
 	public MyData report(MyData data) throws SQLException {
 		ResultSet rs;
 		float avg=0;
@@ -1009,6 +1082,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			 }
 			 return data;
 		  }
+		/**
+		 * gets a username related to a userid from database
+		 * @author Ariel
+		 * @param userid
+		 * @return Username
+		 * @throws SQLException
+		 */
 		public String getUserName(int userid) throws SQLException {
 			if (userid==0)
 				return "System";
@@ -1050,7 +1130,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return toReturn;
 		}
 		/**
-		 * 
+		 *  adds a violation to database
 		 * @param data - the violation we want to add to the table
 		 * @return MyData- success / failed
 		 */
@@ -1086,6 +1166,13 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			return new MyData("failed");
 		}
 
+		/**
+		 * deal with librarian's function of order borrow 
+		 * @author Ariel
+		 * @param bookAndBorrow - holds book & borrow instances
+		 * @return result
+		 * @throws SQLException
+		 */
 		public MyData orderBorrowRequest(MyData bookAndBorrow) throws SQLException {
 			MyData data = writeNewBorrow(bookAndBorrow);
 			String deleteQuery = "DELETE FROM book_reservations WHERE bookID= ? AND memberID = ?";
@@ -1153,16 +1240,29 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		}
 		
 		/**
-		 *  Writes a message from System
-		 *  if from is 0, that means it's a System Message
+		 * Writes a message to inbox
 		 * @author Ariel
-		 * @param to - 1 : Managers, 2 : Librarians
-		 * @param toUpdate - relevant copy in borrow
+		 * @param from (0=System)
+		 * @param to (1=Manager inbox,2=Librarian inbox)
+		 * @param subject
+		 * @param content
 		 * @throws SQLException
 		 */
 		protected void writeMsg(int from, int to, String subject, String content) throws SQLException {
 			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content) VALUES("+from+","+to+",'"+subject+"','"+content+"')");
 		}
+		/**
+		 * 
+		 * @author Ariel
+		 * @param from (0=System)
+		 * @param to (1=Manager inbox,2=Librarian inbox)
+		 * @param subject
+		 * @param content
+		 * @param action - Name of action
+		 * @param regarding - user action regards
+		 * @return success/fail
+		 * @throws SQLException
+		 */
 		protected boolean writeMsg(int from, int to, String subject, String content,String action, int regarding) throws SQLException {
 			PreparedStatement rs = db.update("INSERT INTO messages(sender,reciever,subject,content,action,regarding) VALUES(?,?,?,?,?,?)");
 			rs.setInt(1, from);
