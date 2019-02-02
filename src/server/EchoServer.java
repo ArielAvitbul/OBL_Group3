@@ -61,6 +61,11 @@ public class EchoServer extends AbstractServer
 	listen();
 	initialize();
   }
+  /**
+   * 
+   * @author Ariel
+   * @throws SQLException
+   */
   private void initialize() throws SQLException {
 	  serverCont = new ServerController(db);
 	  db.updateWithExecute("UPDATE members set loggedin=0");
@@ -299,7 +304,7 @@ public class EchoServer extends AbstractServer
   		    	client.sendToClient(save);
 	  			break;
 	  			case "getActivityReports":
-		  			client.sendToClient(serverCont.getActivityReports());
+		  			client.sendToClient(serverCont.getActivityReportDates());
 		  			break;
 	  		    case "Activity Report":
 	  		    case "Borrow Report":

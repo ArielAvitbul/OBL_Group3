@@ -4,7 +4,7 @@ import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 /**
- * 
+ * This class handles a dynamic addition of a ImageView node to a pane and add functionality to it.
  * @author Ariel
  *
  */

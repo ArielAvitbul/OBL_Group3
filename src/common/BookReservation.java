@@ -2,7 +2,11 @@ package common;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-
+/**
+ * This class represents a book reservation in the system
+ * @author Good Guy
+ *
+ */
 
 public class BookReservation implements Serializable{
 

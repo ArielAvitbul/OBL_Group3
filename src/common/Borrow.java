@@ -5,6 +5,11 @@ import java.sql.Timestamp;
 
 import javafx.beans.property.SimpleObjectProperty;
 
+/**
+ * This class represents a Borrow in the system
+ * @author Good Guy
+ *
+ */
 public class Borrow implements Serializable {
 
 

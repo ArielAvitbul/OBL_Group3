@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.sql.Date;
 
 //import common.Member.Status;
-
+/**
+ * This class represents a member's violation in the system.
+ * @author Good Guy
+ *
+ */
 public class Violation implements Serializable	{
 
 	public enum Type

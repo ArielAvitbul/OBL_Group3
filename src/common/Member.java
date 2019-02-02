@@ -1,7 +1,11 @@
 package common;
 
 import java.io.Serializable;
-
+/**
+ * This class represents a Member in the system
+ * @author Good Guy
+ *
+ */
 public class Member extends Reader implements Serializable
 {
 	

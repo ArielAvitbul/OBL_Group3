@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javafx.beans.property.SimpleStringProperty;
-
+/**
+ *This class represents a book in the system 
+ * @author Good Guy
+ *
+ */
 public class Book implements Serializable{
 
 	private int bookID;

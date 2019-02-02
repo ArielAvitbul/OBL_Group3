@@ -1,5 +1,9 @@
 package common;
-
+/**
+ * This class represents a Librarian in the system
+ * @author Good Guy
+ *@see Member
+ */
 public class Librarian extends Member{
 
 	public enum levels

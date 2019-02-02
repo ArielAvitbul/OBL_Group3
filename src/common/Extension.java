@@ -1,7 +1,11 @@
 package common;
 
 import java.sql.Timestamp;
-
+/**
+ * This class represents an Extension for a certain borrow in the system
+ * @author Good Guy
+ *
+ */
 public class Extension {
 
 	private final int memberID;
