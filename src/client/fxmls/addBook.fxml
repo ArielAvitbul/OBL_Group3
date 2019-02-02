@@ -11,12 +11,10 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="myPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="myPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="addImage" layoutX="31.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="addImage" layoutX="348.0" layoutY="43.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/texts/titles/addBook.png" />
          </image>
@@ -27,52 +25,12 @@
       <TextField fx:id="shortDescription" layoutX="599.0" layoutY="93.0" />
       <TextField fx:id="numberOfCopies" layoutX="599.0" layoutY="149.0" />
       <TextField fx:id="shelfLocation" layoutX="599.0" layoutY="204.0" />
-      <Text layoutX="14.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name of book:" wrappingWidth="115.99999237060547">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="14.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="author(s):" wrappingWidth="88.53674232959747">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="14.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edition number:" wrappingWidth="126.39998161792755">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="14.0" layoutY="278.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date of print:" wrappingWidth="115.99998772144318">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="14.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Topic" wrappingWidth="115.99998772144318">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="396.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Short description:" wrappingWidth="148.7999975681305">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="396.0" layoutY="165.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Number of copies:" wrappingWidth="148.79999756813038">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="396.0" layoutY="222.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Shelf location:" wrappingWidth="155.73678588867188">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <Text layoutX="396.0" layoutY="278.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Popularity " wrappingWidth="202.13678076863278">
-         <font>
-            <Font name="System Bold" size="16.0" />
-         </font>
-      </Text>
-      <GridPane fx:id="genresPane" layoutX="98.0" layoutY="318.0" prefHeight="86.0" prefWidth="200.0">
+      <ImageView layoutX="4.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/bookname.png" />
+         </image>
+      </ImageView>
+      <GridPane fx:id="genresPane" layoutX="142.0" layoutY="315.0" prefHeight="90.0" prefWidth="192.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -98,10 +56,56 @@
       </ImageView>
       <DatePicker fx:id="printDate" layoutX="144.0" layoutY="259.0" prefHeight="26.0" prefWidth="149.0" />
       <ChoiceBox fx:id="popularChoice" layoutX="598.0" layoutY="258.0" prefWidth="150.0" />
-      <Button fx:id="chooseFileButton" layoutX="599.0" layoutY="318.0" mnemonicParsing="false" onAction="#chooseFile" text="Choose File" />
+      <Button fx:id="chooseFileButton" layoutX="761.0" layoutY="318.0" mnemonicParsing="false" onAction="#chooseFile" text="Choose File" />
       <ImageView fx:id="back_memberManagement" layoutX="768.0" layoutY="23.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
+      <TextField fx:id="fileNameAddBook" editable="false" layoutX="599.0" layoutY="318.0" />
+      <ImageView layoutX="9.0" layoutY="148.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/author(s).png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="4.0" layoutY="203.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/Editionnumber.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="4.0" layoutY="259.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/Date_of_print.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="9.0" layoutY="346.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/topic.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="416.0" layoutY="91.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/description.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="402.0" layoutY="147.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/copies.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="416.0" layoutY="202.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/Shelf_location.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="416.0" layoutY="256.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/Popularity-.png" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="403.0" layoutY="316.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/Table_of_content.png" />
          </image>
       </ImageView>
    </children>

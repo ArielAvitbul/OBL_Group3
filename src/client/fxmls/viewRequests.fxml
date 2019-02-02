@@ -11,16 +11,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fx:id="back_memberManagement" layoutX="767.0" layoutY="26.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="back_memberManagement" layoutX="766.0" layoutY="32.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/back.jpg" />
          </image>
       </ImageView>
-      <VBox layoutX="14.0" layoutY="32.0" prefHeight="385.0" prefWidth="481.0" spacing="30.0">
+      <VBox layoutX="206.0" layoutY="57.0" prefHeight="379.0" prefWidth="482.0" spacing="30.0">
          <children>
-            <Label text="Select the borrow you want to extend:" textFill="#9a8f8f">
+            <Label prefHeight="28.0" prefWidth="391.0" text="Select the borrow you want to extend:" textFill="#9a8f8f">
                <font>
                   <Font name="Calibri" size="24.0" />
                </font>
@@ -62,5 +62,10 @@
             </VBox>
          </children>
       </VBox>
+      <ImageView layoutX="304.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/titles/Manual_Extension.png" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>
