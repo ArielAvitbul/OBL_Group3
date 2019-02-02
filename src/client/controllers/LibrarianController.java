@@ -136,7 +136,7 @@ public class LibrarianController {
 
     	@FXML
 	    void replacePage(MouseEvent event) {
-    		if(checkPossibility( event)==0)
+    		if(checkPossibility(event)==0)
     			return;
     		else
     			rc.setBottom(event);
@@ -148,11 +148,11 @@ public class LibrarianController {
   	  private int checkPossibility(MouseEvent event) {
 	
 	    	if (member.getStatus().equals(Member.Status.FREEZE) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
-	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is freeze. He can't borrow any book");
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is freezed. He can't borrow any book");
 	    		return 0;
 	    	}
 	    	if (member.getStatus().equals(Member.Status.LOCK) && (((ImageView)event.getSource()).getId().equals("borrowCopy"))) {
-	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is lock. He can't borrow any book");
+	    		ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "This user is locked. He can't borrow any book");
 	    		return 0;
 	    	}
 	    	return 1;
@@ -494,7 +494,7 @@ public class LibrarianController {
 	    	    	dateSelector.setVisible(false);
 	    	    	submitBorrow.setVisible(false);
 	    			SearchResultTable.setVisible(false);
-	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No book came up in the search!", (String)rc.getCC().getFromServer().getData("reason"));
+	    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No book came up in the search!", "No results");
 	    			nameField.clear();
 	    			authorsField.clear();
 		    	}
@@ -626,7 +626,7 @@ public class LibrarianController {
 	    				returnsTable.getItems().addAll(returnBookList);
 	    			}
 	    			else if (result.equals("unfind_borrows_Book")) {
-		    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No books found", (String)rc.getCC().getFromServer().getData("reason"));
+	    				returnsTable.setPlaceholder(new Label("No Active Borrows!"));
 		    			isEmpty = 1;
 		    			}
 	    		}
@@ -863,7 +863,7 @@ public class LibrarianController {
 	    				ExtensionCurrBooks.getItems().addAll(returnBookList);
 	    			}
 	    			else if (result.equals("unfind_borrows_Book")) {
-		    			ClientConsole.newAlert(AlertType.INFORMATION, null, "No books found", (String)rc.getCC().getFromServer().getData("reason"));
+	    				ExtensionCurrBooks.setPlaceholder(new Label ("No books arrived"));
 
 		    			}
     	    }
@@ -1286,6 +1286,8 @@ public class LibrarianController {
 	    	    private GridPane genrePane;
 
 	    	    @FXML
+	    	    private TextField fileName;
+	    	    @FXML
 	    	    void entered(MouseEvent event) {
 	    	    	rc.mouseEntered(event);
 	    	    }
@@ -1313,7 +1315,7 @@ public class LibrarianController {
 		    		newFile = fileChooser.showOpenDialog(null);
 
 		    		if (newFile != null) {
-
+		    			fileName.setText(newFile.getName());
 		    			System.out.println("File selected: " + newFile.getName());
 		    		}
 		    		else {
@@ -1431,6 +1433,8 @@ public class LibrarianController {
 	        private AnchorPane myPane;
 
 	        @FXML
+	        private TextField fileNameAddBook;
+	        @FXML
 	        private ImageView addImage;
 
 	        @FXML
@@ -1502,7 +1506,7 @@ public class LibrarianController {
 	    		newFile = fileChooser.showOpenDialog(null);
 
 	    		if (newFile != null) {
-
+	    			fileNameAddBook.setText(newFile.getName());
 	    			System.out.println("File selected: " + newFile.getName());
 	    		}
 	    		else {

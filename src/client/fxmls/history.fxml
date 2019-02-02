@@ -5,16 +5,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Text layoutX="275.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="MEMBER HISTORY" textAlignment="CENTER" wrappingWidth="349.3366947174072">
-         <font>
-            <Font name="System Bold" size="36.0" />
-         </font>
-      </Text>
       <TableView fx:id="BorrowTable" layoutX="199.0" layoutY="130.0" prefHeight="200.0" prefWidth="502.0">
         <columns>
           <TableColumn fx:id="colType" editable="false" prefWidth="178.39999389648438" text="Type" />
@@ -25,6 +18,11 @@
       <ImageView fx:id="back_memberArea" layoutX="774.0" layoutY="29.0" onMouseEntered="#entered" onMouseExited="#exited" onMouseReleased="#goBack" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/buttons/back.jpg" />
+         </image>
+      </ImageView>
+      <ImageView layoutX="305.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../images/texts/titles/history.png" />
          </image>
       </ImageView>
    </children>
