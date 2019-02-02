@@ -1,3 +1,6 @@
+/**
+ * Java doc for server
+ */
 package server;
 
 import java.io.BufferedInputStream;
@@ -159,8 +162,7 @@ public class ServerController {
 	}
 	/** this method inserts a new user to the database
 	 * @param data - MyData instance with details to write
-	 * @throws SQLException 
-	 * @returns MyData instance with the result
+	 * @return MyData instance with the result
 	 * @author Ariel
 	 * */
 	public MyData createUser(MyData data) {

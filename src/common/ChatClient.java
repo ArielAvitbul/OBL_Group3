@@ -52,7 +52,7 @@ public class ChatClient extends AbstractClient
   /**
    * This method handles all data that comes in from the server.
    *
-   * @param msg The message from the server.
+   * @param o The message from the server.
    */
   public synchronized void handleMessageFromServer(Object o) 
   {
@@ -63,7 +63,7 @@ public class ChatClient extends AbstractClient
   /**
    * This method handles all data coming from the UI            
    *
-   * @param message The message from the UI.    
+   * @param o The message from the UI.    
    */
   public synchronized void handleMessageFromClientUI(Object o)  
   {

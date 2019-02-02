@@ -17,6 +17,7 @@ public interface CommonIF
   /**
    * Method that when overriden is used to display objects onto
    * a UI.
+   * @param o object to handle
    */
   public abstract void handle(Object o);
 }

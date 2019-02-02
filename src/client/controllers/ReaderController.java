@@ -27,7 +27,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -52,7 +51,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
 /**
  * Handles all reader's functionality
  * @author Ariel
@@ -61,10 +59,9 @@ import javafx.stage.Stage;
 public class ReaderController {
 	private ClientConsole cc;
 	private HashMap<String,Object> controllers;
-	public Label welcomeMsg;
 	/**
-	 * Builder for reader controller
-	 * @param cc - a link to the client console, mostly for using send & fromServer
+	 * builds ReaderController
+	 * @param cc - ClientConsole, links to client usage
 	 */
 	public ReaderController(ClientConsole cc) {
 		this.cc = cc;
@@ -99,8 +96,8 @@ public class ReaderController {
 	}
 	/**
 	 * function that get two dates and calculate the difference between the two days.
-	 * @param d2
-	 * @param d1
+	 * @param d2 - bigger date
+	 * @param d1 - smaller date
 	 * @return the difference between teh dates
 	 */
 	public static long getDifferenceDays(java.util.Date d2,java.util.Date d1) {

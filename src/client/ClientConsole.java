@@ -146,7 +146,7 @@ public class ClientConsole extends Application implements CommonIF
 	 * @param title Alert title
 	 * @param header Alert Header
 	 * @param content Alert Content
-	 * @return 
+	 * @return a ButtonType used for confirmation
 	 */
 	public static ButtonType newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
