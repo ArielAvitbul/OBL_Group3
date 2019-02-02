@@ -2,7 +2,12 @@ package common;
 
 import java.io.Serializable;
 import java.util.HashMap;
-
+/**
+ * This class represents a Data transfered between client and server.
+ * contains an HashMap with the relevant objects.
+ * @author Ariel
+ *
+ */
 public class MyData implements Serializable{
 	private String action;
 	private HashMap<String,Object> data;

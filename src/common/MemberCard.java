@@ -2,7 +2,12 @@ package common;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-
+/**
+ * This class represents a MemberCard in the system.
+ * The member card holds all of the member information, except of password , id ,username , status
+ * @author Good Guy
+ *
+ */
 public class MemberCard implements Serializable{
 	
 	private String firstName="";

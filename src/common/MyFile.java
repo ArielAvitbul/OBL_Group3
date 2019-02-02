@@ -1,7 +1,11 @@
 package common;
 
 import java.io.Serializable;
-
+/**
+ * This class represents a file transfered between client and server.
+ * @author Good Guy
+ *
+ */
 public class MyFile implements Serializable {
 	
 	private String Description=null;

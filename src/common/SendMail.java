@@ -10,7 +10,11 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
+/**
+ * This class handles the sending of mail reminders and messages.
+ * @author Good Guy
+ *
+ */
 public class SendMail {
 	      // Recipient's email ID needs to be mentioned.
 	      String to;

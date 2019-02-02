@@ -2,7 +2,11 @@ package common;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-
+/**
+ * This class represents all of the member's history of activities in the system
+ * @author Good Guy
+ *
+ */
 public class History implements Serializable {
 
 	private String name;

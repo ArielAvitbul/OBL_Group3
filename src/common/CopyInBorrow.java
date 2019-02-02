@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javafx.beans.property.SimpleStringProperty;
-
+/**
+ * This class is an association class between a book and borrow
+ * @author Good Guy
+ *
+ */
 public class CopyInBorrow implements Serializable {
 
 	private Book borroBook;

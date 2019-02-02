@@ -2,6 +2,12 @@ package common;
 
 import java.io.Serializable;
 import java.sql.Date;
+
+/**
+ * This class represents a Message in the system.
+ * @author Good Guy
+ *
+ */
 public class Message implements Serializable {
 	private final int msgID;
 	private String from;
