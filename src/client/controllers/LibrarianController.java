@@ -1397,11 +1397,14 @@ public class LibrarianController {
 							catch (Exception e) {
 								System.out.println("Error send (Files)msg) to Server");
 							}
+<<<<<<< HEAD
 		    	    	}
 		    	    	else 
 		    	    		 data.add("FileChose", false);
+=======
 		    	    	} else
 		    	    		data.add("FileChose", false);
+>>>>>>> master
 	    	    		rc.getCC().send(data);
 	    	    		switch (rc.getCC().getFromServer().getAction()) {
 	    	    		case "success":
