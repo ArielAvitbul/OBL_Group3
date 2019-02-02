@@ -99,9 +99,6 @@ public class EchoServer extends AbstractServer
    * @throws SQLException
    */
   private void checkLateReturns() throws SQLException {
-		String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID "
-				+ "FROM copy_in_borrow "
-				+ "INNER JOIN borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
 	  String MyQuery = "SELECT borrows.borrowDate, borrows.returnDate, borrows.memberID, borrows.borrowID, borrows.mailSend, borrows.3timesLate "
 				+ "FROM oblg3.copy_in_borrow "
 				+ "INNER JOIN oblg3.borrows ON copy_in_borrow.borrowID=borrows.borrowID ";
@@ -167,7 +164,6 @@ public class EchoServer extends AbstractServer
 								stmt4.executeUpdate();
 							}
 					}
-
 				}
 
 			}
