@@ -45,6 +45,12 @@ public class serverGUI extends Application
 
 	    @FXML
 	    private TextField portField;
+	    /**
+	     * Launches the server!
+	     * @author Ariel
+	     * @param event
+	     * @throws Exception
+	     */
     @FXML
     void launchServer(MouseEvent event) throws Exception {
     	try {
@@ -94,6 +100,15 @@ public class serverGUI extends Application
 				}
 			});
 	}
+	/**
+	 * create a new JavaFX gui alert
+	 * @author Ariel
+	 * @param type - alert type
+	 * @param title
+	 * @param header
+	 * @param content
+	 * @return ButtonType used for Confirmation
+	 */
 	public static Optional <ButtonType> newAlert(AlertType type, String title, String header, String content) {
 		Alert alert = new Alert(type);
 		alert.setTitle(title == null ? "OBL - Group 3" : title);
