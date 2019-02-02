@@ -151,8 +151,6 @@ public class MemberController {
 	     */
 	    @FXML
 	    void saveInfo(MouseEvent event) {
-	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    		if(checkFields()==1) {
 	    			MyData data = new MyData("saveInfo");
 	    			data.add("id", Integer.parseInt(idField.getText()));
 	    			if(firstnameField.getText().equals("")) {
@@ -186,6 +184,7 @@ public class MemberController {
 	    			else
 	    				data.add("phone", phoneField.getText());
 	    			if(checkFields()==1) {
+	    				if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
 	    			rc.getCC().send(data);
 	    			switch (rc.getCC().getFromServer().getAction()) {
@@ -201,7 +200,6 @@ public class MemberController {
 	    		}
 	    	}
 	    }
-	    	}
 	    }
 	    /**
 	     *

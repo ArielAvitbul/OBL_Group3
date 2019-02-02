@@ -1161,6 +1161,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		 * @throws SQLException
 		 */
 		protected void writeMsg(int from, int to, String content) throws SQLException {
-				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) ALUES("+from+","+to+","+content+")");
+				db.updateWithExecute("INSERT INTO messages(sender,reciever,content) VALUES("+from+","+to+","+content+")");
 		}
 }
