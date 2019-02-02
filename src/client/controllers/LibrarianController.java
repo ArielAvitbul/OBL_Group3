@@ -1345,8 +1345,6 @@ public class LibrarianController {
 	    	    		if (((CheckBox)p).isSelected())
 	    	    			genres.add(p.getId());
 	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    	    	
-	    	    	if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    	    		MyData data = new MyData("updateBook");
 	    	    		data.add("bookID", book.getBookID());
 	    	    		if(!editionNumber.getText().equals(""))
@@ -1417,7 +1415,6 @@ public class LibrarianController {
 	    	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
 	    	    			break;
 	    	    		}
-	    	    	}
 	    	    }
 
 
