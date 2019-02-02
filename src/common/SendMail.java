@@ -47,7 +47,7 @@ public class SendMail {
 				message.setSubject(Subject);
 				message.setText(msg);
 				Transport.send(message);
-				System.out.println("Mail sent to"+ toMail +", subject:"+ Subject);
+				System.out.println("Mail sent to "+ toMail +", subject:"+ Subject);
 
 			} catch (MessagingException e) {
 				throw new RuntimeException(e);

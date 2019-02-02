@@ -166,7 +166,7 @@ public class ServerController {
 			if (db.hasResults(localRS = db.select("SELECT * FROM managers where id = "+ rs.getInt("id")))) 
 				toReturn = new Manager(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),1);
 			else if (db.hasResults(localRS = db.select("SELECT * FROM librarians where id = "+ rs.getInt("id"))))
-				toReturn = new Librarian(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),localRS.getInt("permissionLevel"));
+				toReturn = new Librarian(rs.getInt("id"), rs.getString("username"), rs.getString("password"), localRS.getInt("workerNum"),localRS.getInt("permissionLevel"),Member.Status.valueOf(rs.getString("status")));
 			else // member
 				toReturn = new Member(rs.getInt("id"),rs.getString("username"),rs.getString("password"),Member.Status.valueOf(rs.getString("status")));
 			toReturn.setMemberCard(getMemberCard(rs.getInt("id")));
@@ -382,7 +382,7 @@ public MyData getClosedReturnBook(MyData data) throws SQLException {
 	}
 else {
 	data.setAction("fail");
-	data.add("fail", "The book is not borrow.");
+	data.add("fail", "The nearest return date is unknown at the moment.");
 	return data;
 	}
 }
@@ -905,7 +905,12 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 			java.util.Date today = new java.util.Date();
 			Timestamp sqlDate = new Timestamp(today.getTime());
 			java.util.Date returnDate = new java.util.Date(copy.getNewBorrow().getReturnDate().getTime());
-			if(today.after(returnDate))
+			boolean graduated = false;
+			String queryGraduated = "SELECT graduated FROM members WHERE id="+copy.getNewBorrow().getMemberID();
+			ResultSet gradRs = db.select(queryGraduated);
+			if(db.hasResults(gradRs)) 
+				graduated = gradRs.getBoolean("graduated");
+			else if(today.after(returnDate))
 			{
 				int lates;
 				String query = "SELECT lateReturns FROM member_cards WHERE userID="+copy.getNewBorrow().getMemberID();
@@ -918,7 +923,6 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 						db.updateWithExecute(query1);
 					}
 				}
-			
 			}
 		
 			String query = "UPDATE borrows SET actualReturnDate = ? WHERE borrowID= '"+copy.getNewBorrow().getBorrowID()+"'";
@@ -954,6 +958,17 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				stmt3.setInt(1, 1);
 				stmt3.executeUpdate();
 			}
+			if(graduated)
+			{
+				queryGraduated = "select borrowID from borrows where actualReturnDate is null AND memberID="+copy.getNewBorrow().getMemberID();
+				gradRs = db.select(queryGraduated);
+				if(!db.hasResults(gradRs)) {
+					queryGraduated = "UPDATE members SET status=? WHERE id="+copy.getNewBorrow().getMemberID();
+					PreparedStatement ps = db.update(queryGraduated);
+					ps.setString(1, "LOCK");
+					ps.executeUpdate();
+				}
+			}
 			data.setAction("succeed");
 			data.add("succeed", "Return book is succeed");
 			return data;
@@ -980,7 +995,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 				 return data;
 			}
 			 // check is student has copies in borrow
-			status = db.select("SELECT * FROM borrows join copy_in_borrow WHERE borrows.borrowID=copy_in_borrow.BookID AND memberID="+studentid).next() ? 1 : 2;
+			status = db.select("SELECT * FROM borrows join copy_in_borrow WHERE borrows.borrowID=copy_in_borrow.borrowID AND memberID="+studentid).next() ? 1 : 2;
 			 PreparedStatement ps = db.update("UPDATE members SET graduated=?,status=? where id=?");
 			 ps.setBoolean(1, true);
 			 ps.setString(2, Member.Status.values()[status].toString());
@@ -1148,7 +1163,14 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		protected void writeMsg(int from, int to, String subject, String content) throws SQLException {
 			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content) VALUES("+from+","+to+",'"+subject+"','"+content+"')");
 		}
-		protected void writeMsg(int from, int to, String subject, String content,String action, Integer regarding) throws SQLException {
-			db.updateWithExecute("INSERT INTO messages(sender,reciever,subject,content,action,regarding) VALUES("+from+","+to+",'"+subject+"','"+content+"','"+action+"',"+regarding+")");
+		protected boolean writeMsg(int from, int to, String subject, String content,String action, int regarding) throws SQLException {
+			PreparedStatement rs = db.update("INSERT INTO messages(sender,reciever,subject,content,action,regarding) VALUES(?,?,?,?,?,?)");
+			rs.setInt(1, from);
+			rs.setInt(2, to);
+			rs.setString(3, subject);
+			rs.setString(4, content);
+			rs.setString(5, action);
+			rs.setInt(6, regarding);
+			return rs.executeUpdate()==1;
 	}
 }

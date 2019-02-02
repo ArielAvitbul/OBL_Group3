@@ -165,7 +165,7 @@ public class LibrarianController {
 		}
     	@FXML
     	void initialize() {
-    		if (librarian instanceof Manager) 
+    		if (librarian instanceof Manager && !(member instanceof Manager))
     			statusBox.getItems().addAll(Member.Status.values());
     		else
     			statusBox.getItems().add(member.getStatus());
@@ -751,8 +751,15 @@ public class LibrarianController {
     	     */
     	    @FXML
     	    void manualyExtend(MouseEvent event) {
+    	    	if (borrowsTV.getSelectionModel().getSelectedItem()==null)
+    	    		return;
     	    	MyData toSend = new MyData("BorrowToExtend");
     	    	toSend.add("TheCopyInBorrow", borrowsTV.getSelectionModel().getSelectedItem());
+    	    	if(borrowsTV.getSelectionModel().getSelectedItem().getBorroBook().isPopular()) {
+    	    		ClientConsole.newAlert(AlertType.ERROR, null , "Popular Book", "this book is popular therfore you cannot extend your borrow!");
+    	    		initialize();
+    	    		return;
+    	    	}
     	    	toSend.add("requester", "employee");
 				Date fromPicker = new Date();
 				fromPicker.setDate(newReturnDate.getValue().getDayOfMonth());

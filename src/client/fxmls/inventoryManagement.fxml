@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.image.Image?>
@@ -36,9 +40,9 @@
             <Image url="@../images/buttons/back.jpg" />
          </image>
       </ImageView>
-      <ImageView fitHeight="32.0" fitWidth="386.0" layoutX="258.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutX="258.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../../../../src/client/images/texts/titles/inventoryManagement.png" />
+            <Image url="@../images/texts/titles/inventoryManagement.png" />
          </image>
       </ImageView>
    </children>
