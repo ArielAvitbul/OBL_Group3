@@ -248,7 +248,6 @@ public class LibrarianController {
 	    		data.add("status", statusBox.getSelectionModel().getSelectedItem().toString());
 	    		if(checkFields()==1) {
 	    			if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.") == ButtonType.OK) {
-	    		if (ClientConsole.newAlert(AlertType.CONFIRMATION, "", "Are you sure you wanna save these changes?", "Once changed, the old information would be lost.")== ButtonType.OK) {
 	    		rc.getCC().send(data);
 	    		switch (rc.getCC().getFromServer().getAction()) {
 	    		case "success":
@@ -260,7 +259,7 @@ public class LibrarianController {
 	    			ClientConsole.newAlert(AlertType.INFORMATION, "", "Failed", "Something went wrong, your information was not saved.");
 	    			break;
 	    		}
-	    		}
+	    		
 	    	}
         }
         }
