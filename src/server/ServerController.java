@@ -1171,7 +1171,7 @@ public Borrow getBorrow(int borrowID) throws SQLException {
 		/**
 		 * deal with librarian's function of order borrow 
 		 * @author Ariel
-		 * @param bookAndBorrow - holds book & borrow instances
+		 * @param bookAndBorrow - holds book and borrow instances
 		 * @return result
 		 * @throws SQLException
 		 */

@@ -192,7 +192,7 @@ public class EchoServer extends AbstractServer
 	  return TimeUnit.HOURS.convert(d1.getTime()-d2.getTime(), TimeUnit.MILLISECONDS);
   }
   /**
-   * @Author Feldman
+   * @author Feldman
    * function get two dates and return the difference between them.
    * @param d2 - Date
    * @param d1 - Date
@@ -267,7 +267,7 @@ public class EchoServer extends AbstractServer
   /**
    * This method handles any messages received from the client.
    *
-   * @param msg The message received from the client.
+   * @param o The Object received from the client.
    * 
    * @param client The connection from which the message originated.
    */
